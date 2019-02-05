@@ -1,0 +1,31 @@
+.wrapper-header {
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f1f5;
+    .header-icon {
+        display: block;
+        color: #c4c6cc;
+        font-size: 1.2rem;
+        margin: 0 2rem 0 0;
+        line-height: 2rem;
+    }
+    .header-avatar {
+        width: 2rem;
+        height: 2rem;
+        vertical-align: middle;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+    .wrapper-users {
+        color: #c4c6cc;
+        .text-name {
+            margin-right: 1rem;
+            font-size: .9rem;
+        }
+    }
+    .wrapper-tip {
+        display: flex;
+    }
+}

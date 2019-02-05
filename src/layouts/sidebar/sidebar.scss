@@ -1,0 +1,44 @@
+$mainColor: #4d7cff;
+
+.transition {
+    transition: all 0.2s;
+}
+
+.wrapper-sidebar {
+    width: 5.6rem;
+    height: 100vh;
+    min-height: 20rem;
+    background-color: #FFF;
+    box-shadow: 0 0 20px #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    .ul-nav {
+        width: 100%;
+    }
+}
+
+.li-nav {
+    width: 100%;
+    .link-nav {
+        display: block;
+        text-align: center;
+        color: #c4c6cc;
+        font-size: 0.8rem;
+        text-decoration: none;
+        border-left: .2rem solid #FFF; 
+        padding: 1.2rem 0;
+        @extend .transition;
+        .link-icon {
+            font-size: 1.3rem;
+            display: block;
+            margin: 0 auto 0.3rem;
+        }
+        &:hover {
+            border-left: .15rem solid #4d7cff;
+            color: $mainColor;
+        }
+    }
+}

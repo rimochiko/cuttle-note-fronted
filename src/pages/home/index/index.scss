@@ -1,0 +1,129 @@
+.wrapper-main {
+    padding-left: 5.6rem;
+    display: flex;
+}
+.wrapper-left {
+    width: 30%;
+}
+
+.wrapper-right {
+    background-color: #FFF;
+    width: 70%;
+}
+
+.wrapper-options {
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ecedf0;
+    color: #c4c6cc;
+    svg {
+        margin-right: 2rem;
+    }
+}
+.wrapper-static {
+    display: flex;
+    padding: 3rem;
+    justify-content: space-between;
+    .box-static {
+        svg {
+            color: #4d7cff;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 1.5rem;
+            color: #666;
+        }
+    }
+}
+
+.wrapper-recent {
+    padding: 0 3rem 2rem;
+    .box-recent {
+        margin-bottom: 1rem;
+        line-height: 2;
+        & > a {
+            color: #4d7cff;
+            text-decoration: none;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+
+        & > p {
+            color: #666;
+            font-size: .9rem;
+        }
+    }
+}
+
+.wrapper-news {
+    padding: 0 3rem 2rem;
+    .box-news {
+        margin-bottom: 1rem;
+        line-height: 2;
+        color: #97999d;
+        .news-header {
+            img {
+                vertical-align: middle;
+                margin-right: .5rem;
+            }
+            .link-name {
+                color: #4d7cff;
+                text-decoration: none;
+                margin-right: .5rem;
+            }
+        }
+        .news-body {
+            padding: 1rem 0 1.5rem;
+        }
+    }
+}
+
+.title-wrapper {
+    color: #97999d;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    font-size: .9rem;
+}
+
+.wrapper-group {
+    padding: 2rem 3rem;
+    .box-group {
+        display: flex;
+        margin-bottom: 1rem;
+        .group-avatar {
+            margin-right: 1rem;
+        }
+        .title {
+            color: #4d7cff;
+            font-size: 1.1rem;
+            margin-bottom: .5rem;
+        }
+        .des {
+            color: #97999d;
+            font-size: .9;
+        }
+    }
+}
+
+.wrapper-menu {
+    padding: 2rem 3rem 1rem;
+    .list-menu {
+        > li {
+            > a {
+                display: block;
+                box-sizing: border-box;
+                padding: 1rem;
+                text-align: center;
+                margin-bottom: .5rem;
+                text-decoration: none;
+                color: #4d7cff;
+                svg {
+                    margin-right: .5rem;
+                }
+            }
+        }
+    }
+}

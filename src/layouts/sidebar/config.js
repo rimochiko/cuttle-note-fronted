@@ -1,26 +1,26 @@
 export default [
     {
-        name: '主页',
-        mark: 'home',
+        text: '主页',
+        name: 'home',
         url: '/',
-        icon: ''
+        icon: 'home'
     },
     {
-        name: '文库',
-        mark: 'library',
+        text: '文库',
+        name: 'library',
         url: '/library',
-        icon: ''
+        icon: 'book'
     },
     {
-        name: '图库',
-        mark: 'gallery',
+        text: '图库',
+        name: 'gallery',
         url: '/gallery',
-        icon: ''
+        icon: 'images'
     },
     {
-        name: '团队',
-        mark: 'group',
+        text: '团队',
+        name: 'group',
         url: '/group',
-        icon: ''
+        icon: 'users'
     }
 ];

@@ -1,8 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import './assets/styles/reset.less';
+import './assets/styles/reset.scss';
 import * as serviceWorker from './serviceWorker';
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import brands from '@fortawesome/fontawesome-free-brands'
+import {fas} from '@fortawesome/free-solid-svg-icons'
+import {far} from '@fortawesome/free-regular-svg-icons'
+library.add(brands, far, fas);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
