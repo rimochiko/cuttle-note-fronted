@@ -15,103 +15,75 @@ class Page extends Component {
                 <Sidebar />
                 <div className="wrapper-main">
                     <div className="wrapper-left">
-                        <div className="wrapper-options">
-                            <FontAwesomeIcon icon="trash-alt" />
-                            <FontAwesomeIcon icon="search" /> 
-                            <FontAwesomeIcon icon="folder" /> 
-                        </div>
-
-                        <div className="wrapper-menu">
-                          <h1 className="title-wrapper">快捷操作</h1>
-                          <ul className="list-menu">
-                             <li><a href="#"><FontAwesomeIcon icon="edit" /> 新文档</a></li>
-                             <li><a href="#"><FontAwesomeIcon icon="file-image" /> 新图片</a></li>
-                             <li><a href="#"><FontAwesomeIcon icon="user-plus" /> 加好友</a></li>
-                          </ul>
-                        </div>
-
-                    
-                        <div className="wrapper-group">
-                          <h1 className="title-wrapper">我的团队</h1> 
-                          <div className="box-group">
-                            <div className="group-avatar">
-                                <img src={require("../../../assets/images/avatar5.jpg")} width="45"/>
-                            </div>
-                            <div className="group-name">
-                                <p className="title">野原一家</p>
-                                <p className="des">我们就是很幸福的一家人</p>
-                            </div>
-                          </div>
-                          <div className="box-group">
-                            <div className="group-avatar">
-                                <img src={require("../../../assets/images/avatar6.jpg")} width="45"/>
-                            </div>
-                            <div className="group-name">
-                                <p className="title">向日葵班</p>
-                                <p className="des">小朋友们茁壮成长</p>
-                            </div>
-                          </div>
-                        </div>
+                      <div className="wrapper-options">
+                        <FontAwesomeIcon icon="trash-alt" />
+                        <FontAwesomeIcon icon="search" /> 
+                        <FontAwesomeIcon icon="folder" /> 
+                      </div>
+                      <div className="wrapper-textlist-box">
+                        <ul className="component-tree-list">
+                          <li className="component-tree-item">
+                              <div className="component-tree-btn">
+                                  <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
+                                  <span>根目录</span>
+                              </div>
+                              <ul className="component-tree-list">
+                                <li className="component-tree-item">
+                                  <div className="component-tree-btn">
+                                      <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
+                                      <span>一级目录</span>
+                                  </div>
+                                  <ul className="component-tree-list">
+                                    <li className="component-tree-item">
+                                      <div className="component-tree-btn">
+                                          <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
+                                          <span>二级目录</span>
+                                      </div>
+                                    </li>
+                                  </ul>
+                                </li>
+                                <li className="component-tree-item">
+                                  <div className="component-tree-btn">
+                                      <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
+                                      <span>一级目录</span>
+                                  </div>
+                                </li>
+                              </ul>
+                          </li>
+                          <li className="component-tree-item">
+                              <div className="component-tree-btn">
+                                  <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
+                                  <span>根目录</span>
+                              </div>
+                              <ul className="component-tree-list">
+                                <li className="component-tree-item">
+                                  <div className="component-tree-btn">
+                                      <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
+                                      <span>一级目录</span>
+                                  </div>
+                                </li>
+                              </ul>
+                          </li>
+                        </ul>
+                      </div>                      
                     </div>
                     <div className="wrapper-right">
                         <Header />
-                        <div className="wrapper-static">
-                           <div className="box-static">
-                             <FontAwesomeIcon icon="pen-nib" />
-                             <p>草稿箱 20 篇</p>
-                           </div>
-                           <div className="box-static">
-                             <FontAwesomeIcon icon="book-open" />
-                             <p>昨日阅读 10 次</p>
-                           </div>
-                           <div className="box-static">
-                             <FontAwesomeIcon icon="comments" />
-                             <p>评论 20 条</p>
-                           </div>
+                        <div className="wrapper-article">
+                            <div className="header-article">
+                              <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
+                              <p className="date"><a href="#">serialcoder</a>创建于2019-01-07，最近一次<a href="#">serialcoder</a>更新于2019-01-08</p>
+                            </div>
+                            <div className="body-article">
+                              <blockquote><p>这篇文章去年10月8号发过，后来因为一些 drama 删掉了。这次重发，是因为我想把这篇文章发到知乎，在我发到知乎之前，还是先发回掘金。我对掘金很有感情的。仅为此，不是为了炒冷饭，不求赞，不求关注。</p>
+                              </blockquote>
+                              <p>这个大言不惭的标题源自我与我所认识的前端从业者的比较，也源自别人的评价。读者也可以看我其它文章，评估我的专业能力。当然我不是在每个领域都能匹配别人三年的实践经验（原标题是学前端一年学三年的知识，后来觉得不妥就改了）。我还有很多技术栈没掌握，比如没写过小程序，没用过 jQuery（这个也不想再学了，只是依然还有用人单位在要求）。也有很多坑没踩过，比如没有做过浏览器兼容（说实话也不太想兼容 IE，浪费生命）。我想说的是我对 JS 这门语言以及 CS 这门学科掌握的深度，前端生态圈理解和熟悉的程度，以及知识迁移能力。</p>
+                              <p>我不是想炫耀自己多牛，而是想帮助和我有相似背景的人。我在掘金发了几篇文章后，有几个朋友在知道我零基础学编程一年半就进步这么快后，想知道我是怎么学的。这篇文章就是对他们的详细回答。</p>
+                              <h2>一，背景介绍</h2>
+                              <p>我本科学的是国际贸易，乱选的专业。毕业后做了半年外贸，实在不喜欢，然后去做英文编辑了。第二份工作也很无聊，就是写英文软文，发表在国外的行业期刊上，给公司做广告。然后也做英文官网的内容。这是一个很没创意的工作。每天写几篇我自己都没感觉的文章，不知道价值在哪。最重要的是，这份职业里我找不到持续精进的方向，做一年和做三年好像区别不大。</p>
+                              <p>后来学前端也是误打误撞。因为我同时在做英文官网的内容和产品，会和前端打交道。当时公司的前端是学 UI 转过来的，我观察他的工作，以为就是 HTML 写个页面结构，然后 CSS 做个样式，然后用 JS 做点效果就可以了。这个简单啊，我也可以做。然后我就裸辞去学习前端开发了…… 后来发现我错了，但是自己跳的坑，流着泪也要爬出来。接下来我经历了人生中最难熬的一段时间，也经历了人生中第一次大的转变。</p>
+                            </div>
                         </div>
-
-                        <div className="wrapper-recent">
-                          <h1 className="title-wrapper">最近编辑</h1> 
-                          <div className="box-recent">
-                            <a href="#">
-                               <FontAwesomeIcon icon="signature" />
-                               WireShark数据包
-                            </a>
-                            <p>李年糕 / 前端er在砌砖   2018-12-19 16:59</p>
-                          </div>
-                          <div className="box-recent">
-                            <a href="#">
-                               <FontAwesomeIcon icon="file-image" />
-                               WireShark笔记图
-                            </a>
-                            <p>李年糕 / 前端er在砌砖   2018-12-19 16:59</p>
-                          </div>
-                        </div>
-
-                        <div className="wrapper-news">
-                          <h1 className="title-wrapper">关注动态</h1> 
-                          <div className="box-news">
-                            <div className="news-header">
-                              <img src={require('../../../assets/images/avatar1.jpg')} width="32"/>
-                              <a href="#" className="link-name">小爱公主</a>
-                              <span>3分钟前</span>
-                            </div>
-                            <div className="news-body">
-                              发布了新的文章<a href="#">React深入</a>。
-                            </div>
-                          </div>
-                          <div className="box-news">
-                            <div className="news-header">
-                              <img src={require('../../../assets/images/avatar1.jpg')} width="32"/>
-                              <a href="#" className="link-name">小爱公主</a>
-                              <span>3分钟前</span>
-                            </div>
-                            <div className="news-body">
-                              发布了新的文章<a href="#">React深入</a>。
-                            </div>
-                          </div>                          
-                        </div>
-
                     </div>
                 </div>
             </div>
