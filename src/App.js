@@ -4,13 +4,19 @@ import {
   Route
 } from 'react-router-dom';
 import {HomePage, DashboardPage} from './pages/home';
-import {LibraryPage} from './pages/library';
+import {
+  LibraryPage,
+  LibEditPage
+} from './pages/library';
 import {GalleryPage} from './pages/gallery';
 import {GroupPage} from './pages/group';
 
+import {SettingPage} from './pages/setting';
+
 import {
   LoginPage,
-  RegisterPage
+  RegisterPage,
+  InfoPage
 } from './pages/user';
 
 import './assets/styles/normal.scss'
@@ -22,11 +28,14 @@ class App extends Component {
         <div>
           <Route exact path="/" component={HomePage}/>
           <Route path="/dashboard" component={DashboardPage} />
-          <Route path="/library" component={LibraryPage} />
-          <Route path="/gallery" component={GalleryPage} />
-          <Route path="/group" component={GroupPage} />
-          <Route path="/register" component={RegisterPage} />
-          <Route path="/login" component={LoginPage} />
+          <Route exact path="/library" component={LibraryPage} />
+          <Route path="/library/edit" component={LibEditPage} />
+          <Route exact path="/gallery" component={GalleryPage} />
+          <Route exact path="/group" component={GroupPage} />
+          <Route exact path="/register" component={RegisterPage} />
+          <Route exact path="/setting" component={SettingPage} />
+          <Route exact path="/login" component={LoginPage} />
+          <Route exact path="/info" component={InfoPage} />
         </div>
       </Router>
     );

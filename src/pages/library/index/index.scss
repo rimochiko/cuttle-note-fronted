@@ -1,18 +1,20 @@
+$mainColor: #1e64e5;
 .wrapper-textlist-box {
-    padding: 2rem 3rem 2rem 2rem;
+    padding: 1rem 2rem 1rem 1rem;
 }
-
 .component-tree-list {
     padding-left: 1rem;
     .component-tree-item {
+        font-size: .9rem;
 
     }
     .component-tree-btn {
+        padding: .2rem 0;
         color: #999;
         line-height: 2;
         cursor: pointer;
         &:hover {
-            color: #4d7cff;
+            color: $mainColor;
         }
     }
     .tree-icon-parent {
@@ -25,8 +27,9 @@
 }
 
 .wrapper-article {
-    padding: 2rem 3rem;
-
+    flex: 1;
+    overflow-y: scroll;
+    padding: 3rem 3rem;
     .header-article {
         margin-bottom: 2rem;
         .title {
@@ -35,9 +38,9 @@
         }
         .date {
             color: #999;
-            font-size: .9rem;
+            font-size: .8rem;
             > a {
-                color: #4d7cff;
+                color: $mainColor;
                 margin-right: .2rem;
             }
         }

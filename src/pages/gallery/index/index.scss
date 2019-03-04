@@ -1,40 +1,47 @@
-.wrapper-textlist-box {
-    padding: 2rem 3rem 2rem 2rem;
-}
-
 .component-img-list {
-    display: flex;
-    flex-wrap: wrap;
+    font-size: 0;
+    padding: 1rem;
     .component-img-item {
-        flex: 1 0 auto;
-        margin-bottom: 1rem;
-        box-sizing: cover;
+        padding: 1rem;
+        display: inline-block;
+        width: 50%;
+        box-sizing: border-box;
         .component-img-cover {
             max-width: 100%;
+            box-shadow: 0 0 5px #ddd;
+            margin-bottom: 1rem;
+        }
+        .component-img-text {
+            font-size: .9rem;
+            text-align: center;
+            color: #999;
         }
     }
     
 }
 
 .wrapper-photo {
-    padding: 2rem 3rem;
     position: relative;
+    flex: 1;
+    overflow-y: scroll;
     img {
         max-width: 100%;
     }
     .header-photo {
         position: absolute;
+        top: 2rem;
+        left: 2rem;
         background-color: #FFF;
         padding: 1rem;
         box-shadow: 0 0 3px #ccc;
         .title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             line-height: 1.8;
             margin-bottom: .5rem;
         }
         .date {
             color: #999;
-            font-size: .9rem;
+            font-size: .8rem;
         }
     }
 }

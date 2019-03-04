@@ -1,4 +1,4 @@
-$mainColor: #4d7cff;
+$mainColor: #1e64e5;
 
 .transition {
     transition: all 0.2s;
@@ -9,12 +9,13 @@ $mainColor: #4d7cff;
     height: 100vh;
     min-height: 20rem;
     background-color: #FFF;
-    box-shadow: 0 0 20px #ddd;
+    border-right: 1px solid #ecedf0;
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
     align-items: center;
+    z-index: 100;
     .ul-nav {
         width: 100%;
     }

@@ -20,19 +20,23 @@ class Page extends Component {
                         <FontAwesomeIcon icon="search" /> 
                         <FontAwesomeIcon icon="folder" /> 
                       </div>
-                      <div className="wrapper-textlist-box">
+                      <div className="wrapper-imglist-box">
                         <ul className="component-img-list">
                           <li className="component-img-item">
-                              <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
                           </li>
                           <li className="component-img-item">
-                              <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
                           </li>
                           <li className="component-img-item">
-                              <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
                           </li>
                           <li className="component-img-item">
-                              <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
                           </li>
                         </ul>
                       </div>                      
