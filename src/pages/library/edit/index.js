@@ -1,16 +1,22 @@
 import React, {Component} from 'react';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import config from './config.js';
+import { format } from 'path';
 
 class Page extends Component {
     constructor () {
         super();
-        this.AddTextStyle = this.AddTextStyle.bind(this);
+        this.addTextStyle = this.addTextStyle.bind(this);
     }
     /**
      * 添加文字样式 
      * */
-    AddTextStyle (command) {
+    addTextStyle () {
+
+    }
+
+    textStyleCommand (command) {
       var command = {
         bold: function (text) {
           return `**${text}**`
@@ -19,16 +25,25 @@ class Page extends Component {
           return `*${text}*`
         },
         listul: function (text) {
-
+          text.replace(/\n/, '');
+          return `- ${text}*`
         },
         listol: function (text) {
-
+          text.split('\n').map((item, index) => {
+            return `${index+1}.${item}`;
+          })
+          return text.join('\n');
         },
-        heading: function (text) {
-
+        heading: function (text, level) {
+          // 待改进
+          let front = '';
+          for (let i=0; i < level; i++) {
+            front+='#';
+          }
+          return `${front} ${text}`;
         },
-        link: function (text) {
-
+        link: function (text, link) {
+          
         },
         quote: function (text) {
 
@@ -52,16 +67,13 @@ class Page extends Component {
               <div className="wrapper-edit-header">
                 <input type="text" placeholder="输入文章标题" className="title"/>
                 <ul className="wrapper-edit-tool">
-                  <li><a href="#" onClick={this.AddTextStyle('bold')}><FontAwesomeIcon icon="bold"/></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="italic" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="list-ul" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="list-ol" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="heading" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="link" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="quote-left" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="code" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="image" /></a></li>
-                  <li><a href="#"><FontAwesomeIcon icon="undo" /></a></li>
+                {
+                  config.tool.map((item, index) => {
+                    return (
+                      <li><a href="#" onClick={this.addTextStyle(item.name)}><FontAwesomeIcon icon={item.icon}/></a></li>
+                    )
+                  })
+                }
                 </ul>
               </div>
               <div className="wrapper-edit-body" contentEditable="true">

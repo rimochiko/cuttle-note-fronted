@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
 
 class Page extends Component {
     constructor () {
@@ -21,7 +22,7 @@ class Page extends Component {
                     <input placeholder="密码"/>
                     <input placeholder="确认密码"/>
                     <input type="submit" text="确认注册" className="form-btn"/>
-                    <p className="form-subtext">已有账号? <a href="#">登录</a></p>
+                    <p className="form-subtext">已有账号? <Link to="/login">登录</Link></p>
                 </form>
               </div>
             </div>

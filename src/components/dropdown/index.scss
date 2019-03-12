@@ -1,0 +1,32 @@
+.mck-dropdown {
+    position: relative;
+    cursor: pointer;
+    .mck-dropdown-link {
+        color: #999;
+    }
+    &:hover {
+        .mck-dropdown-box {
+            display: block;
+        }
+    }
+    .mck-dropdown-box {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        transform: translateY(100%);
+        background: #FFF;
+        box-shadow: 0 0 5px #ddd;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1rem;
+
+        .mck-dropdown-item {
+            a {
+                color: #c4c6cc;
+                &:hover {
+                    color: #4d7cff;
+                }
+            }
+        }
+    }
+}

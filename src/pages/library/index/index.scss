@@ -9,9 +9,10 @@ $mainColor: #1e64e5;
 
     }
     .component-tree-btn {
-        padding: .2rem 0;
+        padding: .5rem 0;
+        display: flex;
+        align-items: center;
         color: #999;
-        line-height: 2;
         cursor: pointer;
         &:hover {
             color: $mainColor;
@@ -23,6 +24,7 @@ $mainColor: #1e64e5;
     .tree-icon-child {
         font-size: .5rem;
         margin-right: .5rem;
+        transform: scale(0.6);
     }
 }
 

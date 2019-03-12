@@ -3,6 +3,47 @@ import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Link} from 'react-router-dom';
+
+let treeData = [{
+  id: 1,
+  name: '根目录1',
+  link: '/1',
+  isOpen: true,
+  child : [{
+    id: 11,
+    name: '二级目录1',
+    link: '/1-1',
+    isOpen: true,
+    child : [{
+      id: 111,
+      name: '三级目录1',
+      link: '/1-1-1',
+      isOpen: true,
+      child : []
+    }]
+  }, {
+    id: 12,
+    name: '二级目录2',
+    link: '/1-2',
+    isOpen: true,
+    child : []
+  }]
+}, {
+  id: 2,
+  name: '根目录2',
+  link: '/2',
+  isOpen: true,
+  child : [{
+    id: 21,
+    name: '二级目录1',
+    link: '/2-1',
+    isOpen: true,
+    child : []
+  }]
+}]
+
+
 
 class Page extends Component {
     constructor () {
@@ -21,51 +62,8 @@ class Page extends Component {
                         <FontAwesomeIcon icon="folder" /> 
                       </div>
                       <div className="wrapper-textlist-box">
-                        <ul className="component-tree-list">
-                          <li className="component-tree-item">
-                              <div className="component-tree-btn">
-                                  <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
-                                  <span>根目录</span>
-                              </div>
-                              <ul className="component-tree-list">
-                                <li className="component-tree-item">
-                                  <div className="component-tree-btn">
-                                      <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
-                                      <span>一级目录</span>
-                                  </div>
-                                  <ul className="component-tree-list">
-                                    <li className="component-tree-item">
-                                      <div className="component-tree-btn">
-                                          <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
-                                          <span>二级目录</span>
-                                      </div>
-                                    </li>
-                                  </ul>
-                                </li>
-                                <li className="component-tree-item">
-                                  <div className="component-tree-btn">
-                                      <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
-                                      <span>一级目录</span>
-                                  </div>
-                                </li>
-                              </ul>
-                          </li>
-                          <li className="component-tree-item">
-                              <div className="component-tree-btn">
-                                  <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
-                                  <span>根目录</span>
-                              </div>
-                              <ul className="component-tree-list">
-                                <li className="component-tree-item">
-                                  <div className="component-tree-btn">
-                                      <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
-                                      <span>一级目录</span>
-                                  </div>
-                                </li>
-                              </ul>
-                          </li>
-                        </ul>
-                      </div>                      
+                      
+                      </div>                 
                     </div>
                     <div className="wrapper-right">
                         <Header />

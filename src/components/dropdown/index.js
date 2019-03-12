@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './index.scss';
 
 class DropDown extends Component {
@@ -10,14 +8,15 @@ class DropDown extends Component {
     }
 
     render () {
+        const { children } = this.props;
         return (
-            <div className="wrapper-dropdown">
-                <span></span>
-                <ul class="wrapper-dropdown-list">
+            <div className="mck-dropdown">
+                {children}
+                <ul className="mck-dropdown-box">
                 {
                     this.props.data.map((item, index) => {
                         return (
-                            <li><Link to={item.link}>{item.text}</Link></li>
+                            <li className="mck-dropdown-item" key={item.id}><Link to={item.link}>{item.text}</Link></li>
                         )
                     })
                 }
