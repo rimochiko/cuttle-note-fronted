@@ -15,16 +15,16 @@ class Page extends Component {
         return (
             <div>
                 <Sidebar />
-                <div className="wrapper-main">
-                    <div className="wrapper-left">
-                        <div className="wrapper-options">
-                            <FontAwesomeIcon icon="trash-alt" />
-                            <FontAwesomeIcon icon="search" /> 
-                            <FontAwesomeIcon icon="folder" /> 
+                <div className="main">
+                    <div className="left">
+                        <div className="options">
+                            <Link to="/"><FontAwesomeIcon icon="trash-alt" /></Link>
+                            <Link to="/"><FontAwesomeIcon icon="search" /></Link>
+                            <Link to="/"><FontAwesomeIcon icon="folder" /></Link>
                         </div>
 
-                        <div className="wrapper-menu">
-                          <h1 className="title-wrapper">快捷操作</h1>
+                        <div className="menu wrapper">
+                          <h1 className="section-title">快捷操作</h1>
                           <ul className="list-menu">
                              <li><Link to="/library/edit"><FontAwesomeIcon icon="edit" /> 创建新文档</Link></li>
                              <li><Link to="/gallery/edit"><FontAwesomeIcon icon="images" /> 创建新图片</Link></li>
@@ -33,10 +33,10 @@ class Page extends Component {
                         </div>
 
                     
-                        <div className="wrapper-group">
-                          <h1 className="title-wrapper">我的团队</h1> 
-                          <div className="box-group">
-                            <div className="group-avatar">
+                        <div className="group wrapper">
+                          <h1 className="section-title">我的团队</h1> 
+                          <div className="item-group">
+                            <div className="avatar">
                                 <img src={require("../../../assets/images/avatar5.jpg")} width="45"/>
                             </div>
                             <div className="group-name">
@@ -44,8 +44,8 @@ class Page extends Component {
                                 <p className="des">我们就是很幸福的一家人</p>
                             </div>
                           </div>
-                          <div className="box-group">
-                            <div className="group-avatar">
+                          <div className="item-group">
+                            <div className="avatar">
                                 <img src={require("../../../assets/images/avatar6.jpg")} width="45"/>
                             </div>
                             <div className="group-name">
@@ -55,64 +55,57 @@ class Page extends Component {
                           </div>
                         </div>
                     </div>
-                    <div className="wrapper-right">
+                    <div className="right">
                         <Header />
-                        <div className="wrapper-flex">
-                          <div className="wrapper-static">
-                            <div className="box-static">
-                              <FontAwesomeIcon icon="pen-nib" />
-                              <p>草稿箱 20 篇</p>
+                        <div className="flex-scroll-y">
+                          <div className="recent wrapper">
+                            <h1 className="section-title">最近活动</h1> 
+                            <div className="item-recent">
+                              <div className="cover">
+                                <FontAwesomeIcon icon="pen" />
+                              </div>
+                              <div className="info">
+                                <p className="date">1天前</p>
+                                <p className="info">我添加了新的文章《<Link to="/">WireShark数据包</Link>》</p>
+                              </div>
                             </div>
-                            <div className="box-static">
-                              <FontAwesomeIcon icon="book-open" />
-                              <p>昨日阅读 10 次</p>
+                            <div className="item-recent">
+                              <div className="cover">
+                                <FontAwesomeIcon icon="image" />
+                              </div>
+                              <div className="info">
+                                <p className="date">1天前</p>
+                                <p className="info">我添加了新的图画《<Link to="/">WireShark笔记图</Link>》</p>
+                              </div>
                             </div>
-                            <div className="box-static">
-                              <FontAwesomeIcon icon="comments" />
-                              <p>评论 20 条</p>
+                            <div className="item-recent">
+                              <div className="cover">
+                                <FontAwesomeIcon icon="pen" />
+                              </div>
+                              <div className="info">
+                                <p className="date">2天前</p>
+                                <p className="info"><Link to="/">小葵</Link> 在群 <Link to="/">野原家</Link> 中修改了文章《<Link to="/">WireShark笔记图</Link>》</p>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="wrapper-recent">
-                            <h1 className="title-wrapper">最近编辑</h1> 
-                            <div className="box-recent">
-                              <a href="#">
-                                <FontAwesomeIcon icon="signature" />
-                                WireShark数据包
-                              </a>
-                              <p>李年糕 / 前端er在砌砖   2018-12-19 16:59</p>
-                            </div>
-                            <div className="box-recent">
-                              <a href="#">
-                                <FontAwesomeIcon icon="file-image" />
-                                WireShark笔记图
-                              </a>
-                              <p>李年糕 / 前端er在砌砖   2018-12-19 16:59</p>
-                            </div>
-                          </div>
-
-                          <div className="wrapper-news">
-                            <h1 className="title-wrapper">关注动态</h1> 
-                            <div className="box-news">
-                              <div className="news-header">
-                                <img src={require('../../../assets/images/avatar1.jpg')} width="32"/>
-                                <a href="#" className="link-name">小爱公主</a>
-                                <span>3分钟前</span>
+                          <div className="news wrapper">
+                            <h1 className="section-title">关注动态</h1> 
+                            <div className="item-news">
+                              <div className="avatar">                              
+                                <img src={require('../../../assets/images/avatar1.jpg')}/>
                               </div>
-                              <div className="news-body">
-                                发布了新的文章<a href="#">React深入</a>。
+                              <div className="info">
+                                <div className="header">
+                                  <p><Link to="/" className="link">小爱公主</Link> 发布了新文章《<Link to="/" className="link">一文带你了解 Vim 的起源</Link>》</p>
+                                  <span>3分钟前</span>
+                                </div>
+                                <div className="body">
+                                  <p>我最近偶然发现了一种名为 Intel HEX 的文件格式。据我所知，Intel HEX 文件（使用.hex 扩展名）通过将二进制图像编码成十六进制数字行，使二进制图像不那么晦涩难懂。显然，当人们需要对微控制器进行编程或者将数据烧录进 ROM 时会用到这种文件。无论如何，当我第一次在 Vim 中打开一个 HEX 文件时，我发现了一些震惊的东西。至少对我来说，这种文件格式是非常深奥难懂的，但 Vim 已经掌握了它。HEX 文件的每一行都是一条被划分为不同字段的记...</p>
+                                </div>
                               </div>
                             </div>
-                            <div className="box-news">
-                              <div className="news-header">
-                                <img src={require('../../../assets/images/avatar1.jpg')} width="32"/>
-                                <a href="#" className="link-name">小爱公主</a>
-                                <span>3分钟前</span>
-                              </div>
-                              <div className="news-body">
-                                发布了新的文章<a href="#">React深入</a>。
-                              </div>
-                            </div>                          
+                                                  
                           </div>
                         </div>
                     </div>

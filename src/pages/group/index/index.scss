@@ -24,12 +24,12 @@
     }
 }
 
-.wrapper-group-top {
+.group-top {
     overflow-y: scroll;
     flex: 1;    
 }
 
-.wrapper-group-news {
+.group-news {
     display: flex;
     flex: 1; 
     flex-direction: column;
@@ -41,7 +41,7 @@
     }
 }
 
-.wrapper-group-news {
+.group-news {
     flex-grow: 1;
     padding: 0rem 1rem;
 }
@@ -102,7 +102,7 @@
     }
 }
 
-.wrapper-msg-send {
+.msg-send {
     width: 100%;
     border-top: 1px solid #eee;
     background-color: #f9fafa;
@@ -130,7 +130,7 @@
     
 }
 
-.wrapper-group-btns {
+.group-btns {
     padding: 0 1rem 2rem;
     border-bottom: 1px solid #eee;
     .ul-group-btns {

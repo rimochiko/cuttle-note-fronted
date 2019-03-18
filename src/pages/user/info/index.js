@@ -13,14 +13,14 @@ class Page extends Component {
         return (
             <div>
                 <Sidebar />
-                <div className="wrapper-main">
-                    <div className="wrapper-left">
-                      <div className="wrapper-options">
+                <div className="main">
+                    <div className="left">
+                      <div className="options">
                         <FontAwesomeIcon icon="trash-alt" />
                         <FontAwesomeIcon icon="search" /> 
                         <FontAwesomeIcon icon="folder" /> 
                       </div>
-                      <div className="wrapper-infolist">
+                      <div className="infolist">
                         <h1 className="title-wrapper">我的消息箱</h1>
                         <div className="item-info noread">
                           <div className="cover-info">
@@ -44,10 +44,10 @@ class Page extends Component {
                         </div>
                       </div>                      
                     </div>
-                    <div className="wrapper-right">
+                    <div className="right">
                         <Header />
-                        <div className="wrapper-infos">
-                          <div className="wrapper-infos-top">
+                        <div className="infos">
+                          <div className="infos-top">
                             <div className="item-infos">
                               <div className="cover-infos">
                                   <img src={require('../../../assets/images/avatar_admin1.jpg')}/>

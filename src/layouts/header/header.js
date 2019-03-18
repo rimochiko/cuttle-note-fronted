@@ -7,11 +7,18 @@ import './header.scss';
 let dropMenudata = [{
     id: 1,
     text: '我的主页',
-    link: '/'
+    link: '/',
+    icon: 'user'
 }, {
     id: 2,
+    text: '账号设置',
+    link: '/setting',
+    icon: 'cog'
+}, {
+    id: 3,
     text: '退出',
-    link: '/login'
+    link: '/login',
+    icon: 'sign-out-alt'
 }]
 
 class Header extends Component {
@@ -21,15 +28,12 @@ class Header extends Component {
 
     render () {
         return (
-            <div className="wrapper-header">
-                <Link to="/setting" className="header-icon"><FontAwesomeIcon icon="cog"/></Link>
-                <div className="wrapper-tip">
-                    <Link to="/info" className="header-icon"><FontAwesomeIcon icon="bell"/></Link>
+            <div className="public-header">
+                <Link to="/info" className="header-icon"><FontAwesomeIcon icon="bell"/></Link>
+                <div className="tip">  
                     <DropDown data={dropMenudata}>
                         <span className="mck-dropdown-link">
                            <img src={require('../../assets/images/avatar.jpg')} className="header-avatar"/>
-                           新酱
-                           <FontAwesomeIcon icon="angle-down" className="avatar-icon"/>
                         </span>
                     </DropDown>
                 </div>

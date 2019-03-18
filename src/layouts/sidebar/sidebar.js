@@ -11,19 +11,21 @@ class Sidebar extends Component {
 
     render () {
         return (
-            <div className="wrapper-sidebar">
+            <div className="public-sidebar">
+              <div class="logo">
+              </div>
               <ul className="ul-nav">
                 {
                     config.map((item, index) => {
                             return <li key={item.name}  className="li-nav">
-                               <Link to={item.url} className="link-nav">
+                               <Link to={item.url} className="link-nav" title={item.text}>
                                     <FontAwesomeIcon icon={item.icon} className="link-icon"/>
-                                    {item.text}
                                </Link>
                             </li>
                     })
                 }
               </ul>
+              <div></div>
             </div>
         );
     }

@@ -79,7 +79,6 @@ class Page extends Component {
               <div className="wrapper-edit-body" contentEditable="true">
               </div>
               <div className="wrapper-edit-footer">
-                
                 <p>收录于 <a href="#" class="text-about"><FontAwesomeIcon icon="info-circle"/>Three.js笔记</a>，最近一次保存 2019年3月1日 11:00</p>
                 <div className="btns-box">
                   <button>保存到草稿箱</button>

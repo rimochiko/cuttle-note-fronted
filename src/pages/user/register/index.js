@@ -11,10 +11,10 @@ class Page extends Component {
     render () {
         return (
             <div className="page-login">
-              <div className="wrapper-fixed-logo">
+              <div className="fixed-logo">
                 <a href="#"><img src={require('../../../assets/images/logo1.png')}/></a>
               </div>
-              <div className="wrapper-useropt">
+              <div className="useropt">
                 <h1 className="title">注册</h1>
                 <p className="des">欢迎加入我们:)</p>
                 <form className="form-useropt">

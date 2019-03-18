@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom'
 import './index.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class DropDown extends Component {
     constructor () {
@@ -15,9 +16,16 @@ class DropDown extends Component {
                 <ul className="mck-dropdown-box">
                 {
                     this.props.data.map((item, index) => {
-                        return (
-                            <li className="mck-dropdown-item" key={item.id}><Link to={item.link}>{item.text}</Link></li>
-                        )
+                        if (item.icon) {
+                            return (
+                                <li className="mck-dropdown-item" key={item.id}><Link to={item.link}><FontAwesomeIcon icon={item.icon} />{item.text}</Link></li>
+                            )
+                        } else {
+                            return (
+                                <li className="mck-dropdown-item" key={item.id}><Link to={item.link}>{item.text}</Link></li>
+                            )
+                        }
+                        
                     })
                 }
                 </ul>

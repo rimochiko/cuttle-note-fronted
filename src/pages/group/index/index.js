@@ -14,14 +14,14 @@ class Page extends Component {
         return (
             <div>
                 <Sidebar />
-                <div className="wrapper-main">
-                    <div className="wrapper-left">
-                      <div className="wrapper-options">
+                <div className="main">
+                    <div className="left">
+                      <div className="options">
                         <FontAwesomeIcon icon="trash-alt" />
                         <FontAwesomeIcon icon="search" /> 
                         <FontAwesomeIcon icon="folder" /> 
                       </div>
-                      <div className="wrapper-grouplist">
+                      <div className="grouplist">
                         <h1 className="title-wrapper">我的团队</h1>
                         <div className="item-group">
                           <div className="cover-group">
@@ -43,11 +43,11 @@ class Page extends Component {
                         </div>
                       </div>                      
                     </div>
-                    <div className="wrapper-right">
+                    <div className="right">
                         <Header />
-                        <div className="wrapper-group-top">
-                          <div className="wrapper-group-options">
-                            <div className="wrapper-group-btns">
+                        <div className="group-top">
+                          <div className="group-options">
+                            <div className="group-btns">
                               <h1 className="title-wrapper">团队操作</h1>
                               <ul className="ul-group-btns">
                                 <li><Link to="/">
@@ -74,7 +74,7 @@ class Page extends Component {
                             </div>
                           </div> 
 
-                          <div className="wrapper-group-news">
+                          <div className="group-news">
                             <h1 className="title-wrapper">团队动态</h1>
                             <div className="item-news">
                               <div className="cover-news">
@@ -115,7 +115,7 @@ class Page extends Component {
                           </div>
                         </div>
                         
-                        <div className="wrapper-msg-send">
+                        <div className="msg-send">
                           <input type="text" placeholder="输入要发送的" className="input-msg"/>
                           <button className="btn-msg"><FontAwesomeIcon icon="paper-plane"/></button>
                         </div>

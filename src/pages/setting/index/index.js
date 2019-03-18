@@ -3,12 +3,13 @@ import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Route, Link}  from 'react-router-dom';
+import {Route, Link, Switch}  from 'react-router-dom';
 
 import {
   SetBasicPage,
   SetAccountPage
 } from '..';
+import { SIGPWR } from 'constants';
 
 class Page extends Component {
     constructor () {
@@ -35,14 +36,14 @@ class Page extends Component {
                              <li><Link to="/setting/info"><FontAwesomeIcon icon="envelope" /> 消息设置</Link></li>
                           </ul>
                         </div>
-                    </div>
-                    
-                      
+                    </div>         
                     <div className="wrapper-right">
                         <Header />
-                        <Route exact path="/setting" component={SetBasicPage}/>
-                        <Route path="/setting/basic" component={SetBasicPage} />
-                        <Route path="/setting/account" component={SetAccountPage} />
+                        <Switch>
+                            <Route path="/setting" exact component={SetBasicPage} />
+                            <Route path="/setting/basic" component={SetBasicPage} />
+                            <Route path="/setting/account" component={SetAccountPage} />
+                        </Switch>         
                     </div>
                 </div>
             </div>

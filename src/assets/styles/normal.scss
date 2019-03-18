@@ -6,4 +6,17 @@ body,
 input,
 textarea {
     font-family: 'Microsoft Yahei';
+    color: #333;
+}
+
+/* 板块公共标题 */
+.section-title {
+    color: #979aa1;
+    font-size: .9rem;
+}
+
+.wrapper {
+    .section-title {
+        padding: 2rem 3rem;
+    }
 }

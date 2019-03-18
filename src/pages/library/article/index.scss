@@ -1,9 +1,10 @@
 $mainColor: #1e64e5;
-.wrapper-article {
+.article {
     flex: 1;
     overflow-y: scroll;
-    padding: 3rem 3rem;
+    padding: 3rem 1rem;
     .header-article {
+        padding: 0 2rem;
         margin-bottom: 2rem;
         .title {
             font-size: 1.8rem;
@@ -20,6 +21,8 @@ $mainColor: #1e64e5;
     }
     .body-article {
         line-height: 2;
+        padding: 0 2rem;
+        font-size: .9rem;
         blockquote {
             border-left: 0.2rem solid #cbcbcb;
             background-color: #f8f8f8;
@@ -52,5 +55,74 @@ $mainColor: #1e64e5;
         img {
             max-width: 100%;
         }
+    }
+}
+
+.footer-article {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+    padding: 0 2rem;
+    .footer-ul {
+        display: flex;
+        font-size: .9rem;
+        color: #999;
+        li {
+            margin-right: 2rem;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}
+
+.comments {
+    .input-comment-box {
+        padding: 0rem 2rem;
+        .input-textarea {
+            resize: none;
+            box-sizing: border-box;
+            width: 100%;
+            padding: .6rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+.ul-comment-single {
+    padding: 0 2rem;
+    .li-comment-single {
+        display: flex;
+        color: #666;
+        line-height: 1.8;
+        font-size:.9rem;
+        margin-bottom: .5rem;
+        justify-content: space-between;
+        img {
+           width: 1.5rem;
+           height: 1.5rem;
+           border-radius: 50%;
+           margin-right: .5rem;
+           vertical-align: middle;
+           flex-shrink: 0;
+       }
+    }
+    .author-comment {
+       flex: 1;
+       padding-right: 1rem;
+       a {
+           color: #999;
+       }
+       .date {
+           color: #999;
+           font-size: .8rem;
+       }
+    }
+    .btn-reply {
+        font-size: .9rem;
+        flex-shrink: 0;
+        color: #999;
+        cursor: pointer;
     }
 }

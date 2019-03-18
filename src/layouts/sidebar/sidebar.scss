@@ -1,11 +1,7 @@
-$mainColor: #1e64e5;
+@import '../../assets/styles/public.scss';
 
-.transition {
-    transition: all 0.2s;
-}
-
-.wrapper-sidebar {
-    width: 5.6rem;
+.public-sidebar {
+    width: 4.6rem;
     height: 100vh;
     min-height: 20rem;
     background-color: #FFF;
@@ -14,7 +10,9 @@ $mainColor: #1e64e5;
     top: 0;
     left: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-between;
     z-index: 100;
     .ul-nav {
         width: 100%;
@@ -26,20 +24,17 @@ $mainColor: #1e64e5;
     .link-nav {
         display: block;
         text-align: center;
-        color: #c4c6cc;
-        font-size: 0.8rem;
+        color: $purpleGray;
         text-decoration: none;
-        border-left: .2rem solid #FFF; 
         padding: 1.2rem 0;
         @extend .transition;
         .link-icon {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             display: block;
             margin: 0 auto 0.3rem;
         }
         &:hover {
-            border-left: .15rem solid #4d7cff;
-            color: $mainColor;
+            color: $purple;
         }
     }
 }

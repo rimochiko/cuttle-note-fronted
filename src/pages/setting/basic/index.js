@@ -11,7 +11,7 @@ class Page extends Component {
 
     render () {
         return (
-          <div className="wrapper-settings-detail">
+          <div className="settings-detail">
             <div className="input-group">
               <label className="input-label">昵称</label>
               <input className="input-text" type="text" placeholder="请输入昵称"/>

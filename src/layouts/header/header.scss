@@ -1,4 +1,4 @@
-.wrapper-header {
+.public-header {
     padding: 1.5rem 3rem;
     display: flex;
     flex-shrink: 0;
@@ -10,6 +10,9 @@
         font-size: 1.2rem;
         margin: 0 2rem 0 0;
         line-height: 2rem;
+        &:hover {
+            color: #4d7cff;
+        }
     }
     .header-avatar {
         width: 2rem;
@@ -21,7 +24,7 @@
     .avatar-icon {
         margin-left: .5rem;
     }
-    .wrapper-tip {
+    .tip {
         display: flex;
     }
 }

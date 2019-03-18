@@ -1,0 +1,19 @@
+$purple: #632df8;
+$fontPurple: #906bf7;
+$purpleGray: #b9cae2;
+$bgGray: #f7f8f9;
+$borderGray: #ecedf0;
+$normalGray: #c4c6cc;
+$deepGray: #a3a9b6;
+$fontGray: #999;
+$fontBlack: #31333b;
+
+.transition {
+    transition: all 0.2s;
+}
+
+.flex-scroll-y {
+    flex: 1;
+    overflow-y: scroll;
+}
+

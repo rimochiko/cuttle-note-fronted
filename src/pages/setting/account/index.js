@@ -9,7 +9,7 @@ class Page extends Component {
 
     render () {
         return (
-          <div className="wrapper-settings-detail">
+          <div className="settings-detail">
             <div className="input-static-group">
               <label className="input-label">手机号码</label>
               <div className="input-static">

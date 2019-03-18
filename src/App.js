@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   BrowserRouter as Router,
-  Route
+  Route,
+  Switch
 } from 'react-router-dom';
 import {HomePage, DashboardPage} from './pages/home';
 import {
@@ -24,17 +25,17 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div>
+        <Switch>
           <Route exact path="/" component={HomePage}/>
           <Route path="/dashboard" component={DashboardPage} />
-          <Route exact path="/library" component={LibraryPage} />
-          <Route exact path="/gallery" component={GalleryPage} />
-          <Route exact path="/group" component={GroupPage} />
-          <Route exact path="/register" component={RegisterPage} />
-          <Route exact path="/setting" component={SettingPage} />
-          <Route exact path="/login" component={LoginPage} />
-          <Route exact path="/info" component={InfoPage} />
-        </div>
+          <Route path="/library" component={LibraryPage} />
+          <Route path="/gallery" component={GalleryPage} />
+          <Route path="/group" component={GroupPage} />
+          <Route path="/register" component={RegisterPage} />
+          <Route path="/setting" component={SettingPage} />         
+          <Route path="/login" component={LoginPage} />
+          <Route path="/info" component={InfoPage} />
+        </Switch>
       </Router>
     );
   }

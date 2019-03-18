@@ -59,18 +59,18 @@ class Page extends Component {
         return (
             <div>
                 <Sidebar />
-                <div className="wrapper-main">
-                    <div className="wrapper-left">
-                      <div className="wrapper-options">
+                <div className="main">
+                    <div className="left">
+                      <div className="options">
                         <FontAwesomeIcon icon="trash-alt" />
                         <FontAwesomeIcon icon="search" /> 
                         <FontAwesomeIcon icon="folder" /> 
                       </div>
-                      <div className="wrapper-textlist-box">
+                      <div className="textlist-box">
                         <Tree data={treeData} />
                       </div>                 
                     </div>
-                    <div className="wrapper-right">
+                    <div className="right">
                         <Header />
                         <Switch>
                           <Route exact path="/library" component={LibArticlePage}/>
