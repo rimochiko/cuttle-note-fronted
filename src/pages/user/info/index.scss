@@ -1,0 +1,134 @@
+.item-info {
+    display: flex;
+    box-sizing: border-box;
+    padding: 1.5rem 2rem;
+    &:hover {
+        background-color: #f5faff;
+    }
+    .cover-info {
+        margin-right: 1rem;
+        > img {
+            width: 3.5rem;
+            border-radius: 50%;
+        }
+    }
+    .info-info {
+        .text-status {
+            font-size: .7rem;
+            color: #FFF;
+            background-color: #999;
+            border-radius: .3rem;
+            padding: .2rem .5rem;
+            margin-right: .5rem;
+        }
+        .text-main {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .text-date {
+            font-size: .8rem;
+            margin-bottom: .5rem;
+            color: #999;
+        }
+        .text-sub {
+            font-size: .8rem;
+            color: #999;
+            line-height: 1.8;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.item-info.noread {
+    .info-info {
+        .text-status {
+            background: #4d7cff;
+        }
+        .text-main {
+            font-weight: 600;
+        }
+    }   
+}
+
+
+.wrapper-infos {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    .item-infos {
+        display: flex;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+    }
+}
+
+.wrapper-infos-top {
+    flex-grow: 1;
+    padding: 2rem 3rem;
+    overflow-y: scroll;
+}
+
+.item-infos {
+    &.mine {
+        flex-direction: row-reverse;
+        .cover-infos {
+            margin-right: 0;
+            margin-left: 1rem;
+        }     
+        .info-infos {
+            .bubble {
+                background-color: #1e64e5;
+                border-radius: 1rem;
+                border-bottom-right-radius: 0;
+                color: #FFF;
+                a {
+                    margin: 0 .5rem;
+                    color: #FFF;
+                    text-decoration: underline;
+                    text-decoration-style: dashed;
+                }
+                .name {
+                    color: #FFF;
+                }
+             }
+             .date {
+                 text-align: right;
+             }
+        }   
+    }
+    .cover-infos {
+        margin-right: 1rem;
+        > img {
+            width: 3rem;
+            border-radius: 50%;
+        }
+    }
+    .info-infos {
+        .bubble {
+           background-color: #F1F2F6; 
+           border-radius: 1rem;
+           border-bottom-left-radius: 0;
+           padding: 1rem;
+           margin-bottom: .5rem;
+           line-height: 1.8;
+           font-size: .9rem;
+           .title {
+               font-size: 1.2rem;
+               margin-bottom: .5rem;
+           }
+           .name {
+               color: #999;
+               font-size: .8rem;
+               margin-bottom: .5rem;
+           }
+        }
+        .date {
+            color: #999;
+            font-size: .8rem;
+        }
+    }
+}

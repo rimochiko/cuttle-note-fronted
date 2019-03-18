@@ -1,11 +1,11 @@
 .wrapper-header {
     padding: 1.5rem 3rem;
     display: flex;
+    flex-shrink: 0;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #f0f1f5;
     .header-icon {
-        display: block;
         color: #c4c6cc;
         font-size: 1.2rem;
         margin: 0 2rem 0 0;
@@ -17,13 +17,9 @@
         vertical-align: middle;
         border-radius: 50%;
         margin-right: 0.5rem;
-    }
-    .wrapper-users {
-        color: #c4c6cc;
-        font-size: .9rem;
-        svg {
-            margin-left: 1rem;
-        }
+    }     
+    .avatar-icon {
+        margin-left: .5rem;
     }
     .wrapper-tip {
         display: flex;

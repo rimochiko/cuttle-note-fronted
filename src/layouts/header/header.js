@@ -25,11 +25,11 @@ class Header extends Component {
                 <Link to="/setting" className="header-icon"><FontAwesomeIcon icon="cog"/></Link>
                 <div className="wrapper-tip">
                     <Link to="/info" className="header-icon"><FontAwesomeIcon icon="bell"/></Link>
-                    <DropDown className="wrapper-users" data={dropMenudata}>
+                    <DropDown data={dropMenudata}>
                         <span className="mck-dropdown-link">
                            <img src={require('../../assets/images/avatar.jpg')} className="header-avatar"/>
                            新酱
-                           <FontAwesomeIcon icon="angle-down"/>
+                           <FontAwesomeIcon icon="angle-down" className="avatar-icon"/>
                         </span>
                     </DropDown>
                 </div>

@@ -3,6 +3,12 @@ import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Route, Link}  from 'react-router-dom';
+
+import {
+  SetBasicPage,
+  SetAccountPage
+} from '..';
 
 class Page extends Component {
     constructor () {
@@ -24,9 +30,9 @@ class Page extends Component {
                         <div className="wrapper-menu">
                           <h1 className="title-wrapper">我的设置</h1>
                           <ul className="list-menu">
-                             <li><a href="#"><FontAwesomeIcon icon="user" /> 基本资料</a></li>
-                             <li><a href="#"><FontAwesomeIcon icon="unlock" /> 账户管理</a></li>
-                             <li><a href="#"><FontAwesomeIcon icon="envelope" /> 消息设置</a></li>
+                             <li><Link to="/setting/basic"><FontAwesomeIcon icon="user" /> 基本资料</Link></li>
+                             <li><Link to="/setting/account"><FontAwesomeIcon icon="unlock" /> 账户管理</Link></li>
+                             <li><Link to="/setting/info"><FontAwesomeIcon icon="envelope" /> 消息设置</Link></li>
                           </ul>
                         </div>
                     </div>
@@ -34,7 +40,9 @@ class Page extends Component {
                       
                     <div className="wrapper-right">
                         <Header />
-                      
+                        <Route exact path="/setting" component={SetBasicPage}/>
+                        <Route path="/setting/basic" component={SetBasicPage} />
+                        <Route path="/setting/account" component={SetAccountPage} />
                     </div>
                 </div>
             </div>
