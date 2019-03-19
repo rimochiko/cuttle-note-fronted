@@ -1,0 +1,16 @@
+/*上部导航按钮*/
+.public-options {
+    display: flex;
+    align-items: center;
+    padding: 2rem 3rem;
+    svg {
+        margin-right: 2rem;
+    }
+    a {
+        transition: all .2s;
+        color: #c4c6cc;
+        &:hover {
+            color: #632df8;
+        }
+    }
+}
