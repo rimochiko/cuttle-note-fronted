@@ -8,15 +8,28 @@ class Page extends Component {
     constructor () {
         super();
         this.addTextStyle = this.addTextStyle.bind(this);
+        this.state = {
+          articleContent: '1111'
+        }
     }
     /**
      * 添加文字样式 
      * */
-    addTextStyle () {
-
+    addTextStyle (e, command) {
+      e.preventDefault();
+      let editBox = this.refs.editBox;
+      console.log(editBox.document);
+      switch(command){
+				case "bold": document.execCommand("bold",false,null);break;
+				case "italic": document.execCommand("italic",false,null);break;
+        case "link": 
+          let url = prompt("输入指向的网址");
+          if(url) 
+				  document.execCommand("createlink",false,url);		
+			}
     }
 
-    textStyleCommand (command) {
+    textStyleCommand (e, command) {
       var command = {
         bold: function (text) {
           return `**${text}**`
@@ -63,23 +76,35 @@ class Page extends Component {
 
     render () {
         return (
-            <div className="wrapper-edit-page">
-              <div className="wrapper-edit-header">
+            <div className="edit-page">
+              <div className="edit-header">
                 <input type="text" placeholder="输入文章标题" className="title"/>
-                <ul className="wrapper-edit-tool">
-                {
-                  config.tool.map((item, index) => {
-                    return (
-                      <li><a href="#" onClick={this.addTextStyle(item.name)}><FontAwesomeIcon icon={item.icon}/></a></li>
-                    )
-                  })
-                }
-                </ul>
+                <div className="edit-tool">
+                  <ul className="ul-tool">
+                  {
+                    config.tool.map((item, index) => {
+                      return (
+                        <li key={item.id}>
+                          <a href="#"
+                             onClick={(e, command) =>
+                               {this.addTextStyle(e, item.name)}
+                             }
+                          >
+                             <FontAwesomeIcon icon={item.icon}/>
+                          </a>
+                        </li>
+                      )
+                    })
+                  }
+                  </ul>
+                  <span><FontAwesomeIcon icon={['fab','markdown']}/>markdown</span>
+                </div>
               </div>
-              <div className="wrapper-edit-body" contentEditable="true">
+              <div className="edit-body" contentEditable="true" ref="editBox">
+                {this.state.articleContent}
               </div>
-              <div className="wrapper-edit-footer">
-                <p>收录于 <a href="#" class="text-about"><FontAwesomeIcon icon="info-circle"/>Three.js笔记</a>，最近一次保存 2019年3月1日 11:00</p>
+              <div className="edit-footer">
+                <p>最近一次保存 2019年3月1日 11:00</p>
                 <div className="btns-box">
                   <button>保存到草稿箱</button>
                   <button className="confirm">发布</button>

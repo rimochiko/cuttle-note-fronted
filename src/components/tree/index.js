@@ -27,7 +27,7 @@ class Tree extends Component {
             } 
         }
         let childTree = clickedNode.nextElementSibling;
-        console.log(childTree, item);
+        //console.log(childTree, item);
         return false;
     }
     
@@ -35,8 +35,8 @@ class Tree extends Component {
      * 生成目录节点图标
      * */
     generateIcon (item, isEmpty) {
-        console.log("item");
-        console.log(item);
+        //console.log("item");
+        //console.log(item);
         if (isEmpty) {
         return (
             <FontAwesomeIcon icon="circle" className="tree-icon-child" onClick={(e, item) => {this.toggleTree(e, item)}}/>

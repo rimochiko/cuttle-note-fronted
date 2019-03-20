@@ -42,14 +42,14 @@ class Page extends Component {
                   <img src={require('../../../assets/images/avatar.jpg')} className="input-img"/>
                   <div className="input-file-box">
                       <input className="file-input" type="file" placeholder="请输入昵称"/>
-                      <button className="file-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
+                      <button className="file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                   </div>
               </div>
               <span className="input-mark">必填项</span>
             </div>
 
             <div className="input-group">
-              <input className="input-btn" type="submit" text="确认" />
+              <input className="input-btn radius-btn" type="submit" text="确认" />
             </div>
           </div>
         );

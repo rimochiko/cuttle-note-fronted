@@ -1,27 +1,35 @@
-$mainColor: #1e64e5;
+@import '../../../assets/styles/public.scss';
+/*文章区域*/
 .article {
     flex: 1;
     overflow-y: scroll;
-    padding: 3rem 1rem;
-    .header-article {
-        padding: 0 2rem;
+    padding: 2rem 0;
+    .header {
+        padding: 0 3rem;
         margin-bottom: 2rem;
-        .title {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-        }
-        .date {
-            color: #999;
-            font-size: .8rem;
-            > a {
-                color: $mainColor;
-                margin-right: .2rem;
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            a {
+                color: $fontGray;
+            }
+            span {
+                color: $fontGray;
+                margin-right: 1rem;
+                font-size: .85rem;
+                &:last-child {
+                    margin-right: 0;
+                }
             }
         }
+        .title {
+            font-size: 1.9rem;
+            margin-bottom: 2rem;
+        }
     }
-    .body-article {
+    .body {
         line-height: 2;
-        padding: 0 2rem;
+        padding: 0 3rem;
         font-size: .9rem;
         blockquote {
             border-left: 0.2rem solid #cbcbcb;
@@ -58,17 +66,25 @@ $mainColor: #1e64e5;
     }
 }
 
-.footer-article {
+.footer-info {
     display: flex;
     justify-content: space-between;
-    margin: 1rem 0;
-    padding: 0 2rem;
+    margin: 2rem 0;
+    padding: 0 3rem;
     .footer-ul {
         display: flex;
-        font-size: .9rem;
-        color: #999;
+        font-size: .85rem;
+        color: $normalGray;
+        cursor: pointer;
         li {
             margin-right: 2rem;
+            @extend .transition;
+            &:hover {
+                color: $purple;
+            }
+            svg {
+                margin-right: .1rem;
+            }
             &:last-child {
                 margin-right: 0;
             }
@@ -76,14 +92,19 @@ $mainColor: #1e64e5;
     }
 }
 
+/*文章评论*/
 .comments {
     .input-comment-box {
-        padding: 0rem 2rem;
+        padding: 0rem 3rem;
         .input-textarea {
             resize: none;
             box-sizing: border-box;
             width: 100%;
-            padding: .6rem;
+            border-radius: .3rem;
+            border: none;
+            background-color: #fdfdfd;
+            min-height: 6rem;
+            padding: .8rem;
             font-size: 1rem;
             margin-bottom: 1rem;
         }
@@ -91,17 +112,17 @@ $mainColor: #1e64e5;
 }
 
 .ul-comment-single {
-    padding: 0 2rem;
+    padding: 0 3rem;
     .li-comment-single {
         display: flex;
         color: #666;
-        line-height: 1.8;
-        font-size:.9rem;
-        margin-bottom: .5rem;
+        line-height: 2;
+        font-size:.85rem;
+        margin-bottom: 1rem;
         justify-content: space-between;
         img {
-           width: 1.5rem;
-           height: 1.5rem;
+           width: 2rem;
+           height: 2rem;
            border-radius: 50%;
            margin-right: .5rem;
            vertical-align: middle;
@@ -120,7 +141,7 @@ $mainColor: #1e64e5;
        }
     }
     .btn-reply {
-        font-size: .9rem;
+        font-size: .85rem;
         flex-shrink: 0;
         color: #999;
         cursor: pointer;

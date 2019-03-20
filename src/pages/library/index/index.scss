@@ -1,38 +1,9 @@
-$mainColor: #1e64e5;
-.wrapper-textlist-box {
-    padding: 1rem 2rem 1rem 1rem;
-}
-.component-tree-list {
-    padding-left: 1rem;
-    .component-tree-item {
-        font-size: .9rem;
+@import '../../../assets/styles/public.scss';
 
-    }
-    .component-tree-btn {
-        padding: .5rem 0;
-        display: flex;
-        align-items: center;
-        a {
-           color: #999; 
-           &:hover {
-            color: $mainColor;
-           }
-        }
-        cursor: pointer;
-        svg {
-            color: #999;
-            &:hover {
-                color: $mainColor;
-            }
-        }
-        
-    }
-    .tree-icon-parent {
-        margin-right: .5rem;
-    }
-    .tree-icon-child {
-        font-size: .5rem;
-        margin-right: .5rem;
-        transform: scale(0.6);
-    }
+.tree {
+  .switch {
+      font-size: .9rem;
+      color: $fontGray;
+      margin-bottom: 1rem;
+  }
 }

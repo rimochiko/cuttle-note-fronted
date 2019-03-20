@@ -3,12 +3,13 @@ import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Route, Switch} from 'react-router-dom';
+import {Route, Switch, Link} from 'react-router-dom';
 import {
   LibEditPage,
   LibArticlePage
 } from '..';
 import Tree from '../../../components/tree';
+import Options from '../../../layouts/options/'; 
 
 let treeData = [{
   id: 1,
@@ -57,21 +58,22 @@ class Page extends Component {
 
     render () {
         return (
-            <div>
+           <div className="page">
                 <Sidebar />
                 <div className="main">
                     <div className="left">
-                      <div className="options">
-                        <FontAwesomeIcon icon="trash-alt" />
-                        <FontAwesomeIcon icon="search" /> 
-                        <FontAwesomeIcon icon="folder" /> 
-                      </div>
-                      <div className="textlist-box">
+                      <Options></Options>
+                      <div className="section tree">
+                        <div className="switch">
+                          范围：<select>
+                            <option>我的</option>
+                            <option>野原家</option>
+                          </select>
+                        </div>
                         <Tree data={treeData} />
                       </div>                 
                     </div>
                     <div className="right">
-                        <Header />
                         <Switch>
                           <Route exact path="/library" component={LibArticlePage}/>
                           <Route path="/library/edit" component={LibEditPage} />

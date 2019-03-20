@@ -1,44 +1,31 @@
 @import '../../../assets/styles/public.scss';
 
 /*主页三块布局*/
+.page {
+    display: flex;
+}
+
 .main {
-    padding-left: 26.6rem;
+    display: flex;
+    flex: 1;
 }
 
 .left {
     width: 22rem;
     overflow: hidden;
     box-sizing: border-box;
-    position: fixed;
-    left: 4.6rem;
-    top: 0;
     height: 100vh;
     background-color: $bgGray;
+    flex-shrink: 0;
 }
 
 .right {
+    flex: 1;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     background-color: #FFF;
-}
-
-/*上部导航按钮*/
-.options {
-    display: flex;
-    align-items: center;
-    padding: 2rem 3rem;
-    svg {
-        margin-right: 2rem;
-    }
-    a {
-        @extend .transition;
-        color: $normalGray;
-        &:hover {
-            color: $purple;
-        }
-    }
 }
 
 /*团队列表*/

@@ -1,3 +1,4 @@
+@import '../../../assets/styles/public.scss';
 .settings-detail {
     overflow-y: scroll;
     padding: 3rem;
@@ -45,14 +46,14 @@
 
            }
            .file-btn {
-               background-color: #4d7cff;
+               background-color: $purple;
                color: #fff;
                border: none;
                padding: .5rem 1rem;
            }
        }
        .input-btn {
-            background-color: #4d7cff;
+            background-color: $purple;
             color: #fff;
             border: none;
             padding: .5rem 1rem;
@@ -87,9 +88,13 @@
 }
 
 .input-btn {
-    background-color: #4d7cff;
+    background-color: $purple;
     color: #fff;
     border: none;
-    padding: .5rem 1rem;
-    cursor: pointer;         
+    padding: .5rem 2rem;
+    cursor: pointer;  
+    @extend .transition;
+    &:hover {
+        background-color: $fontPurple;
+    }       
 }

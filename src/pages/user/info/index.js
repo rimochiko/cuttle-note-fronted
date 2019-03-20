@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
+import Options from '../../../layouts/options/'; 
+
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -11,15 +13,11 @@ class Page extends Component {
 
     render () {
         return (
-            <div>
+          <div className="page">
                 <Sidebar />
                 <div className="main">
                     <div className="left">
-                      <div className="options">
-                        <FontAwesomeIcon icon="trash-alt" />
-                        <FontAwesomeIcon icon="search" /> 
-                        <FontAwesomeIcon icon="folder" /> 
-                      </div>
+                      <Options />
                       <div className="infolist">
                         <h1 className="title-wrapper">我的消息箱</h1>
                         <div className="item-info noread">

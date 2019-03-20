@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
+import Options from '../../../layouts/options/'; 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Route, Link, Switch}  from 'react-router-dom';
@@ -18,18 +19,13 @@ class Page extends Component {
 
     render () {
         return (
-            <div>
+            <div className="page">
                 <Sidebar />
-                <div className="wrapper-main">
-                    <div className="wrapper-left">
-                        <div className="wrapper-options">
-                            <FontAwesomeIcon icon="trash-alt" />
-                            <FontAwesomeIcon icon="search" /> 
-                            <FontAwesomeIcon icon="folder" /> 
-                        </div>
-
-                        <div className="wrapper-menu">
-                          <h1 className="title-wrapper">我的设置</h1>
+                <div className="main">
+                    <div className="left">
+                        <Options></Options>
+                        <div className="menu wrapper">
+                          <h1 className="section-title">我的设置</h1>
                           <ul className="list-menu">
                              <li><Link to="/setting/basic"><FontAwesomeIcon icon="user" /> 基本资料</Link></li>
                              <li><Link to="/setting/account"><FontAwesomeIcon icon="unlock" /> 账户管理</Link></li>
@@ -37,8 +33,7 @@ class Page extends Component {
                           </ul>
                         </div>
                     </div>         
-                    <div className="wrapper-right">
-                        <Header />
+                    <div className="right">
                         <Switch>
                             <Route path="/setting" exact component={SetBasicPage} />
                             <Route path="/setting/basic" component={SetBasicPage} />

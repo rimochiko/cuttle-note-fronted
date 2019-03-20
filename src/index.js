@@ -5,10 +5,10 @@ import './assets/styles/reset.scss';
 import * as serviceWorker from './serviceWorker';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import brands from '@fortawesome/fontawesome-free-brands'
+import {fab} from '@fortawesome/free-brands-svg-icons'
 import {fas} from '@fortawesome/free-solid-svg-icons'
 import {far} from '@fortawesome/free-regular-svg-icons'
-library.add(brands, far, fas);
+library.add(fab, far, fas);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

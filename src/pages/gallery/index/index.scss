@@ -1,3 +1,6 @@
+@import '../../../assets/styles/public.scss';
+
+/*图片列表*/
 .component-img-list {
     font-size: 0;
     padding: 1rem;
@@ -8,8 +11,9 @@
         box-sizing: border-box;
         .component-img-cover {
             max-width: 100%;
-            box-shadow: 0 0 5px #ddd;
+            box-shadow: 0 10px 15px #ddd;
             margin-bottom: 1rem;
+            border-radius: .3rem;
         }
         .component-img-text {
             font-size: .9rem;
@@ -20,28 +24,42 @@
     
 }
 
+/*图片预览*/
 .photo {
     position: relative;
-    flex: 1;
     overflow-y: scroll;
-    img {
-        max-width: 100%;
+    padding-bottom: 1rem;
+    .body {
+        img {
+            max-width: 100%;
+        }
     }
-    .header-photo {
+    .header {
         position: absolute;
         top: 2rem;
-        left: 2rem;
-        background-color: #FFF;
+        right: 2rem;
+        background-color: #fdfdfd;
         padding: 1rem;
-        box-shadow: 0 0 3px #ccc;
+        box-shadow: 0 10px 15px #ddd;
+        
         .title {
             font-size: 1.1rem;
             line-height: 1.8;
             margin-bottom: .5rem;
         }
-        .date {
-            color: #999;
+        .detail {
+            line-height: 1.5;
+            color: $fontGray;
             font-size: .8rem;
+            p {
+                margin-bottom: .5rem;
+            }
+            span {
+                margin-right: .5rem;
+            }
+            a {
+                color: $fontGray;
+            }
         }
     }
 }

@@ -4,16 +4,18 @@
     width: 4.6rem;
     height: 100vh;
     min-height: 20rem;
+    flex-shrink: 0;
     background-color: #FFF;
     border-right: 1px solid #ecedf0;
-    position: fixed;
-    top: 0;
-    left: 0;
     display: flex;
     flex-direction: column;
     align-content: center;
     justify-content: space-between;
     z-index: 100;
+    .logo {
+        text-align: center;
+        padding-top: 2rem;
+    }
     .ul-nav {
         width: 100%;
     }
@@ -38,3 +40,10 @@
         }
     }
 }
+
+.header-avatar {
+    width: 1.7rem;
+    height: 1.7rem;
+    vertical-align: middle;
+    border-radius: 50%;
+} 

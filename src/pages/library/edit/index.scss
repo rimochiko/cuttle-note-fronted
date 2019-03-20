@@ -1,9 +1,10 @@
-.wrapper-edit-page {
+@import '../../../assets/styles/public.scss';
+.edit-page {
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
-.wrapper-edit-header {
+.edit-header {
     .title {
         width: 100%;
         box-sizing: border-box;
@@ -12,35 +13,41 @@
         outline: none;
         padding: 1.5rem 2rem;
     }
-    .wrapper-edit-tool {
+    .edit-tool {
         width: 100%;
-        display: flex;
         padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
         box-sizing: border-box;
         background-color: #FCFCFC;
         border-top: 1px solid #eee;
         border-bottom: 1px solid #eee;
-        li {
-            a {
-                display: block;
-                color: #333;
-                font-size: .9rem;
-                padding: 1rem 1rem;
-                &:hover {
-                    color: #2974ff;
+        .ul-tool {
+            display: flex;
+            li {
+                a {
+                    display: block;
+                    color: #333;
+                    font-size: .9rem;
+                    padding: 1rem 1rem;
+                    @extend .transition;
+                    &:hover {
+                        color: $purple;
+                    }
                 }
-            }
+            }            
         }
+
     }
 }
-.wrapper-edit-body {
+.edit-body {
     flex-grow: 1;
     padding: 2rem;
     font-size: .9rem;
     outline: none;
     background-color: #FFF;
 }
-.wrapper-edit-footer {
+.edit-footer {
     display: flex;
     justify-content: space-between;
     padding: 1rem 2rem;
@@ -50,7 +57,7 @@
     background-color: #FCFCFC;
     border-top: 1px solid #eee;
     .text-about {
-        color: #2974ff;
+        color: $purple
         svg {
             margin-right: .2rem;
         }
@@ -67,7 +74,7 @@
             margin-left: 1rem;
         }
         .confirm {
-            background-color: #2974ff;
+            background-color: $purple;
         }
     }
 }
