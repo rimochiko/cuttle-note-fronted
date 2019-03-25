@@ -79,7 +79,7 @@ class Page extends Component {
 
     render () {
         return (
-            <div className="edit-page">
+            <div className="edit-page flex-1">
               <div className="edit-header">
                 <input type="text" placeholder="输入文章标题" className="title"/>
                 <div className="edit-tool">
@@ -100,7 +100,10 @@ class Page extends Component {
                     })
                   }
                   </ul>
-                  <span><FontAwesomeIcon icon={['fab','markdown']}/>markdown</span>
+                  <ul className="ul-tool">
+                    <li><a href="#"><FontAwesomeIcon icon={['fab','markdown']}/></a></li>
+                    <li><a href="#"><FontAwesomeIcon icon="expand-arrows-alt"/></a></li>
+                  </ul>
                 </div>
               </div>
               <div className="edit-body" contentEditable="true" ref="editBox">
@@ -109,8 +112,8 @@ class Page extends Component {
               <div className="edit-footer">
                 <p>最近一次保存 2019年3月1日 11:00</p>
                 <div className="btns-box">
-                  <button>保存到草稿箱</button>
-                  <button className="confirm">发布</button>
+                  <button className="radius-btn input-btn">保存到草稿箱</button>
+                  <button className="radius-btn input-btn">发布</button>
                 </div>
               </div>
             </div>

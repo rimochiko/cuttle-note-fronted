@@ -8,6 +8,7 @@ $borderColor: #e9e9f4;
     height: 100vh;
     min-height: 20rem;
     flex-shrink: 0;
+    box-sizing: border-box;
     background-color: $bgColor;
     border-right: 1px solid $borderColor;
     display: flex;
@@ -15,10 +16,122 @@ $borderColor: #e9e9f4;
     align-content: center;
     justify-content: space-between;
     z-index: 100;
+    position: relative;
+    font-weight: 300;
+    .header-avatar {
+        width: 2rem;
+        height: 2rem;
+        vertical-align: middle;
+        border-radius: 50%;
+        border: 2px solid #FFF;
+    } 
+    .author-panel {
+        box-shadow: 0 10px 15px #eeeef8;
+        display: none;
+        position: absolute;
+        height: 100vh;
+        padding: 0 3rem;
+        top: 0;
+        left: 5rem;
+        width: 14rem;
+        background-color: $bgColor;
+        text-align: center;
+        &.open {
+            display: block;
+        }
+        .header {
+            display: flex;
+            padding: 2rem 0;
+            color: #363c75;
+            p {
+                flex: 1;
+                text-align: center;
+                font-size: 1rem;
+            }
+            svg {
+                font-size: .9rem;
+                flex-grow: 0;
+                cursor: pointer;
+            }
+        }
+        .list {
+            margin-top: 2rem;
+            text-align: left;
+            span {
+                display: block;
+                font-size: .9rem;
+                color: #363c75;
+                margin-bottom: 1rem;
+            }
+            ul {
+                display: flex;
+                flex-wrap: wrap;
+                li {
+                    margin-right: .5rem;
+                    margin-bottom: .5rem;
+                    width: 2rem;
+                    height: 2rem;
+                    font-size: .7rem;
+                    line-height: 2rem;
+                    text-align: center;
+                    border-radius: .3rem;
+                    &:last-child {
+                        background-color: #f7f7fb;
+                        color: #b2b2d1;
+                        font-weight: 400;
+                    }
+                }
+                img {
+                    width: 2rem;
+                    border-radius: .3rem;
+                }
+            }
+        }
+        .profile {
+            margin: 2rem 0;
+            .avatar {
+                width: 8rem;
+                height: 8rem;
+                margin-bottom: 1rem;
+                vertical-align: middle;
+                border-radius: .5rem;
+                box-shadow: 0 10px 15px #eeeef8;
+            }
+            .name {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+                color: #363c75;
+            }
+            .about {
+                font-size: .9rem;
+                margin-bottom: 2rem;
+                color: #363c75;
+            }
+            .des {
+                font-size: .85rem;
+                color: #8493b8;
+            }
+        }
+        .option {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            font-size: .85rem;
+            a {
+                width: 5rem;
+                display: block;
+                margin: 1rem auto;
+                padding: .6rem 2rem;
+            }
+            svg {
+                margin-right: .5rem;
+            }
+        }
+    }
     .logo {
         text-align: center;
         padding-top: 1.5rem;
         padding-bottom: 2.5rem;
+        cursor: pointer;
     }
     .ul-nav {
         padding: 0 1rem;
@@ -47,11 +160,3 @@ $borderColor: #e9e9f4;
         }
     }
 }
-
-.header-avatar {
-    width: 2rem;
-    height: 2rem;
-    vertical-align: middle;
-    border-radius: 50%;
-    border: 2px solid #FFF;
-} 

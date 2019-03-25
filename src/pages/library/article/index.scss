@@ -5,20 +5,6 @@
     font-weight: 300;
     .header {
         margin-bottom: 2rem;
-        .tag {
-            display: flex;
-            li {
-                a {
-                    display: block;
-                    font-size: .8rem;
-                    color: #fd64a9;
-                    background: #f9d6ec;
-                    padding: .2rem .5rem;
-                    border-radius: .3rem;
-                    margin: 0 1rem 1rem 0;
-                }
-            }
-        }
         .detail {
             display: flex;
             justify-content: space-between;
@@ -113,6 +99,20 @@
     }
 }
 
+.tag {
+    display: flex;
+    li {
+        a {
+            display: block;
+            font-size: .8rem;
+            color: #fd64a9;
+            background: #f9d6ec;
+            padding: .2rem .5rem;
+            border-radius: .3rem;
+            margin: 0 1rem 1rem 0;
+        }
+    }
+}
 
 
 /*文章评论*/

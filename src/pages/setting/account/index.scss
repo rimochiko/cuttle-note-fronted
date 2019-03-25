@@ -1,6 +1,5 @@
 @import '../../../assets/styles/public.scss';
 .settings-detail {
-    overflow-y: scroll;
     padding: 3rem;
     .input-group {
        margin-bottom: 2rem;
@@ -8,6 +7,7 @@
            display: block;
            width: 100%;
            margin-bottom: .5rem;
+           color: #3e4077;
        }
        .input-area {
            resize: none;
@@ -16,7 +16,7 @@
            padding: .6rem .8rem;
            outline: none;
            border-radius: .2rem;
-           border: 1px solid #ddd;
+           border: 1px solid #eef0f3;
            font-size: .9rem;
            margin-bottom: .5rem;
        }
@@ -26,14 +26,14 @@
            padding: .6rem .8rem;
            outline: none;
            border-radius: .2rem;
-           border: 1px solid #ddd;
+           border: 1px solid #eef0f3;
            font-size: .9rem;
            margin-bottom: .5rem;
 
        }
        .input-mark {
            font-size: .8rem;
-           color: #999;
+           color: #8493b8;
        }
        .input-file-box {
            position: relative;
@@ -45,19 +45,6 @@
                z-index: -1;
 
            }
-           .file-btn {
-               background-color: $purple;
-               color: #fff;
-               border: none;
-               padding: .5rem 1rem;
-           }
-       }
-       .input-btn {
-            background-color: $purple;
-            color: #fff;
-            border: none;
-            padding: .5rem 1rem;
-            cursor: pointer;         
        }
 
     }
@@ -85,16 +72,4 @@
             margin-bottom: .5rem;
         }
     }
-}
-
-.input-btn {
-    background-color: $purple;
-    color: #fff;
-    border: none;
-    padding: .5rem 2rem;
-    cursor: pointer;  
-    @extend .transition;
-    &:hover {
-        background-color: $fontPurple;
-    }       
 }

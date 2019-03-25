@@ -1,15 +1,54 @@
+@import '../../../assets/styles/public.scss';
+
+.info-menu {
+    @extend .section;
+    font-weight: 300;
+    .section-title {
+        color: #a3a5b6;
+        font-size: .9rem;
+    }
+    margin: 3rem 2rem;
+    padding: 2rem;
+    .list-menu {
+        > li {
+            > a {
+                @extend .transition;
+                display: block;
+                box-sizing: border-box;
+                padding: 2rem 0 0rem;
+                text-decoration: none;
+                color: #9396b2;
+                font-size: .9rem;
+                border-radius: .5rem;
+                &:hover {
+                    color: $purple;
+                    svg {
+                        color: $purple;
+                    }
+                }
+                svg {
+                    color: $normalGray;
+                    margin-right: .5rem;
+                }
+            }
+        }
+    }
+}
+
 .item-info {
     display: flex;
     box-sizing: border-box;
-    padding: 1.5rem 2rem;
+    padding: 1rem;
+    margin: 2rem 3rem;
     &:hover {
         background-color: #f5faff;
     }
     .cover-info {
         margin-right: 1rem;
         > img {
-            width: 3.5rem;
+            width: 3rem;
             border-radius: 50%;
+            box-shadow: 0 10px 15px #eeeef8;
         }
     }
     .info-info {
@@ -57,8 +96,12 @@
 .infos {
     display: flex;
     flex: 1;
+    font-weight: 300;
     flex-direction: column;
     justify-content: space-between;
+    margin: 3rem 3rem 3rem 0;
+    padding: 3rem;
+    @extend .section;
     .item-infos {
         display: flex;
         align-items: flex-end;
@@ -69,37 +112,9 @@
 .infos-top {
     flex-grow: 1;
     padding: 2rem 3rem;
-    overflow-y: scroll;
 }
 
 .item-infos {
-    &.mine {
-        flex-direction: row-reverse;
-        .cover-infos {
-            margin-right: 0;
-            margin-left: 1rem;
-        }     
-        .info-infos {
-            .bubble {
-                background-color: #1e64e5;
-                border-radius: 1rem;
-                border-bottom-right-radius: 0;
-                color: #FFF;
-                a {
-                    margin: 0 .5rem;
-                    color: #FFF;
-                    text-decoration: underline;
-                    text-decoration-style: dashed;
-                }
-                .name {
-                    color: #FFF;
-                }
-             }
-             .date {
-                 text-align: right;
-             }
-        }   
-    }
     .cover-infos {
         margin-right: 1rem;
         > img {
@@ -108,8 +123,9 @@
         }
     }
     .info-infos {
+        color: #3e4077;
         .bubble {
-           background-color: #F1F2F6; 
+           background-color: #f7f7fb; 
            border-radius: 1rem;
            border-bottom-left-radius: 0;
            padding: 1rem;
@@ -121,14 +137,15 @@
                margin-bottom: .5rem;
            }
            .name {
-               color: #999;
+               color: #bbbbd6;
                font-size: .8rem;
                margin-bottom: .5rem;
            }
         }
         .date {
-            color: #999;
+            color: #9ea3bd;
             font-size: .8rem;
+            text-align: right;
         }
     }
 }

@@ -19,30 +19,30 @@ class Page extends Component {
             </div>
 
             <div className="input-group">
-              <label class="input-label">个人简介</label>
+              <label className="input-label">个人简介</label>
               <textarea className="input-area" type="text" placeholder=""/>
-              <span class="input-mark">必填项</span>
+              <span className="input-mark">必填项</span>
             </div>
 
             <div className="input-group">
-              <label class="input-label">地址</label>
+              <label className="input-label">地址</label>
               <input className="input-text" type="text" placeholder="请输入昵称"/>
-              <span class="input-mark">必填项</span>
+              <span className="input-mark">必填项</span>
             </div>
 
             <div className="input-group">
-              <label class="input-label">职业</label>
+              <label className="input-label">职业</label>
               <input className="input-text" type="text" placeholder="请输入昵称"/>
-              <span class="input-mark">必填项</span>
+              <span className="input-mark">必填项</span>
             </div>
 
             <div className="input-group">
-              <label class="input-label">头像</label>
-              <div class="two-side">
+              <label className="input-label">头像</label>
+              <div className="two-side">
                   <img src={require('../../../assets/images/avatar.jpg')} className="input-img"/>
                   <div className="input-file-box">
                       <input className="file-input" type="file" placeholder="请输入昵称"/>
-                      <button className="file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
+                      <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                   </div>
               </div>
               <span className="input-mark">必填项</span>

@@ -24,13 +24,24 @@ let dropMenudata = [{
 class Sidebar extends Component {
     constructor () {
         super();
+        this.state = {
+          isBarOpen: true
+        }
+        this.toggleBar = this.toggleBar.bind(this);
+    }
+
+    toggleBar () {
+      this.setState(prevState => ({
+        isBarOpen: !prevState.isBarOpen,
+        barStyle: this.state.isBarOpen? 'block': 'none'  
+      }));
     }
 
     render () {
         return (
             <div className="public-sidebar">
               <div className="header">
-                <div className="logo">
+                <div className="logo" onClick={this.toggleBar}>
                     <img src={require('../../assets/images/avatar.jpg')} className="header-avatar"/>
                 </div>
                 <ul className="ul-nav">
@@ -44,20 +55,59 @@ class Sidebar extends Component {
                     })
                 }
                 </ul>
-              </div>
-              <div>
-                <ul className="ul-nav">
-                    <li className="li-nav">
-                        <Link to='/' className="link-nav">
-                            <FontAwesomeIcon icon="fold" className="link-icon"/>
-                        </Link>
-                    </li>
-                    <li className="li-nav">
-                        <Link to='/' className="link-nav">
-                            <FontAwesomeIcon icon="cog" className="link-icon"/>
-                        </Link>
-                    </li>
-                </ul>
+                <div className="author-panel"  style={{display: this.state.barStyle}}>
+                  <div className="header">
+                    <p>我的资料</p>
+                    <span><FontAwesomeIcon icon="times"/></span>
+                  </div>
+                  <div className="profile">
+                    <img src={require('../../assets/images/avatar.jpg')} className="avatar"/>
+                    <p className="name">九月的风</p>
+                    <p className="des">没什么好说的...</p>
+                    <div className="list">
+                      <span>我的关注</span>
+                      <ul>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar1.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar2.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar3.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar5.jpg')}/>
+                        </Link></li>
+                        <li>+16</li>
+                      </ul>
+                    </div>
+
+                    <div className="list">
+                      <span>我的粉丝</span>
+                      <ul>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar3.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar2.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar6.jpg')}/>
+                        </Link></li>
+                        <li><Link to="/">
+                          <img src={require('../../assets/images/avatar4.jpg')}/>
+                        </Link></li>
+                        <li>+34</li>
+                      </ul>
+                    </div>
+                    
+                  </div>
+                  <div className="option">
+                    <Link to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</Link>
+                    <Link to="/login" className="radius-btn input-btn"><FontAwesomeIcon icon="sign-out-alt" />退出登录</Link>
+                  </div>
+                </div>
               </div>
             </div>
         );

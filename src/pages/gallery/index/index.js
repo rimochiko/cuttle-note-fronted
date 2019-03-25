@@ -60,6 +60,9 @@ class Page extends Component {
                     <div className="right flex-scroll-y">
                         <div className="photo">
                             <div className="header">
+                                <ul className="tag">
+                                    <li><a href="#">未完结</a></li>
+                                </ul>
                                 <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
                                 <div className="detail">
                                     <p>
@@ -79,11 +82,11 @@ class Page extends Component {
                                 </div>
                                 <div className="extra">
                                     <ul className="extra-ul">
-                                    <li><FontAwesomeIcon icon="eye"></FontAwesomeIcon> 11</li>
-                                    <li><FontAwesomeIcon icon="thumbs-up"></FontAwesomeIcon> 0</li>
+                                    <li><FontAwesomeIcon icon={["far","eye"]}></FontAwesomeIcon> 11</li>
+                                    <li><FontAwesomeIcon icon={["far","thumbs-up"]}></FontAwesomeIcon> 0</li>
                                     </ul>
                                     <ul className="extra-ul">
-                                    <li><FontAwesomeIcon icon="star"></FontAwesomeIcon> 收藏</li>
+                                    <li><FontAwesomeIcon icon={["far", "star"]}></FontAwesomeIcon> 收藏</li>
                                     <li><FontAwesomeIcon icon="share-alt"></FontAwesomeIcon> 分享</li>
                                     </ul>
                                 </div>

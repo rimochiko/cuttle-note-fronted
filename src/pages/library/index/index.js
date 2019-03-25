@@ -76,20 +76,18 @@ class Page extends Component {
         return (
            <div className="page">
                 <Sidebar />
-                <div className="flex-row overflow">
+                <div className="flex-row overflow flex-1">
                     <div className="left white">
                       <Options data={optiondata}/>
                       <div className="tree">
                         <Tree data={treeData} />
                       </div>                 
                     </div>
-                    <div className="right flex-scroll-y">
-                        <Switch>
-                          <Route exact path="/library" component={LibArticlePage}/>
-                          <Route path="/library/edit" component={LibEditPage} />
-                          <Route path="/library/article" component={LibArticlePage} />
-                        </Switch> 
-                    </div>
+                    <Switch>
+                      <Route exact path="/library" component={LibArticlePage}/>
+                      <Route path="/library/edit" component={LibEditPage} />
+                      <Route path="/library/article" component={LibArticlePage} />
+                    </Switch> 
                 </div>
             </div>
         );

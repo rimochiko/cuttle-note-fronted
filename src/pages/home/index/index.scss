@@ -21,39 +21,7 @@
     flex-shrink: 0;
 }
 
-/*操作列表*/
-.menu {
-    .title {
-        padding: 0 3rem;
-    }
-    .list-menu {
-        > li {
-            > a {
-                @extend .transition;
-                display: block;
-                box-sizing: border-box;
-                padding: 1rem 1rem;
-                margin: 0 2rem;
-                text-decoration: none;
-                color: $deepGray;
-                font-size: .9rem;
-                border-radius: .5rem;
-                &:hover {
-                    color: $purple;
-                    background-color: #fdfdfd;
-                    box-shadow: 0 10px 15px #eee;
-                    svg {
-                        color: $purple;
-                    }
-                }
-                svg {
-                    color: $normalGray;
-                    margin-right: .5rem;
-                }
-            }
-        }
-    }
-}
+
 
 .panel {
     display: flex;

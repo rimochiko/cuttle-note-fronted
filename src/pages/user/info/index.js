@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
-import Options from '../../../layouts/options/'; 
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import {Link} from 'react-router-dom';
 class Page extends Component {
     constructor () {
         super();
@@ -15,53 +14,35 @@ class Page extends Component {
         return (
           <div className="page">
                 <Sidebar />
-                <div className="main flex-row">
-                    <div className="left">
-                      <Options />
-                      <div className="infolist">
-                        <h1 className="title-wrapper">我的消息箱</h1>
-                        <div className="item-info noread">
-                          <div className="cover-info">
-                            <img src={require('../../../assets/images/avatar_admin.jpg')}/>
-                          </div>
-                          <div className="info-info">
-                            <p className="text-main"><span class="text-status">未读</span>举报处理结果通知</p>
-                            <p className="text-date">2019年3月10日 15:23</p>
-                            <p className="text-sub">您好，您在视频[日漫改]她爱上了我的谎/迷雾中的蝴蝶(2013年)-剧中歌曲向cut中举报的弹幕『未删减版同步连载中+微新:ss66802』已被删除，原因是『恶意刷屏』</p>
-                          </div>
-                        </div>
-                        <div className="item-info read">
-                          <div className="cover-info">
-                            <img src={require('../../../assets/images/avatar_admin1.jpg')}/>
-                          </div>
-                          <div className="info-info">
-                            <p className="text-main"><span class="text-status">已读</span>欢迎加入墨鱼笔记！</p>
-                            <p className="text-date">2019年3月10日 15:23</p>
-                            <p className="text-sub">亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。</p>
-                          </div>
-                        </div>
-                      </div>                      
-                    </div>
-                    <div className="right">
-                        <Header />
-                        <div className="infos">
-                          <div className="infos-top">
-                            <div className="item-infos">
-                              <div className="cover-infos">
-                                  <img src={require('../../../assets/images/avatar_admin1.jpg')}/>
-                              </div>
-                              <div className="info-infos">
-                                <div className="bubble">
-                                  <p className="name">肥嘟嘟左卫门</p>
-                                  <p className="title">欢迎加入墨鱼笔记！</p>
-                                  亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。
-                                </div>
-                                <p className="date">发布于 12:09</p>
-                              </div>
+                <div className="flex-column">
+                    <Header />
+                    <div className="flex-row flex-1">
+                        <div className="left">
+                            <div className="info-menu">
+                                <h1 className="section-title">消息类型</h1>
+                                <ul className="list-menu">
+                                    <li><Link to="/setting/basic"><FontAwesomeIcon icon="bullhorn" /> 系统消息</Link></li>
+                                    <li><Link to="/setting/account"><FontAwesomeIcon icon={['far', "thumbs-up"]} /> 互动消息</Link></li>
+                                    <li><Link to="/setting/info"><FontAwesomeIcon icon={['far', "comments"]} /> 评论回复</Link></li>
+                                </ul>
                             </div>
-                          </div>
+                        </div>  
+                        <div className="infos flex-1">
+                            <div className="item-infos">
+                            <div className="cover-infos">
+                                <img src={require('../../../assets/images/avatar_admin1.jpg')}/>
+                            </div>
+                            <div className="info-infos">
+                                <div className="bubble">
+                                <p className="name">肥嘟嘟左卫门</p>
+                                <p className="title">欢迎加入墨鱼笔记！</p>
+                                亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。
+                                </div>
+                                <p className="date">12:09</p>
+                            </div>
+                            </div>
                         </div>
-                    </div>
+                    </div>   
                 </div>
             </div>
         );
