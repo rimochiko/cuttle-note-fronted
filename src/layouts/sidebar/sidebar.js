@@ -29,25 +29,36 @@ class Sidebar extends Component {
     render () {
         return (
             <div className="public-sidebar">
-              <div className="logo">
-                <DropDown data={dropMenudata}>
-                    <span className="mck-dropdown-link">
+              <div className="header">
+                <div className="logo">
                     <img src={require('../../assets/images/avatar.jpg')} className="header-avatar"/>
-                    </span>
-                </DropDown>
-              </div>
-              <ul className="ul-nav">
+                </div>
+                <ul className="ul-nav">
                 {
                     config.map((item, index) => {
                             return <li key={item.name}  className="li-nav">
-                               <Link to={item.url} className="link-nav" title={item.text}>
+                                <Link to={item.url} className="link-nav" title={item.text}>
                                     <FontAwesomeIcon icon={item.icon} className="link-icon"/>
-                               </Link>
+                                </Link>
                             </li>
                     })
                 }
-              </ul>
-              <div></div>
+                </ul>
+              </div>
+              <div>
+                <ul className="ul-nav">
+                    <li className="li-nav">
+                        <Link to='/' className="link-nav">
+                            <FontAwesomeIcon icon="fold" className="link-icon"/>
+                        </Link>
+                    </li>
+                    <li className="li-nav">
+                        <Link to='/' className="link-nav">
+                            <FontAwesomeIcon icon="cog" className="link-icon"/>
+                        </Link>
+                    </li>
+                </ul>
+              </div>
             </div>
         );
     }

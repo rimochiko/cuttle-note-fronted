@@ -10,11 +10,15 @@ class Options extends Component {
 
     render () {
         return (
-            <div className="public-options">
-                <Link to="/" className="header-icon"><FontAwesomeIcon icon="trash" /></Link>
-                <Link to="/" className="header-icon"><FontAwesomeIcon icon="search" /></Link> 
-                <Link to="/info" className="header-icon"><FontAwesomeIcon icon="bell"/></Link>
-            </div>
+            <ul className="public-options">
+            {
+                this.props.data.map((item, index) => {
+                    return (
+                        <Link to={item.link} className="header-icon" title={item.text} key={item.id}><FontAwesomeIcon icon={item.icon} /></Link>
+                    )
+                })
+            }
+            </ul>
         );
     }
 }

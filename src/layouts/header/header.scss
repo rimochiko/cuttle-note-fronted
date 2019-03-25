@@ -1,33 +1,29 @@
 @import '../../assets/styles/public.scss';
 
+$iconColor: #9190b4;
 .public-header {
     padding: 1.5rem 3rem;
     display: flex;
     flex-shrink: 0;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #f0f1f5;
+    background-color: #FFF;
     .header-icon {
-        color: #c4c6cc;
-        font-size: 1.2rem;
-        margin: 0 2rem 0 0;
-        line-height: 2rem;
+        color: #9190b4;
+        font-size: 1.1rem;
         @extend .transition;
         &:hover {
             color: $purple;
         }
+        &.icon-left {
+            margin-right: 1.5rem;
+        }
+        &.icon-right {
+            margin-left: 1.5rem;
+        }
     }
-    .header-avatar {
-        width: 2rem;
-        height: 2rem;
-        vertical-align: middle;
-        border-radius: 50%;
-        margin-right: 0.5rem;
-    }     
-    .avatar-icon {
-        margin-left: .5rem;
-    }
-    .tip {
-        display: flex;
+    .header-btn {
+        color: #9190b4;
+        font-size: .9rem;
     }
 }

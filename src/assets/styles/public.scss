@@ -1,12 +1,12 @@
 $purple: #632df8;
-$fontPurple: #906bf7;
-$purpleGray: #b9cae2;
-$bgGray: #f7f8f9;
+$fontPurple: #331cbf;
+$purpleGray: #a7a9c0;
+$bgGray: #f8f9ff;
 $borderGray: #ecedf0;
 $normalGray: #c4c6cc;
 $deepGray: #a3a9b6;
 $fontGray: #999;
-$fontBlack: #31333b;
+$fontBlack: #3e4077;
 
 .transition {
     transition: all 0.2s;
@@ -17,4 +17,24 @@ $fontBlack: #31333b;
     overflow-y: scroll;
 }
 
+.overflow {
+    height: 100vh;
+    overflow: hidden;
+}
 
+.section {
+    background-color: #FFF;
+    box-shadow: 0 10px 15px #eeeef8;
+    border-radius: .3rem;
+}
+
+.btn {
+    border: none;
+    background-color: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.flex-1 {
+    flex: 1;
+}

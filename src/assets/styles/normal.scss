@@ -1,29 +1,34 @@
 body {
-    background-color: #f5f6fa;
+    background-color: #f5f5fc;
+    font-weight: 300;
+    min-height: 100vh;
+    min-width: 1300px;
 }
 
 body,
 input,
 textarea {
     font-family: 'Microsoft Yahei';
-    color: #333;
+    color: #2a2b2f;
 }
 
 /* 板块公共标题 */
 .section-title {
-    color: #979aa1;
-    font-size: .9rem;
-}
-
-.wrapper {
-    .section-title {
-        padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    svg {
+        color: #acafc4;
+        font-size: 1rem;
     }
-}
+    .text {
+        color: #a3a5b6;
+        font-size: .9rem;
+    }
 
+}
 
 .section {
-    padding: 1rem 3rem;
+    padding: 1rem 0rem;
 }
 
 .radius-btn {
@@ -33,4 +38,19 @@ textarea {
 .flex-column {
     display: flex;
     flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+
+.input-btn {
+    background-image: linear-gradient(to bottom,#4c68fa, #4c8efa);
+    background-color: #4d7cff;
+    color: #fff;
+    border: none;
+    padding: .5rem 1rem;
+    cursor: pointer;         
 }

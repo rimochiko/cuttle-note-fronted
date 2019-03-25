@@ -13,19 +13,38 @@ $mainColor: #632df8;
     .component-tree-btn {
         padding: .5rem 0;
         display: flex;
+        justify-content: space-between;
         align-items: center;
         a {
-           color: #999; 
+           color: #3e4077; 
            &:hover {
             color: $mainColor;
            }
         }
         cursor: pointer;
         svg {
-            color: #999;
+            color: #9396b2;
             &:hover {
                 color: $mainColor;
             }
+        }
+        &:hover {
+            .btn-add {
+                display: block;
+            }
+        }
+        .btn-add {
+            flex-grow: 0;
+            flex-shrink: 0;
+            display: none;
+            background-color: #e9e9f8;
+            width: .8rem;
+            height: .8rem;
+            text-align: center;
+            border-radius: .2rem;
+            line-height: .6rem;
+            font-weight: 400;
+            color: #9396b2;
         }
         
     }

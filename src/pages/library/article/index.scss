@@ -1,20 +1,32 @@
 @import '../../../assets/styles/public.scss';
 /*文章区域*/
 .article {
-    flex: 1;
-    overflow-y: scroll;
-    padding: 2rem 0;
+    margin: 2rem 3rem;
+    font-weight: 300;
     .header {
-        padding: 0 3rem;
         margin-bottom: 2rem;
+        .tag {
+            display: flex;
+            li {
+                a {
+                    display: block;
+                    font-size: .8rem;
+                    color: #fd64a9;
+                    background: #f9d6ec;
+                    padding: .2rem .5rem;
+                    border-radius: .3rem;
+                    margin: 0 1rem 1rem 0;
+                }
+            }
+        }
         .detail {
             display: flex;
             justify-content: space-between;
             a {
-                color: $fontGray;
+                color: #adafc5;
             }
             span {
-                color: $fontGray;
+                color: #adafc5;
                 margin-right: 1rem;
                 font-size: .85rem;
                 &:last-child {
@@ -25,17 +37,21 @@
         .title {
             font-size: 1.9rem;
             margin-bottom: 2rem;
+            color: #3e4077;
         }
     }
     .body {
+        @extend .section;
         line-height: 2;
-        padding: 0 3rem;
+        padding: 3rem 3rem 0;
+        margin-bottom: 2rem;
         font-size: .9rem;
+        color: #3e4077;
         blockquote {
-            border-left: 0.2rem solid #cbcbcb;
-            background-color: #f8f8f8;
+            background-color: #f7f7fb;
             padding: .5rem 2rem;
-            color: #666;
+            color: #8d8db0;
+            border-radius: .5rem;
         }
         p {
             margin-top: 1rem;
@@ -63,46 +79,60 @@
         img {
             max-width: 100%;
         }
+        b {
+            font-weight: bold;
+        }
+        i {
+            font-style: italic;
+        }
     }
-}
-
-.footer-info {
-    display: flex;
-    justify-content: space-between;
-    margin: 2rem 0;
-    padding: 0 3rem;
-    .footer-ul {
+    .extra {
         display: flex;
-        font-size: .85rem;
-        color: $normalGray;
-        cursor: pointer;
-        li {
-            margin-right: 2rem;
-            @extend .transition;
-            &:hover {
-                color: $purple;
-            }
-            svg {
-                margin-right: .1rem;
-            }
-            &:last-child {
-                margin-right: 0;
+        justify-content: space-between;
+        margin: 3rem 0;
+        padding: 0rem 0rem 3rem;
+        .extra-ul {
+            display: flex;
+            font-size: .85rem;
+            color: #adafc5;
+            cursor: pointer;
+            li {
+                margin-right: 2rem;
+                @extend .transition;
+                &:hover {
+                    color: $purple;
+                }
+                svg {
+                    margin-right: .1rem;
+                }
+                &:last-child {
+                    margin-right: 0;
+                }
             }
         }
     }
 }
 
+
+
 /*文章评论*/
 .comments {
+    padding-top: 2rem;
+    @extend .section;
+    .section-title {
+        padding-left: 3rem;
+        color: #999;
+    }
     .input-comment-box {
         padding: 0rem 3rem;
+        margin: 2rem 0;
         .input-textarea {
             resize: none;
             box-sizing: border-box;
             width: 100%;
             border-radius: .3rem;
             border: none;
-            background-color: #fdfdfd;
+            background-color: #f7f7fb;
             min-height: 6rem;
             padding: .8rem;
             font-size: 1rem;
@@ -112,10 +142,14 @@
 }
 
 .ul-comment-single {
-    padding: 0 3rem;
+    padding: 2rem 3rem;
+    .section-title {
+        padding-left: 3rem;
+        color: #a3a5b6;
+    }
     .li-comment-single {
         display: flex;
-        color: #666;
+        color: #3e4077;
         line-height: 2;
         font-size:.85rem;
         margin-bottom: 1rem;
@@ -133,17 +167,17 @@
        flex: 1;
        padding-right: 1rem;
        a {
-           color: #999;
+           color: #a3a5b6;
        }
        .date {
-           color: #999;
+           color: #a3a5b6;
            font-size: .8rem;
        }
     }
     .btn-reply {
         font-size: .85rem;
         flex-shrink: 0;
-        color: #999;
+        color: #a3a5b6;
         cursor: pointer;
     }
 }

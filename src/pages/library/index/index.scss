@@ -1,9 +1,15 @@
 @import '../../../assets/styles/public.scss';
 
 .tree {
+  font-weight: 300;
+  padding: 2rem 3rem;
   .switch {
       font-size: .9rem;
       color: $fontGray;
       margin-bottom: 1rem;
   }
+}
+
+.white {
+  background-color: #FFF;
 }

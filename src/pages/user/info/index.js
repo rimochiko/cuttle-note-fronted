@@ -15,7 +15,7 @@ class Page extends Component {
         return (
           <div className="page">
                 <Sidebar />
-                <div className="main">
+                <div className="main flex-row">
                     <div className="left">
                       <Options />
                       <div className="infolist">

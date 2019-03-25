@@ -6,50 +6,19 @@
 }
 
 .main {
-    display: flex;
+    height: 100vh;
+    overflow-y: scroll;
     flex: 1;
+}
+
+.public-body {
+    flex: 1;
+    padding: 3rem 3rem;
 }
 
 .left {
     width: 22rem;
-    overflow: hidden;
-    box-sizing: border-box;
-    height: 100vh;
-    background-color: $bgGray;
     flex-shrink: 0;
-}
-
-.right {
-    flex: 1;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background-color: #FFF;
-}
-
-/*团队列表*/
-.group {
-    .item-group {
-        display: flex;
-        margin: 0 3rem 2rem;
-        .avatar {
-            margin-right: 1rem;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 10px 15px #ddd;
-        }
-        .title {
-            display: inline-block;
-            color: #666;
-            font-size: 1rem;
-            margin-bottom: .5rem;
-        }
-        .des {
-            color: #97999d;
-            font-size: .8rem;
-        }
-    }
 }
 
 /*操作列表*/
@@ -63,14 +32,16 @@
                 @extend .transition;
                 display: block;
                 box-sizing: border-box;
-                padding: 1rem 3rem;
+                padding: 1rem 1rem;
+                margin: 0 2rem;
                 text-decoration: none;
                 color: $deepGray;
                 font-size: .9rem;
                 border-radius: .5rem;
                 &:hover {
                     color: $purple;
-                    background-color: #f5faff;
+                    background-color: #fdfdfd;
+                    box-shadow: 0 10px 15px #eee;
                     svg {
                         color: $purple;
                     }
@@ -84,81 +55,203 @@
     }
 }
 
-/*最新编辑*/
-.recent {
-    margin-bottom: -2rem;
-    .item-recent {
-        padding: 0 3rem;
-        margin-bottom: 2rem;
-        display: flex;
-        color: $fontGray;
-        .cover {
-            flex-shrink: 0;
-            width: 3rem;
-            height: 3rem;
-            text-align: center;
-            line-height: 3rem;
-            font-size: 1.6rem;
-            background: $bgGray;
-            color: $normalGray;
-            margin-right: 1rem;
-            border-radius: .5rem;
+.panel {
+    display: flex;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+/*欢迎面板*/
+.welcome {
+    padding: 2rem;
+    flex-shrink: 0;
+    align-items: center;
+    margin-bottom: 3rem;
+    @extend .section;
+    .icon {
+        font-size: 2rem;
+        margin: 0 2rem 0 0rem;
+        color: #e0e2f3;
+    }
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #3e4077;
+        font-weight: 300;
+        .name {
+            font-weight: normal;
         }
+    }
+    p {
+        font-size: .9rem;
+        color: #8493b8;
+    }
+}
+
+/*数据统计*/
+.statist {
+    width: 28rem;
+    flex-shrink: 0;
+    flex-grow: 0;
+    padding: 2rem;
+    font-weight: 300;
+    @extend .section;
+    .section-title {
+        margin-bottom: 2rem;
+    }
+    .statist-graph {
+        height: 20rem;
+    }
+    .item-statist {
+        box-sizing: border-box;
+        width: 7rem;
+        height: 7rem;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .data {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #3e4077;
+        }
+        .name {
+            color: #8493b8;
+            font-size: .9rem;
+        }
+    }
+}
+
+/*最近浏览*/
+.history {
+    flex: 1;
+    margin-left: 3rem;
+    padding: 2rem;
+    font-weight: 300;
+    @extend .section;
+    .item-history {
+        padding: .6rem 0 .6rem 0;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        line-height: 2rem;
+        border-bottom: 1px solid #eef0f3;
+        font-size: .85rem;
+        justify-content: space-between;
+        color: #8493b8;
+        align-items: center;
         .info {
-            .date {
-                font-size: .8rem;
-                line-height: 1;
-                margin-bottom: .5rem;
+            flex-grow: 1;
+            svg {
+                color: #e0e2f3;
+                margin-right: .8rem;
             }
-            a {
-                color: $fontPurple;
-                text-decoration: none;
+        }
+        .author {
+            flex-grow: 0;
+            width: 10rem;
+            margin: 0 2rem;
+            img {
+                width: 1.8rem;
+                height: 1.8rem;
+                vertical-align: middle;
+                margin-right: .5rem;
+                border-radius: 50%;
+            }
+        }
+        .date {
+            width: 5rem;
+            flex-grow: 0;
+            font-size: .8rem;
+            margin: 0 2rem 0 0;
+            text-align: right;
+        }
+        .collect {
+            cursor: pointer;
+            &.active {
                 svg {
-                    margin-right: .5rem;
+                    color: #ffec55;
                 }
             }
-            font-size: .9rem;
-            line-height: 1.8;
         }
         
+        svg {
+            color: #99a0b5;
+        }
+        a {
+            color: #3e4077;
+        }
+        &:last-child {
+            border-bottom: none;
+        }
     }
 }
 
 /*最新动态*/
 .news {
+    margin-top: 3rem;
+    padding: 2rem;
+    font-weight: 300;
+    @extend .section;
+    .section-title {
+        margin-bottom: 2rem;
+    }
     .item-news {
         display: flex;
-        margin-bottom: 1rem;
-        padding: 0 3rem;
+        margin-bottom: 2rem;
         font-size: .9rem;
         .avatar {
             flex-shrink: 0;
-            margin-right: 1rem;
+            margin-right: 2rem;
             > img {
-                width: 3rem;
-                height: 3rem;
+                width: 4rem;
+                height: 4rem;
                 border-radius: 50%;
                 box-shadow: 0 10px 15px #ddd;
             }
         }
-        .info {
-            flex: 1;
-            .header {
-                display: flex;
-                justify-content: space-between;
-                font-size: .9rem;
-                color: $fontGray;
-                .link {
-                    color: $fontPurple;
-                }
+        .author {
+            a {
+                color: #3e4077;
+                font-size: .9rem;   
             }
-            .body {
-                padding: 1rem 0 1.5rem;
-                font-size: .85rem;
-                line-height: 1.8;
-                color: $deepGray;
+            margin-bottom: 1rem;
+        }
+        .date {
+            color: #8493b8;
+            font-size: .8rem;
+            margin-bottom: .8rem;
+        }
+        .type {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            color: #3e4077;
+            a {
+                color: #4c71f9;
             }
         }
-
+        .icon {
+            margin-right: 1rem;
+            display: block;
+            line-height: 1.8rem;
+            font-size: .9rem;
+            text-align: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 50%;
+            &.pen {
+                background-color: #e2e5f4;
+                color: #3954e8;
+            }
+            &.camera {
+                background-color: #f7e9e4;
+                color: #fe7a4b;
+            } 
+        }
+        .body {
+            color: #8493b8;
+        }
     }
 }

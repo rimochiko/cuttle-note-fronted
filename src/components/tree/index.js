@@ -71,8 +71,9 @@ class Tree extends Component {
                 <ul className="component-tree-list" key={item.id} style={{display: (item.isOpen ? "block" : "none")}}>
                 <li className="component-tree-item" key={item.id}>
                     <div className="component-tree-btn">
-                        {itemIcon}
-                        <Link to={item.link}>{item.name}</Link>
+                        <div className="btn-main">{itemIcon}
+                        <Link to={item.link}>{item.name}</Link></div>
+                        <div className="btn-add">+</div>
                     </div>
                     { childData }
                 </li>

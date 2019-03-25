@@ -2,13 +2,13 @@
 .public-options {
     display: flex;
     align-items: center;
-    padding: 2rem 3rem;
+    padding: 2rem 3rem 0;
     svg {
-        margin-right: 2rem;
+        margin-right: 1.5rem;
     }
     a {
         transition: all .2s;
-        color: #c4c6cc;
+        color: #9396b2;
         &:hover {
             color: #632df8;
         }

@@ -13,7 +13,7 @@ import Options from '../../../layouts/options/';
 
 let treeData = [{
   id: 1,
-  name: '根目录1',
+  name: '我的空间',
   link: '/1',
   isOpen: true,
   child : [{
@@ -49,6 +49,22 @@ let treeData = [{
   }]
 }]
 
+let optiondata = [{
+  id: 2,
+  text: '草稿箱',
+  link: '/',
+  icon: ['far','clipboard'],
+}, {
+  id: 3,
+  text: '收藏夹',
+  link: '/',
+  icon: ['far','star']
+}, {
+  id: 4,
+  text: '回收站',
+  link: '/',
+  icon: ['far','trash-alt']
+}];
 
 
 class Page extends Component {
@@ -60,20 +76,14 @@ class Page extends Component {
         return (
            <div className="page">
                 <Sidebar />
-                <div className="main">
-                    <div className="left">
-                      <Options></Options>
-                      <div className="section tree">
-                        <div className="switch">
-                          范围：<select>
-                            <option>我的</option>
-                            <option>野原家</option>
-                          </select>
-                        </div>
+                <div className="flex-row overflow">
+                    <div className="left white">
+                      <Options data={optiondata}/>
+                      <div className="tree">
                         <Tree data={treeData} />
                       </div>                 
                     </div>
-                    <div className="right">
+                    <div className="right flex-scroll-y">
                         <Switch>
                           <Route exact path="/library" component={LibArticlePage}/>
                           <Route path="/library/edit" component={LibEditPage} />

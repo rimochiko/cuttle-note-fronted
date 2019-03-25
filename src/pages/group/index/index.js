@@ -7,6 +7,23 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Link} from 'react-router-dom';
 
+let optiondata = [{
+  id: 2,
+  text: '草稿箱',
+  link: '/',
+  icon: ['far','clipboard'],
+}, {
+  id: 3,
+  text: '收藏夹',
+  link: '/',
+  icon: ['far','star']
+}, {
+  id: 4,
+  text: '回收站',
+  link: '/',
+  icon: ['far','trash-alt']
+}];
+
 class Page extends Component {
     constructor () {
         super();
@@ -16,11 +33,10 @@ class Page extends Component {
         return (
           <div className="page">
                 <Sidebar />
-                <div className="main">
+                <div className="flex-row flex-1">
                     <div className="left">
-                      <Options />
-                      <div className="us wrapper">
-                        <h1 className="section-title">我的团队</h1>
+                      <div className="us">
+                        <input type="text" placeholder="搜索人" className="us-input"/>
                         <div className="item-us">
                           <div className="cover-us">
                             <img src={require('../../../assets/images/avatar5.jpg')}/>
@@ -41,8 +57,9 @@ class Page extends Component {
                         </div>
                       </div>                      
                     </div>
-                    <div className="right">
-                        <div className="us-list">
+
+                    <div className="center flex-1 flex-column">
+                        <div className="us-list flex-1">
                           <div className="header">
                               <ul className="us-people">
                                 <li><img src={require('../../../assets/images/avatar2.jpg')}/></li>
@@ -91,10 +108,17 @@ class Page extends Component {
                         </div>
                         
                         <div className="msg-send">
-                          <input type="text" placeholder="输入要发送的" className="input-msg"/>
-                          <button className="btn-msg"><FontAwesomeIcon icon="paper-plane"/></button>
+                          <textarea className="msg-input"></textarea>
+                          <ul className="msg-ul">
+                            <li><span className="input-btn radius-btn">发送</span></li>
+                            <li><span className="tool-btn"><FontAwesomeIcon icon={['far', 'smile']}/></span></li>
+                            <li><span className="tool-btn"><FontAwesomeIcon icon="at"/></span></li>
+                            <li><span className="tool-btn"><FontAwesomeIcon icon="paperclip"/></span></li>
+                            <li><span className="tool-btn"><FontAwesomeIcon icon={['far', 'image']}/></span></li>
+                          </ul>
                         </div>
                     </div>
+
                     <div className="other">
                       <div className="us-about">
                         <div className="cover">
@@ -104,8 +128,8 @@ class Page extends Component {
                         <p className="des">暂无简介</p>
                       </div>
                       <div className="us-options">
-                        <div className="us-btns wrapper">
-                          <h1 className="section-title">团队操作</h1>
+                        <div className="us-btns">
+                          <h1 className="normal-title">团队操作</h1>
                           <ul className="ul-us-btns">
                             <li><Link to="/">
                               <FontAwesomeIcon icon="book" />

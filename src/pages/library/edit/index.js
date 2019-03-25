@@ -18,6 +18,9 @@ class Page extends Component {
     addTextStyle (e, command) {
       e.preventDefault();
       let editBox = this.refs.editBox;
+      let selection = window.getSelection();
+      let range = selection.getRangeAt(0);
+      
       console.log(editBox.document);
       switch(command){
 				case "bold": document.execCommand("bold",false,null);break;

@@ -1,24 +1,20 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom'
 import DropDown from '../../components/dropdown';
+import Badge from '../../components/badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './header.scss';
 
 let dropMenudata = [{
     id: 1,
-    text: '我的主页',
+    text: '新文档',
     link: '/',
-    icon: 'user'
+    icon: 'file-alt'
 }, {
     id: 2,
-    text: '账号设置',
+    text: '新画图',
     link: '/setting',
-    icon: 'cog'
-}, {
-    id: 3,
-    text: '退出',
-    link: '/login',
-    icon: 'sign-out-alt'
+    icon: 'file-image'
 }]
 
 class Header extends Component {
@@ -29,13 +25,14 @@ class Header extends Component {
     render () {
         return (
             <div className="public-header">
-                <Link to="/info" className="header-icon"><FontAwesomeIcon icon="bell"/></Link>
-                <div className="tip">  
+                <div className="left-header">
+                </div>
+                <div className="right-header flex-row">
                     <DropDown data={dropMenudata}>
-                        <span className="mck-dropdown-link">
-                           <img src={require('../../assets/images/avatar.jpg')} className="header-avatar"/>
-                        </span>
+                        <FontAwesomeIcon icon="plus" className="header-icon icon-right"/>
                     </DropDown>
+                    <Link to="/info"><FontAwesomeIcon icon="search" className="header-icon icon-right"/></Link>
+                    <Link to="/info"><Badge><FontAwesomeIcon icon="bell" className="header-icon icon-right"/></Badge></Link>
                 </div>
             </div>
         );

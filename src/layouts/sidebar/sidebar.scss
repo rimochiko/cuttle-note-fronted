@@ -1,12 +1,15 @@
 @import '../../assets/styles/public.scss';
 
+$bgColor: #FFF;
+$borderColor: #e9e9f4;
+
 .public-sidebar {
-    width: 4.6rem;
+    width: 5rem;
     height: 100vh;
     min-height: 20rem;
     flex-shrink: 0;
-    background-color: #FFF;
-    border-right: 1px solid #ecedf0;
+    background-color: $bgColor;
+    border-right: 1px solid $borderColor;
     display: flex;
     flex-direction: column;
     align-content: center;
@@ -14,10 +17,11 @@
     z-index: 100;
     .logo {
         text-align: center;
-        padding-top: 2rem;
+        padding-top: 1.5rem;
+        padding-bottom: 2.5rem;
     }
     .ul-nav {
-        width: 100%;
+        padding: 0 1rem;
     }
 }
 
@@ -26,9 +30,11 @@
     .link-nav {
         display: block;
         text-align: center;
-        color: $purpleGray;
+        color: #7f83b8;
         text-decoration: none;
-        padding: 1.2rem 0;
+        padding: .6rem 0;
+        margin-bottom: 1rem;
+        border-radius: .3rem;
         @extend .transition;
         .link-icon {
             font-size: 1.1rem;
@@ -36,14 +42,16 @@
             margin: 0 auto 0.3rem;
         }
         &:hover {
-            color: $purple;
+            color: #474747;
+            background-color: #e9e9f8;
         }
     }
 }
 
 .header-avatar {
-    width: 1.7rem;
-    height: 1.7rem;
+    width: 2rem;
+    height: 2rem;
     vertical-align: middle;
     border-radius: 50%;
+    border: 2px solid #FFF;
 } 
