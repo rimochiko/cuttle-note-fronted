@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 import {HomePage, DashboardPage} from './pages/home';
 import {
-  LibraryPage
+  LibraryPage,
+  LibEditPage
 } from './pages/library';
 import {GalleryPage} from './pages/gallery';
 import {GroupPage} from './pages/group';
@@ -29,6 +30,7 @@ class App extends Component {
           <Route exact path="/" component={HomePage}/>
           <Route path="/dashboard" component={DashboardPage} />
           <Route path="/library" component={LibraryPage} />
+          <Route path="/article/edit" component={LibEditPage} />
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/group" component={GroupPage} />
           <Route path="/register" component={RegisterPage} />

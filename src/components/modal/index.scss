@@ -1,0 +1,35 @@
+$dotColor: #ff6a6a;
+.mck-modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, .8);
+    z-index: 300;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+    .mck-modal-box {
+        background-color: #fff;
+        border-radius: .3rem;
+        box-shadow: 0 10px 15px #f7f7fb;
+        overflow: hidden;
+        .mck-modal-header {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eef0f3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .title {
+                color: #363c75;
+                font-size: .9rem;
+            }
+            .close {
+                color: #363c75;
+                font-size: .9rem;
+                margin-left: 2rem;
+                cursor: pointer;
+            }
+        }
+    }
+}

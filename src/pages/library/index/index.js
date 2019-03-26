@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
-import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Route, Switch, Link} from 'react-router-dom';
 import {
-  LibEditPage,
   LibArticlePage
 } from '..';
 import Tree from '../../../components/tree';
@@ -85,7 +82,6 @@ class Page extends Component {
                     </div>
                     <Switch>
                       <Route exact path="/library" component={LibArticlePage}/>
-                      <Route path="/library/edit" component={LibEditPage} />
                       <Route path="/library/article" component={LibArticlePage} />
                     </Switch> 
                 </div>

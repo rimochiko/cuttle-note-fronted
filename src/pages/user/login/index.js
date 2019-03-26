@@ -22,7 +22,9 @@ class Page extends Component {
                     <input placeholder="密码"/>
                     <div className="other-login">
                       <a href="#">忘记密码？</a>
-                      <p>三方登录：<FontAwesomeIcon icon="qq" /><FontAwesomeIcon icon="weibo" /><FontAwesomeIcon icon="wechat" /></p>
+                      <p>三方登录 <FontAwesomeIcon icon={["fab","qq"]} />
+                      <FontAwesomeIcon icon={["fab","weibo"]} />
+                      <FontAwesomeIcon icon={["fab","wechat"]} /></p>
                     </div>
                     <input type="submit" text="登录" className="form-btn"/>
                     <p className="form-subtext">还没有账号? <Link to="/register">注册</Link></p>

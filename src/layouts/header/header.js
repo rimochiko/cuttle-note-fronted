@@ -8,7 +8,7 @@ import './header.scss';
 let dropMenudata = [{
     id: 1,
     text: '新文档',
-    link: '/library/edit',
+    link: '/article/edit',
     icon: 'file-alt'
 }, {
     id: 2,
