@@ -33,6 +33,26 @@ class Page extends Component {
           if(url) 
             document.execCommand("createlink",false,url);
           break;
+        case "listul": 
+        break;
+        case "listol": 
+        break;
+        case "heading": 
+        break;
+        case "link": 
+        break;
+        case "quote":
+          document.execCommand('formatBlock', false, '<blockquote>');
+          break; 
+        break;
+        case "image": 
+        break;
+        case "code": 
+          document.execCommand('formatBlock', false, '<pre>');
+        break;
+        case "undo": 
+          document.execCommand('Undo');
+        break;
 			}
     }
 
@@ -155,7 +175,7 @@ class Page extends Component {
                           <h1 onClick={this.addTextStyle.bind(this, 'title', 1)}>一级标题</h1>
                           <h2 onClick={this.addTextStyle.bind(this, 'title', 2)}>二级标题</h2>
                           <h3 onClick={this.addTextStyle.bind(this, 'title', 3)}>三级标题</h3>
-                          <h4 nClick={this.addTextStyle.bind(this, 'title', 4)}>四级标题</h4>
+                          <h4 onClick={this.addTextStyle.bind(this, 'title', 4)}>四级标题</h4>
                         </div>
                       </div>
 
@@ -172,9 +192,7 @@ class Page extends Component {
                       <div
                         className="single-tool" 
                         title="引用"
-                        onClick={(e, command) =>
-                          {this.addTextStyle(e, 'quote')}
-                        }>
+                        onClick={this.addTextStyle.bind(this, 'quote')}>
                         <FontAwesomeIcon icon="quote-left"/>
                       </div>
                     </li>
@@ -182,9 +200,7 @@ class Page extends Component {
                       <div
                         className="single-tool" 
                         title="代码"
-                        onClick={(e, command) =>
-                          {this.addTextStyle(e, 'code')}
-                        }>
+                        onClick={this.addTextStyle.bind(this, 'code')}>
                         <FontAwesomeIcon icon="code"/>
                       </div>
                     </li>
@@ -192,9 +208,7 @@ class Page extends Component {
                       <div
                         className="single-tool" 
                         title="图片"
-                        onClick={(e, command) =>
-                          {this.addTextStyle(e, 'image')}
-                        }>
+                        onClick={this.addTextStyle.bind(this, 'image')}>
                         <FontAwesomeIcon icon="image"/>
                       </div>
                     </li>
@@ -202,9 +216,7 @@ class Page extends Component {
                       <div
                         className="single-tool" 
                         title="撤销"
-                        onClick={(e, command) =>
-                          {this.addTextStyle(e, 'undo')}
-                        }>
+                        onClick={this.addTextStyle.bind(this, 'undo')}>
                         <FontAwesomeIcon icon="undo"/>
                       </div>
                     </li>
