@@ -16,7 +16,6 @@ $dotColor: #ff6a6a;
         overflow: hidden;
         .mck-modal-header {
             padding: 1rem 2rem;
-            border-bottom: 1px solid #eef0f3;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -25,11 +24,29 @@ $dotColor: #ff6a6a;
                 font-size: .9rem;
             }
             .close {
-                color: #363c75;
-                font-size: .9rem;
+                color: #ced8d1;
+                font-size: 1rem;
                 margin-left: 2rem;
                 cursor: pointer;
             }
         }
     }
 }
+
+.modal-enter {
+    opacity: 0.01;
+  }
+  
+  .modal-enter.modal-enter-active {
+    opacity: 1;
+    transition: opacity 200ms ease-in-out;
+  }
+  
+  .modal-leave {
+    opacity: 1;
+  }
+  
+  .modal-leave.modal-leave-active {
+    opacity: 0.01;
+    transition: opacity 200ms ease-in-out;
+  }

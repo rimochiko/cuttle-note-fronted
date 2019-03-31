@@ -11,9 +11,10 @@
     padding: 2rem 2rem 1rem;
     .input-group {
         margin-bottom: 1rem;
+        font-size: .9rem;
     }
     label {
-        margin-right: .5rem;
+        margin-right: .8rem;
         color: #3e4077;
     }
     input {
@@ -150,6 +151,15 @@
     img {
         max-width: 100%;
     }
+    pre {
+        background: #2a324b;
+        border-radius: .5rem;
+        color: #ef596f;
+        font-family: 'consolas';
+        padding: .5rem 2rem;
+        margin: 1rem 0;
+        line-height: 1.5;
+    }
 }
 .edit-footer {
     border-bottom-left-radius: .3rem;
@@ -174,4 +184,39 @@
             margin-left: 1rem;
         }
     }
+}
+
+
+.edit-side {
+    font-weight: 300;
+    .section-title {
+        color: #a3a5b6;
+        font-size: .9rem;
+    }
+    margin: 2rem 2rem 2rem 0;
+}
+.edit-menu {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    @extend .section;
+    .detail {
+        font-size: .9rem;
+        margin-top: 2rem;
+        color: #3e4077;
+        a {
+            color: #3e4077;
+        }
+        svg {
+            margin-left: .5rem;
+            color: #99a0b5;
+        }
+    }
+}
+
+.edit-tags {
+    padding: 2rem;
+    @extend .section;
+    .tag {
+        margin-top: 2rem;
+    }    
 }

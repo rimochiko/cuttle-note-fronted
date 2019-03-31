@@ -3,6 +3,7 @@ import './index.scss';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
+import { Link } from 'react-router-dom';
 
 class Page extends Component {
     constructor () {
@@ -29,7 +30,9 @@ class Page extends Component {
           console.log(document.execCommand('italic',false,null));
           break;
         case "link": 
-          let url  = '';
+          console.log(1);
+          this.refs.addLink.toggle();
+          let url="";
           if(url) 
             document.execCommand("createlink",false,url);
           break;
@@ -39,13 +42,12 @@ class Page extends Component {
         break;
         case "heading": 
         break;
-        case "link": 
-        break;
         case "quote":
           document.execCommand('formatBlock', false, '<blockquote>');
           break; 
         break;
         case "image": 
+          this.refs.addImage.toggle();
         break;
         case "code": 
           document.execCommand('formatBlock', false, '<pre>');
@@ -89,7 +91,7 @@ class Page extends Component {
           return `${front} ${text}`;
         },
         link: function (text, link) {
-          
+          this.refs.addLink.show();
         },
         quote: function (text) {
 
@@ -112,7 +114,7 @@ class Page extends Component {
           <div className="page">
           <Sidebar />
             <div className="flex-row overflow flex-1">
-            <Modal title="添加链接">
+            <Modal title="添加链接" ref="addLink">
               <div className="edit-link-body">
                 <div className="input-group">
                   <label>名称</label>
@@ -125,9 +127,25 @@ class Page extends Component {
                 <div className="input-group">
                   <button className="radius-btn input-btn">确定</button>
                 </div>
-              </div>
-              
+              </div>   
             </Modal>
+
+            <Modal title="添加图片" ref="addImage">
+              <div className="edit-link-body">
+                <div className="input-group">
+                  <label>图片地址</label>
+                  <input type="text" />
+                </div>
+                <div className="input-group">
+                  <label>图片描述</label>
+                  <input type="text" />
+                </div>
+                <div className="input-group">
+                  <button className="radius-btn input-btn">确定</button>
+                </div>
+              </div>   
+            </Modal>
+
             <div className="edit-page flex-1">
               <div className="edit-header">
                 <input type="text" placeholder="输入文章标题" className="title"/>
@@ -249,12 +267,19 @@ class Page extends Component {
               </div>
             </div>
             
-              <div className="flex-column">
+              <div className="flex-column edit-side">
                 <div className="edit-menu">
-                  <h1 className="section-title">结构</h1>
+                  <h1 className="section-title">文章目录</h1>
+                  <div className="detail">
+                    <Link to="/">我的空间</Link> / <Link to="/">笔记</Link> / <Link to="/">2019-01-23</Link>
+                    <span><FontAwesomeIcon icon="edit"/></span>  
+                  </div>
                 </div>
                 <div className="edit-tags">
                   <h1 className="section-title">标签</h1>
+                  <ul className="tag">
+                    <li><a href="#">+ 添加</a></li>
+                  </ul>
                 </div>
               </div>
                 
