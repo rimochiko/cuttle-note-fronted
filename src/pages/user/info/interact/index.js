@@ -1,49 +1,52 @@
 import React, {Component} from 'react';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Link} from 'react-router-dom';
 class Page extends Component {
     constructor () {
         super();
     }
-
+    /**
+     * 互动消息
+     * 1.点赞提醒
+     * 2.关注提醒
+     * 3.收藏提醒
+     *  */
     render () {
         return (
             <div className="infos flex-1">
                 <div className="item-infos">
                     <div className="cover-infos">
-                        <img src={require('../../../../assets/images/avatar_admin1.jpg')}/>
+                        <img src={require('../../../../assets/images/avatar2.jpg')}/>
                     </div>
                     <div className="info-infos">
                         <div className="bubble">
-                        <p className="name">肥嘟嘟左卫门</p>
-                        <p className="title">欢迎加入墨鱼笔记！</p>
-                        亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。
+                        <p className="name">小丸子</p>
+                       给你的文章 <Link to="/">如何成长为一个优秀的工程师？</Link> 一个赞。
                         </div>
                         <p className="date">12:09</p>
                     </div>
                 </div>
                 <div className="item-infos">
                     <div className="cover-infos">
-                        <img src={require('../../../../assets/images/avatar_admin1.jpg')}/>
+                        <img src={require('../../../../assets/images/avatar2.jpg')}/>
                     </div>
                     <div className="info-infos">
                         <div className="bubble">
-                        <p className="name">肥嘟嘟左卫门</p>
-                        <p className="title">欢迎加入墨鱼笔记！</p>
-                        亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。
+                        <p className="name">小丸子</p>
+                       收藏了你的文章 <Link to="/">如何成长为一个优秀的工程师？</Link> 。
                         </div>
                         <p className="date">12:09</p>
                     </div>
                 </div>
                 <div className="item-infos">
                     <div className="cover-infos">
-                        <img src={require('../../../../assets/images/avatar_admin1.jpg')}/>
+                        <img src={require('../../../../assets/images/avatar2.jpg')}/>
                     </div>
                     <div className="info-infos">
                         <div className="bubble">
-                        <p className="name">肥嘟嘟左卫门</p>
-                        <p className="title">欢迎加入墨鱼笔记！</p>
-                        亲爱的小新同学，你已经成功注册并成为了墨鱼笔记的一员了，墨鱼笔记有着很多很多新的功能等着你的发现和挖掘，希望墨鱼笔记能给你带来不一样的感觉。
+                        <p className="name">小丸子</p>
+                       已加入团队 <Link to="/">老鼠爱大米</Link> 。
                         </div>
                         <p className="date">12:09</p>
                     </div>

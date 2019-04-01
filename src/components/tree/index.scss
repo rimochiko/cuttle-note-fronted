@@ -15,11 +15,23 @@ $mainColor: #632df8;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        .btn-main {
+            display: flex;
+            align-items: center;
+        }
         a {
+           display: flex;
+           align-items: center;
            color: #3e4077; 
            &:hover {
             color: $mainColor;
            }
+        }
+        .link-img {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            margin-right: .3rem;
         }
         cursor: pointer;
         svg {

@@ -11,6 +11,7 @@ class Tree extends Component {
         this.generateIcon = this.generateIcon.bind(this);
         this.loopTreeUl = this.loopTreeUl.bind(this);
         this.isNodeEmpty = this.isNodeEmpty.bind(this);
+        this.generateLink = this.generateLink.bind(this)
     }
 
     /**
@@ -49,6 +50,21 @@ class Tree extends Component {
         );
         }
     }
+
+    /**
+     * 生成目录链接
+     *  */
+    generateLink (item, hasImg) {
+        if (hasImg) {
+            return (
+                <Link to={this.props.base + item.link}><img src={item.img} className="link-img"/>{item.name}</Link>
+            )
+        } else {
+            return (
+                <Link to={this.props.base + item.link}>{item.name}</Link>
+            )
+        }
+    }
     
     /**
      * 判断节点是否为空
@@ -67,16 +83,18 @@ class Tree extends Component {
         return treeData.map((item, index) => {
             let childData = this.loopTreeUl(item.child);
             let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.child));
+            let itemLink = this.generateLink(item, item.img&&item.img.length > 0);
             return (
                 <ul className="component-tree-list" key={item.id} style={{display: (item.isOpen ? "block" : "none")}}>
-                <li className="component-tree-item" key={item.id}>
-                    <div className="component-tree-btn">
-                        <div className="btn-main">{itemIcon}
-                        <Link to={item.link}>{item.name}</Link></div>
-                        <div className="btn-add">+</div>
-                    </div>
-                    { childData }
-                </li>
+                    <li className="component-tree-item" key={item.id}>
+                        <div className="component-tree-btn">
+                            <div className="btn-main">{itemIcon}
+                                {itemLink}
+                            </div>
+                            <div className="btn-add">+</div>
+                        </div>
+                        { childData }
+                    </li>
                 </ul>
             );
         });
@@ -85,7 +103,6 @@ class Tree extends Component {
 
     render () {
         let treeMenu = this.loopTreeUl(this.props.data);
-        console.log(treeMenu);
         return (
             <div className="mck-wrapper-tree">
                 { treeMenu }

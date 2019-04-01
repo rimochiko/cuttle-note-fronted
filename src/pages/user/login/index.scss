@@ -1,3 +1,4 @@
+@import '../../../assets/styles/public.scss';
 .page-login {
     background-color: #8b90f9;
     width: 100%;
@@ -11,10 +12,10 @@
 .useropt {
     text-align: center;
     font-weight: 300;
-    letter-spacing: .2rem;
+    letter-spacing: .1rem;
     .title {
         color: #FFF;
-        font-size: 3rem;
+        font-size: 2.5rem;
         margin-bottom: 1rem;
     }
     .des {
@@ -24,10 +25,12 @@
     }
     .form-useropt {
         input {
+            font-weight: 300;
             display: block;
             margin-bottom: 1rem;
-            font-size: 1.3rem;
+            font-size: 1rem;
             padding: .8rem 1rem;
+            width:16rem;
             border: none;
             border-radius: .2rem;
             outline: none;
@@ -39,18 +42,27 @@
             & > a {
                 color: #FFF;
             }
+            svg {
+                margin-left: .3rem;
+            }
             margin-bottom: 1rem;
             font-size: .9rem;
         }
         .form-btn {
+            display: block;
             border: .1rem solid #FFF;
             color: #FFF;
             background: none;
-            font-size: 1.1rem;
-            padding: .8rem 3rem;
+            font-size: 1rem;
+            padding: .6rem 2rem;
             border-radius: 2rem;
-            margin: 0 auto 1rem;
+            margin: 2rem auto 1rem;
+            width: 8rem;
             cursor: pointer;
+            @extend .transition;
+            &:hover {
+                background-color: #FFF;
+            }
         }
         .form-subtext {
             color: #bfc2fa;

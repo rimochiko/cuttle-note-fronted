@@ -9,7 +9,10 @@ import {
   LibraryPage,
   LibEditPage
 } from './pages/library';
-import {GalleryPage} from './pages/gallery';
+import {
+  GalleryPage,
+  GalleryEditPage
+} from './pages/gallery';
 import {GroupPage} from './pages/group';
 
 import {SettingPage} from './pages/setting';
@@ -32,6 +35,7 @@ class App extends Component {
           <Route path="/library" component={LibraryPage} />
           <Route path="/article/edit" component={LibEditPage} />
           <Route path="/gallery" component={GalleryPage} />
+          <Route path="/photo/edit" component={GalleryEditPage} />
           <Route path="/group" component={GroupPage} />
           <Route path="/register" component={RegisterPage} />
           <Route path="/setting" component={SettingPage} />         

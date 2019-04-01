@@ -141,11 +141,25 @@
                font-size: .8rem;
                margin-bottom: .5rem;
            }
+           .quote {
+               color: #999;
+               padding-bottom: .5rem;
+               margin-bottom: .5rem;
+               border-bottom: 1px dashed #aaa;
+               a {
+                   color: #999;
+                   display: block;
+               }
+           }
         }
         .date {
             color: #9ea3bd;
             font-size: .8rem;
             text-align: right;
+            span {
+                margin-left: 1rem;
+                cursor: pointer;
+            }
         }
     }
 }

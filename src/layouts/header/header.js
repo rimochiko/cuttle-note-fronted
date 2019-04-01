@@ -13,7 +13,7 @@ let dropMenudata = [{
 }, {
     id: 2,
     text: '新画图',
-    link: '/setting',
+    link: '/photo/edit',
     icon: 'file-image'
 }]
 

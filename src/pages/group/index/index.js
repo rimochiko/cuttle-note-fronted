@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
-import Options from '../../../layouts/options/'; 
+import Modal from '../../../components/modal';
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,6 +34,26 @@ class Page extends Component {
           <div className="page">
                 <Sidebar />
                 <div className="flex-row flex-1">
+                    <Modal title="添加成员">
+                      <input type="text" placeholder="搜索ID"/>
+                      <ul>
+                        <li>
+                          <img src={require('../../../assets/images/avatar.jpg')} />
+                          <p>我呀我呀</p>
+                        </li>
+                      </ul>
+                    </Modal>
+
+                    <Modal title="团队管理">
+                      
+                    </Modal>
+
+
+                    <Modal title="团队统计">
+                      
+                    </Modal>
+
+
                     <div className="left">
                       <div className="us">
                         <input type="text" placeholder="搜索人" className="us-input"/>
@@ -125,29 +145,33 @@ class Page extends Component {
                            <img src={require('../../../assets/images/avatar5.jpg')}/>
                         </div>
                         <p className="title">野原家</p>
-                        <p className="des">暂无简介</p>
+                        <p className="des">
+                          <Link to="/library"><FontAwesomeIcon icon="book" />文库</Link>
+                          <Link to="/library"><FontAwesomeIcon icon="database" />统计</Link>
+                          <Link to="/library"><FontAwesomeIcon icon="cogs" />设置</Link>
+                        </p>
                       </div>
                       <div className="us-options">
                         <div className="us-btns">
-                          <h1 className="normal-title">团队操作</h1>
+                          <h1 className="normal-title">团队任务</h1>
                           <ul className="ul-us-btns">
                             <li><Link to="/">
-                              <FontAwesomeIcon icon="book" />
-                                <span class="list-text">团队文库</span>
+                              <FontAwesomeIcon icon={['far','check-square']} />
+                                <span class="list-text">完成“React Diff算法分析”</span>
                               </Link>
                             </li>
                             <li><Link to="/">
-                              <FontAwesomeIcon icon="calendar" />
+                            <FontAwesomeIcon icon={['far','check-square']} />
                                 <span class="list-text">团队任务</span>
                               </Link>
                             </li>
                             <li><Link to="/">
-                              <FontAwesomeIcon icon="database" />
+                            <FontAwesomeIcon icon={['far','square']} />
                                 <span class="list-text">团队统计</span>
                               </Link>
                             </li>
                             <li><Link to="/">
-                              <FontAwesomeIcon icon="cog" />
+                            <FontAwesomeIcon icon={['far','square']} />
                                 <span class="list-text">团队管理</span>
                               </Link>
                             </li>
