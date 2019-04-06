@@ -34,8 +34,19 @@ $mainColor: #632df8;
             margin-right: .3rem;
         }
         cursor: pointer;
+        .toggle-btn {
+            width: 1rem;
+            height: 1rem;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         svg {
             color: #9396b2;
+            
             &:hover {
                 color: $mainColor;
             }

@@ -107,7 +107,7 @@ class Page extends Component {
                                     <ul className="ul-comment-single">
                                         <li className="li-comment-single">
                                         <img src={require('../../../assets/images/avatar1.jpg')} />
-                                        <div class="author-comment"> 
+                                        <div className="author-comment"> 
                                             <Link to="/">小爱公主</Link>：
                                             vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。
                                             <span className="date"> 2019/3/18</span>
@@ -116,7 +116,7 @@ class Page extends Component {
                                         </li>
                                         <li className="li-comment-single">
                                         <img src={require('../../../assets/images/avatar2.jpg')} />
-                                        <div class="author-comment">
+                                        <div className="author-comment">
                                             <Link to="/">小葵</Link>：
                                             冲呀！！投票走起！！
                                             <span className="date"> 2019/3/18</span>
@@ -125,7 +125,7 @@ class Page extends Component {
                                         </li>
                                         <li className="li-comment-single">
                                         <img src={require('../../../assets/images/avatar1.jpg')} />
-                                        <div class="author-comment">
+                                        <div className="author-comment">
                                             <Link to="/">小爱公主</Link> 回复 <Link to="/">小葵</Link>：
                                             样式优先级那一块，内嵌、链接和导入，应该是在最后的优先级最高。
                                             <span className="date"> 2019/3/18</span>

@@ -38,3 +38,30 @@ $fontBlack: #3e4077;
 .flex-1 {
     flex: 1;
 }
+
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+    background: white;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fff;
+    border-radius: 6px;
+    background: #c9c9c9;
+}
+
+::-webkit-scrollbar-thumb {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #fff;
+    border-radius: 6px;
+    background-color: #c6c6c6;
+}

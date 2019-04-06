@@ -2,15 +2,18 @@
 .public-options {
     display: flex;
     align-items: center;
-    padding: 2rem 2rem 0;
-    svg {
-        margin-right: 1.5rem;
-    }
     a {
         transition: all .2s;
+        text-align: center;
+        display: block;
+        width: 4rem;
+        height: 4rem;
+        line-height: 4rem;
         color: #9396b2;
+        &.active,
         &:hover {
             color: #632df8;
+            background-color: #fff;
         }
     }
 }

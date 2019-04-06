@@ -18,35 +18,35 @@ class Tree extends Component {
      * 折叠树形目录
      * */
     toggleTree (e, item) {
-        let clickedNode = e.target;
-        let findCount = 0;
-        while (clickedNode.tagName !== 'div' && clickedNode.className !== 'component-tree-btn') {
-            clickedNode = clickedNode.parentNode;
-            findCount++;
-            if (findCount > 3) {
-                return false;
-            } 
+        if (this.isNodeEmpty(item.child)) {
+            return false;
         }
-        let childTree = clickedNode.nextElementSibling;
-        //console.log(childTree, item);
-        return false;
+        item.isOpen = !item.isOpen;
+        this.forceUpdate();
     }
     
     /**
      * 生成目录节点图标
      * */
     generateIcon (item, isEmpty) {
-        //console.log("item");
-        //console.log(item);
+        let id = item;
         if (isEmpty) {
         return (
-            <FontAwesomeIcon icon="circle" className="tree-icon-child" onClick={(e, item) => {this.toggleTree(e, item)}}/>
+            <div className="toggle-btn" onClick={(e, item) => {this.toggleTree(e, id)}}>
+                <FontAwesomeIcon icon="circle" className="tree-icon-child"/>
+            </div>
         );
         } else {
         return item.isOpen ? (
-            <FontAwesomeIcon icon="caret-down" className="tree-icon-parent" onClick={(e, item) => {this.toggleTree(e, item)}}/>
+            <div className="toggle-btn" onClick={(e, item) => {this.toggleTree(e, id)}}>
+                <FontAwesomeIcon icon="caret-down" className="tree-icon-parent"/>
+            </div>
+            
         ) : (
-            <FontAwesomeIcon icon="caret-right" className="tree-icon-parent" onClick={(e, item) => {this.toggleTree(e, item)}}/>
+            <div className="toggle-btn" onClick={(e, item) => {this.toggleTree(e, id)}}>
+                <FontAwesomeIcon icon="caret-right" className="tree-icon-parent"/>
+            </div>
+            
         );
         }
     }
@@ -78,20 +78,20 @@ class Tree extends Component {
     /**
      * 生成树列表
      * */
-    loopTreeUl (treeData) {
+    loopTreeUl (treeData,isOpen) {
         if (this.isNodeEmpty(treeData)) return; 
         return treeData.map((item, index) => {
-            let childData = this.loopTreeUl(item.child);
+            let childData = this.loopTreeUl(item.child, item.isOpen);
             let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.child));
             let itemLink = this.generateLink(item, item.img&&item.img.length > 0);
             return (
-                <ul className="component-tree-list" key={item.id} style={{display: (item.isOpen ? "block" : "none")}}>
+                <ul className="component-tree-list" key={item.id} style={{display: (isOpen ? "block" : "none")}}>
                     <li className="component-tree-item" key={item.id}>
                         <div className="component-tree-btn">
                             <div className="btn-main">{itemIcon}
                                 {itemLink}
                             </div>
-                            <div className="btn-add">+</div>
+                            <Link className="btn-add" to="/article/edit">+</Link>
                         </div>
                         { childData }
                     </li>
@@ -102,7 +102,7 @@ class Tree extends Component {
     
 
     render () {
-        let treeMenu = this.loopTreeUl(this.props.data);
+        let treeMenu = this.loopTreeUl(this.props.data, true);
         return (
             <div className="mck-wrapper-tree">
                 { treeMenu }

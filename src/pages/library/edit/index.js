@@ -9,25 +9,88 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
-          articleContent: '1111'
+          articleContent: '1111',
+          currentPos: 0,
+          currentContainer: null,
+          lastSaveTime: 1033
         }
-        this.addBoldStyle = this.addBoldStyle.bind(this);
     }
+
+    /**
+     * 获取选中文本
+    */
+    getSelectedText () {
+      var html = "";
+      if (typeof window.getSelection != 'undefined') {
+        var select = window.getSelection();
+        if (select.rangeCount) {
+          let container = document.createElement('div');
+          for (var i = 0, len = select.rangeCount; i < len; i++) {
+            container.appendChild(select.getRangeAt(i).cloneContents());
+          }
+          html = container.innerHTML;
+        }
+      } else if (typeof document.selection != "undefined") {
+        if (document.selection.type == "Text") {
+          html = document.selection.createRange().htmlText;
+        }
+      }
+      return html;
+    }
+
+    /**
+     * 获取鼠标光标所在位置
+    */
+    getLastCursor (element) {
+      console.log('blur');
+      let currentPos = 0,
+          currentContainer = null;
+      if (document.selection) {
+        console.log('selection');
+        // IE
+        let selectRange = document.selection.createRange();
+        selectRange.moveStart('character', -element.value.length);
+        currentPos = selectRange.text.length;
+      } else if (element.selectionStart || element.selectionStart == '0') {
+        console.log('selectionStart');
+        currentPos = element.selectionStart;
+      } else if (window.getSelection) {
+        currentPos = window.getSelection().getRangeAt(0).startOffset;
+        currentContainer = window.getSelection().getRangeAt(0).commonAncestorContainer;
+      }
+      console.log(currentPos);
+      this.setState({
+        currentPos,
+        currentContainer
+      })
+    }
+
     /**
      * 添加文字样式 
      * */
     addTextStyle (command) {
       let editBox = this.refs.editBox;
+      // 获取目前editBox所在光标位置
+      console.info(this.state.currentPos);
       editBox.focus();
-      let selection = window.getSelection();
-      let range = selection.getRangeAt(0);
+
+      var selection = window.getSelection();
+      var range = selection.getRangeAt(0);
+      // 光标移动到到原来的位置加上新内容的长度
+      range.setStart(this.state.currentContainer, this.state.currentPos)
+      // 光标开始和光标结束重叠
+      range.collapse(true)
+      // 清除选定对象的所有光标对象
+      selection.removeAllRanges()
+      // 插入新的光标对象
+      selection.addRange(range)
 
       switch(command){
         case "bold": 
           document.execCommand('bold',false,null);
           break;
         case "italic": 
-          console.log(document.execCommand('italic',false,null));
+          document.execCommand('italic',false,null);
           break;
         case "link": 
           console.log(1);
@@ -255,13 +318,13 @@ class Page extends Component {
                   </ul>
                 </div>
               </div>
-              <div className="edit-body" contentEditable ref="editBox">
+              <div className="edit-body" contentEditable ref="editBox" onBlur={this.getLastCursor.bind(this)}>
                 
               </div>
               <div className="edit-footer">
-                <p>最近一次保存 2019年3月1日 11:00</p>
+                <p>最近一次保存 {this.state.lastSaveTime}</p>
                 <div className="btns-box">
-                  <button className="radius-btn input-btn">保存到草稿箱</button>
+                  <button className="radius-btn sub-btn">保存到草稿箱</button>
                   <button className="radius-btn input-btn">发布</button>
                 </div>
               </div>
@@ -269,16 +332,24 @@ class Page extends Component {
             
               <div className="flex-column edit-side">
                 <div className="edit-menu">
-                  <h1 className="section-title">文章目录</h1>
+                  <div className="section-title">
+                    <h1 className="text">文章目录</h1>
+                    <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
+                  </div>
                   <div className="detail">
                     <Link to="/">我的空间</Link> / <Link to="/">笔记</Link> / <Link to="/">2019-01-23</Link>
-                    <span><FontAwesomeIcon icon="edit"/></span>  
                   </div>
                 </div>
                 <div className="edit-tags">
                   <h1 className="section-title">标签</h1>
-                  <ul className="tag">
-                    <li><a href="#">+ 添加</a></li>
+                  <input type="text" placeholder="输入标签名..." class="input"/>
+                  <ul className="tags">
+                    <li>
+                      <span>
+                        日记
+                      </span>
+                      <FontAwesomeIcon icon="times" />
+                    </li>
                   </ul>
                 </div>
               </div>

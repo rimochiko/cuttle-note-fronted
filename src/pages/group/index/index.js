@@ -7,26 +7,50 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Link} from 'react-router-dom';
 
-let optiondata = [{
-  id: 2,
-  text: '草稿箱',
-  link: '/',
-  icon: ['far','clipboard'],
+let groupList = [{
+  id: '1232',
+  name: '野原家',
+  count: 3,
+  avatar: require('../../../assets/images/avatar5.jpg'),
+  news: []
 }, {
-  id: 3,
-  text: '收藏夹',
-  link: '/',
-  icon: ['far','star']
-}, {
-  id: 4,
-  text: '回收站',
-  link: '/',
-  icon: ['far','trash-alt']
+  id: '1233',
+  name: '向日葵班',
+  count: 14,
+  avatar: require('../../../assets/images/avatar6.jpg'),
+  news: []
 }];
+
+let groupMember = [{
+  id: 'hdbdm', 
+  name: '无脸男',
+  avatar: require('../../../assets/images/avatar2.jpg')
+}, {
+  id: 'hdbd3m',
+  name: '大神', 
+  avatar: require('../../../assets/images/avatar4.jpg')
+},
+{
+  id: 'hdb2dm', 
+  name: '山东省',
+  avatar: require('../../../assets/images/avatar3.jpg')
+},
+{
+  id: 'hdb4dm', 
+  name: '圣斗士',
+  avatar: require('../../../assets/images/avatar.jpg')
+}]
 
 class Page extends Component {
     constructor () {
         super();
+    }
+    
+    /** 
+     * 添加成员面板
+    */
+    toggleAddMem () {
+      this.refs.addMem.toggle();
     }
 
     render () {
@@ -34,14 +58,17 @@ class Page extends Component {
           <div className="page">
                 <Sidebar />
                 <div className="flex-row flex-1">
-                    <Modal title="添加成员">
-                      <input type="text" placeholder="搜索ID"/>
-                      <ul>
-                        <li>
-                          <img src={require('../../../assets/images/avatar.jpg')} />
-                          <p>我呀我呀</p>
-                        </li>
-                      </ul>
+                    <Modal title="添加成员" ref="addMem">
+                      <div className="add-mem">
+                        <input type="text" placeholder="搜索ID" className="input"/>
+                        <ul className="ul-add-mem">
+                          <li>
+                            <img src={require('../../../assets/images/avatar.jpg')} />
+                            <p>我呀我呀</p>
+                          </li>
+                        </ul>
+                      </div>
+                    
                     </Modal>
 
                     <Modal title="团队管理">
@@ -57,24 +84,21 @@ class Page extends Component {
                     <div className="left">
                       <div className="us">
                         <input type="text" placeholder="搜索人" className="us-input"/>
-                        <div className="item-us">
-                          <div className="cover-us">
-                            <img src={require('../../../assets/images/avatar5.jpg')}/>
-                          </div>
-                          <div className="info-us">
-                            <p className="text-main">野原家（4）</p>
-                            <p className="text-sub">无动态</p>
-                          </div>
-                        </div>
-                        <div className="item-us">
-                          <div className="cover-us">
-                            <img src={require('../../../assets/images/avatar6.jpg')}/>
-                          </div>
-                          <div className="info-us">
-                            <p className="text-main">向日葵班（6）</p>
-                            <p className="text-sub">无动态</p>
-                          </div>
-                        </div>
+                        {
+                          groupList.map((item) => (
+                            <div className="item-us" key={item.id}>
+                              <div className="cover-us">
+                                <img src={item.avatar} alt={item.name}/>
+                              </div>
+                              <div className="info-us">
+                                <p className="text-main">{item.name}({item.count})</p>
+                                <p className="text-sub">{item.news}</p>
+                              </div>
+                            </div>    
+                          ))
+                        }
+                        
+                        
                       </div>                      
                     </div>
 
@@ -82,11 +106,13 @@ class Page extends Component {
                         <div className="us-list flex-1">
                           <div className="header">
                               <ul className="us-people">
-                                <li><img src={require('../../../assets/images/avatar2.jpg')}/></li>
-                                <li><img src={require('../../../assets/images/avatar.jpg')}/></li>
-                                <li><img src={require('../../../assets/images/avatar3.jpg')}/></li>
-                                <li><img src={require('../../../assets/images/avatar4.jpg')}/></li>
-                                <li><span className="btn-add">+</span></li>
+                               {
+                                 groupMember.map((item) => (
+                                   <li key={item.id}>
+                                     <img src={item.avatar} alt={item.name}/></li>
+                                 ))
+                               }
+                                <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
                               </ul>
                           </div>
                           <div className="us-news">
@@ -157,22 +183,22 @@ class Page extends Component {
                           <ul className="ul-us-btns">
                             <li><Link to="/">
                               <FontAwesomeIcon icon={['far','check-square']} />
-                                <span class="list-text">完成“React Diff算法分析”</span>
+                                <span className="list-text">完成“React Diff算法分析”</span>
                               </Link>
                             </li>
                             <li><Link to="/">
                             <FontAwesomeIcon icon={['far','check-square']} />
-                                <span class="list-text">团队任务</span>
+                                <span className="list-text">团队任务</span>
                               </Link>
                             </li>
                             <li><Link to="/">
                             <FontAwesomeIcon icon={['far','square']} />
-                                <span class="list-text">团队统计</span>
+                                <span className="list-text">团队统计</span>
                               </Link>
                             </li>
                             <li><Link to="/">
                             <FontAwesomeIcon icon={['far','square']} />
-                                <span class="list-text">团队管理</span>
+                                <span className="list-text">团队管理</span>
                               </Link>
                             </li>
                           </ul>
