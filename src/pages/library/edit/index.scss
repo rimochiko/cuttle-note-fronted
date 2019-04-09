@@ -45,6 +45,10 @@
         background-color: #f7f7fb;
         border-top: 1px solid #eef0f3;
         border-bottom: 1px solid #eef0f3;
+        button {
+            border: none;
+            background: none;
+        }
         .heading {
             position: relative;
             color: #7f83b8;
@@ -120,6 +124,17 @@
     color: #3e4077;
     overflow-y: scroll;
     font-weight: 300;
+    line-height: 1.8;
+    ul {
+        list-style: circle;
+        padding-left: 1rem;
+        margin: 1rem 0;
+    }
+    ol {
+        list-style: decimal;
+        padding-left: 1rem;
+        margin: 1rem 0;
+    }
     b {
         font-weight: bold;
     }

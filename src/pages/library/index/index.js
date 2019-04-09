@@ -3,7 +3,6 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import {Link} from 'react-router-dom';
 import Tree from '../../../components/tree';
-import Options from '../../../layouts/options/';
 import Modal from '../../../components/modal'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -63,10 +62,261 @@ let optiondata = [{
   icon: ['far','trash-alt']
 }];
 
+let historyList = [
+  {
+    id: 1,
+    title: '嗨，你真的懂this吗？',
+    link: '/',
+    author: {
+      name: '前端小姐姐',
+      avatar: 'https://tvax4.sinaimg.cn/crop.0.0.1242.1242.180/005NMivaly8ffc6s0p58bj30yi0yi0un.jpg',
+      id: 'ssdfe'
+    },
+    date: '15分钟前',
+    isCollected: false,
+    type: 1
+  },
+  {
+    id: 2,
+    title: '一个Vue引发的性能问题',
+    link: '/',
+    author: {
+      name: 'heyKid',
+      avatar: 'https://tva3.sinaimg.cn/crop.0.0.1242.1242.50/e084652ajw8f2hj7kztoxj20yi0yijsd.jpg',
+      id: 'grgrh'
+    },
+    date: '34分钟前',
+    isCollected: false,
+    type: 1
+  },
+  {
+    id: 3,
+    title: '是否要做Code Review？与BAT资深架构...',
+    link: '/',
+    author: {
+      name: '小郑哥',
+      avatar: 'https://ww2.sinaimg.cn/bmiddle/005Afflpgy1g1cucjpez6j30j60j675n.jpg',
+      id: 'rgrg'
+    },
+    date: '1天前',
+    isCollected: true,
+    type: 2
+  },
+  {
+    id: 4,
+    title: '《深入react技术栈》之样式处理',
+    link: '/',
+    author: {
+      name: '歌非',
+      avatar: 'https://tvax3.sinaimg.cn/crop.0.0.996.996.50/dcedbca1ly8fv8o71kltwj20ro0rot9s.jpg',
+      id: 'trrtr'
+    },
+    date: '1天前',
+    isCollected: false,
+    type: 1
+  },
+  {
+    id: 5,
+    title: '9102了，你还不会移动端真机调试？',
+    link: '/',
+    author: {
+      name: 'sedes',
+      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
+      id: 'sedes'
+    },
+    date: '1天前',
+    isCollected: false,
+    type: 2
+  },
+  {
+    id: 6,
+    title: '搜索和在线阅读 Github 代码的插件推荐',
+    link: '/',
+    author: {
+      name: 'sedes',
+      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
+      id: 'sedes'
+    },
+    date: '1天前',
+    isCollected: false,
+    type: 2
+  },
+  {
+    id: 7,
+    title: '最让程序员自豪的事情是什么？',
+    link: '/',
+    author: {
+      name: '此人已失踪',
+      avatar: 'https://tvax1.sinaimg.cn/crop.0.0.996.996.50/006I03Dqly8fzprit6axsj30ro0ro0ua.jpg',
+      id: 'sedes'
+    },
+    date: '1天前',
+    isCollected: false,
+    type: 1
+  },
+  {
+    id: 8,
+    title: '搜索和在线阅读 Github 代码的插件推荐',
+    link: '/',
+    author: {
+      name: 'sedes',
+      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
+      id: 'sedes'
+    },
+    date: '1天前',
+    isCollected: false,
+    type: 1
+  }
+]
+
+let postInfo = {
+  id: '132',
+  author: {
+    id: 'seris',
+    nickname: 'seris'
+  },
+  createDate: '2018-12-31',
+  lastDate: '2019-02-12',
+  lastAuthor: {
+    id: 'seris',
+    nickname: 'seris'    
+  },
+  content: '',
+  comments: [{
+    id: 1,
+    from: {
+      id: 'dsjds',
+      nickname: '九月的风',
+      avatar: require('../../../assets/images/avatar1.jpg')
+    },  
+    to: null,
+    content: 'vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。',
+    date: '2018-12-31'
+  }, {
+    id: 2,
+    from: {
+      id: 'dsjds',
+      nickname: '九月的风',
+      avatar: require('../../../assets/images/avatar1.jpg')
+    },
+    to: {
+      id: 'dsjds',
+      nickname: '大神',
+      avatar: require('../../../assets/images/avatar2.jpg')
+    },
+    avatar: require('../../../assets/images/avatar2.jpg'),
+    content: 'vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。',
+    date: '2018-12-31'
+  }] 
+}
+
+
+
 
 class Page extends Component {
     constructor () {
         super();
+    }
+    
+    /** 
+     * 删除文章
+    */
+    removePost () {
+      this.refs.remove.toggle()
+    }
+    
+    /** 
+     * 展示草稿箱
+    */
+    showDraft() {
+      this.refs.draft.toggle()
+    }
+
+    /** 
+     * 展示回收站
+    */
+    showTrash() {
+      this.refs.trash.toggle()
+    }
+
+
+        /** 
+     * 获取列表Icon
+     * */
+    getPostIcon (type) {
+      switch (type) {
+        case 1: return (
+          <FontAwesomeIcon icon="file-alt" />
+        );break;
+        case 2: return (
+          <FontAwesomeIcon icon="file-image" />
+        );
+      }
+    }
+    /**
+     *  获取收藏按钮
+     *  */
+    getPostCollect(isCollected) {
+      if (isCollected) {
+        return (
+          <span className="collect active"><FontAwesomeIcon icon="star"/></span>
+        );
+      } else {
+        return (
+          <span className="collect"><FontAwesomeIcon icon={["far","star"]}/></span>
+        );
+      }
+    }
+    /** 
+     * 获取收藏记录
+     * */
+   getCollectList (item) {
+      return (
+        <div className="item-history" key={item.id}>
+          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
+          <p className="author"><img src={item.author.avatar}/><Link to="/">{item.author.name}</Link></p>
+          <p className="option">
+            {this.getPostCollect(item.isCollected)}
+          </p>
+        </div>
+      )
+    }
+  
+    /** 
+     * 获取草稿箱记录
+     * */
+    getDraftList (item) {
+      return (
+        <div className="item-history" key={item.id}>
+          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
+          <p className="date">{item.date}</p>
+          <p className="option">
+            <span>继续编辑</span>
+            <span>删除</span>
+          </p>
+        </div>
+        
+      )
+    }
+
+        /** 
+     * 获取回收站记录
+     * */
+    getTrashList (item) {
+      return (
+        <div className="item-history" key={item.id}>
+          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
+          <p className="date">{item.date}</p>
+          <p className="option">
+            <span>恢复</span>
+            <span>彻底删除</span>
+          </p>
+        </div>
+      )
+    }
+
+    showCollect () {
+      this.refs.collect.toggle();
     }
 
     render () {
@@ -74,8 +324,39 @@ class Page extends Component {
            <div className="page">
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
+                    <Modal title="收藏夹" ref="collect">
+                     <div className="modal-collect">
+                      {
+                        historyList.map((item, index) => {
+                          return this.getCollectList(item);
+                        })
+                      }                     
+                     </div>
+                    </Modal>
+                    <Modal title="草稿箱" ref="draft">
+                     <div className="modal-collect">
+                      {
+                        historyList.map((item, index) => {
+                          return this.getDraftList(item);
+                        })
+                      }                     
+                     </div>
+                    </Modal>
+                    <Modal title="回收站" ref="trash">
+                     <div className="modal-collect">
+                      {
+                        historyList.map((item, index) => {
+                          return this.getTrashList(item);
+                        })
+                      }                     
+                     </div>
+                    </Modal>
                     <div className="left white">
-                      <Options data={optiondata}/>
+                      <ul className="public-options">
+                        <span className="header-icon" title="草稿箱" onClick={this.showDraft.bind(this)}><FontAwesomeIcon icon={['far','clipboard']} /></span>
+                        <span className="header-icon" title="收藏夹" onClick={this.showCollect.bind(this)}><FontAwesomeIcon icon={['far','star']} /></span>
+                        <span className="header-icon" title="回收站" onClick={this.showTrash.bind(this)}><FontAwesomeIcon icon={['far','trash-alt']} /></span>
+                      </ul>
                       <div className="tree">
                         <Tree data={treeData} base="/library"/>
                       </div>                 
@@ -107,20 +388,14 @@ class Page extends Component {
                               </p>
                               <p>
                                 <span title="文章信息"><FontAwesomeIcon icon="info-circle"/></span>
-                                <span title="编辑"><FontAwesomeIcon icon="pen"/></span>
-                                <span title="删除"><FontAwesomeIcon icon="trash-alt"/></span>
+                                <Link title="编辑" to="/article/edit"><FontAwesomeIcon icon="pen"/></Link>
+                                <span title="删除" onClick={this.removePost.bind(this)}><FontAwesomeIcon icon="trash-alt"/></span>
                               </p>
                             </div>
                           </div>
                           <div className="body">
                             <div className="content">
-                              <blockquote><p>这篇文章去年10月8号发过，后来因为一些 drama 删掉了。这次重发，是因为我想把这篇文章发到知乎，在我发到知乎之前，还是先发回掘金。我对掘金很有感情的。仅为此，不是为了炒冷饭，不求赞，不求关注。</p>
-                              </blockquote>
-                              <p>这个大言不惭的标题源自我与我所认识的前端从业者的比较，也源自别人的评价。读者也可以看我其它文章，评估我的专业能力。当然我不是在每个领域都能匹配别人三年的实践经验（原标题是学前端一年学三年的知识，后来觉得不妥就改了）。我还有很多技术栈没掌握，比如没写过小程序，没用过 jQuery（这个也不想再学了，只是依然还有用人单位在要求）。也有很多坑没踩过，比如没有做过浏览器兼容（说实话也不太想兼容 IE，浪费生命）。我想说的是我对 JS 这门语言以及 CS 这门学科掌握的深度，前端生态圈理解和熟悉的程度，以及知识迁移能力。</p>
-                              <p>我不是想炫耀自己多牛，而是想帮助和我有相似背景的人。我在掘金发了几篇文章后，有几个朋友在知道我零基础学编程一年半就进步这么快后，想知道我是怎么学的。这篇文章就是对他们的详细回答。</p>
-                              <h2>一，背景介绍</h2>
-                              <p>我本科学的是国际贸易，乱选的专业。毕业后做了半年外贸，实在不喜欢，然后去做英文编辑了。第二份工作也很无聊，就是写英文软文，发表在国外的行业期刊上，给公司做广告。然后也做英文官网的内容。这是一个很没创意的工作。每天写几篇我自己都没感觉的文章，不知道价值在哪。最重要的是，这份职业里我找不到持续精进的方向，做一年和做三年好像区别不大。</p>
-                              <p>后来学前端也是误打误撞。因为我同时在做英文官网的内容和产品，会和前端打交道。当时公司的前端是学 UI 转过来的，我观察他的工作，以为就是 HTML 写个页面结构，然后 CSS 做个样式，然后用 JS 做点效果就可以了。这个简单啊，我也可以做。然后我就裸辞去学习前端开发了…… 后来发现我错了，但是自己跳的坑，流着泪也要爬出来。接下来我经历了人生中最难熬的一段时间，也经历了人生中第一次大的转变。</p>
+                              
                             </div>
                             <div className="extra">
                               <ul className="extra-ul">
@@ -145,35 +420,37 @@ class Page extends Component {
                             </div>
 
                             <div className="list-comment-box">
-                              <h1 className="section-title">全部评论（3）</h1>
+                              <h1 className="section-title">全部评论（{postInfo.comments.length}）</h1>
                               <ul className="ul-comment-single">
-                                <li className="li-comment-single">
-                                  <img src={require('../../../assets/images/avatar1.jpg')} />
-                                  <div className="author-comment"> 
-                                    <Link to="/">小爱公主</Link>：
-                                    vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。
-                                    <span className="date"> 2019/3/18</span>
-                                  </div>
-                                  <span className="btn-reply">回复</span>
-                                </li>
-                                <li className="li-comment-single">
-                                  <img src={require('../../../assets/images/avatar2.jpg')} />
-                                  <div className="author-comment">
-                                    <Link to="/">小葵</Link>：
-                                    冲呀！！投票走起！！
-                                    <span className="date"> 2019/3/18</span>
-                                  </div>
-                                  <span className="btn-reply">回复</span>
-                                </li>
-                                <li className="li-comment-single">
-                                  <img src={require('../../../assets/images/avatar1.jpg')} />
-                                  <div className="author-comment">
-                                    <Link to="/">小爱公主</Link> 回复 <Link to="/">小葵</Link>：
-                                    样式优先级那一块，内嵌、链接和导入，应该是在最后的优先级最高。
-                                    <span className="date"> 2019/3/18</span>
-                                  </div>
-                                  <span className="btn-reply">回复</span>
-                                </li>
+                                {
+                                  postInfo.comments.map((item) => {
+                                    if (item.to) {
+                                      return (
+                                        <li className="li-comment-single" key={item.id}>
+                                          <img src={item.from.avatar} />
+                                          <div className="author-comment">
+                                            <Link to="/">{item.from.nickname}</Link> 回复 <Link to="/">{item.to.nickname}</Link>：
+                                            {item.content}
+                                            <span className="date"> {item.date}</span>
+                                          </div>
+                                          <span className="btn-reply">回复</span>
+                                        </li>                                      
+                                      )
+                                    } else {
+                                      return (
+                                        <li className="li-comment-single" key={item.id}>
+                                          <img src={item.from.avatar} />
+                                          <div className="author-comment">
+                                            <Link to="/">{item.from.nickname}</Link>：
+                                            {item.content}
+                                            <span className="date"> {item.date}</span>
+                                          </div>
+                                          <span className="btn-reply">回复</span>
+                                        </li>        
+                                      )
+                                    }
+                                  })
+                                }
                               </ul>
                             </div>
                           </div>

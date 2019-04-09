@@ -54,15 +54,19 @@
 
 .chart-edit-shapes {
     overflow-y: scroll;
-    width: 16rem;
+    width: 16.25rem;
     flex-shrink: 0;
     height: 100%;
     flex-grow: 0;
-    .ul-chart-shape {
+    .chart-shape-group {
         padding: 1.5rem;
         .section-title {
             color: #a3a5b6;
             font-size: .9rem;
+            margin-bottom: 1rem;
+        }
+        canvas {
+            background:rgba(255,255,255,0);
         }
     }
 }
@@ -71,9 +75,15 @@
     overflow: scroll;
     background-color: #D8D8D8;
     .edit-canvas {
-        margin: 3rem;
-        width: 64rem;
-        height: 32rem;
+        margin: 32px;
+        padding: 16px;
+        width: 1020px;
+        height: 600px;
+        box-shadow: 0 10px 15px #eee;
+        canvas {
+            background: #fff;
+            border: 1px solid #E8E8E8;
+        }
         background-color: #f4f4f4;
         box-shadow: 0 10px 15px #ddd;
     }

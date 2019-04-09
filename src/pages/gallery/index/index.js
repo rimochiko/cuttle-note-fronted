@@ -1,33 +1,38 @@
 import React, {Component} from 'react';
-import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
-import Options from '../../../layouts/options/'; 
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Link} from 'react-router-dom';
 
-let optiondata = [{
-    id: 1,
-    text: '草稿箱',
-    link: '/',
-    icon: ['far','clipboard'],
-  }, {
-    id: 2,
-    text: '收藏夹',
-    link: '/',
-    icon: ['far','star']
-  }, {
-    id: 3,
-    text: '回收站',
-    link: '/',
-    icon: ['far','trash-alt']
-  }];
 
 class Page extends Component {
     constructor () {
         super();
     }
+
+        /** 
+     * 删除文章
+    */
+    removePost () {
+    }
+    
+    /** 
+     * 展示草稿箱
+     */
+    showDraft() {
+    }
+
+    /** 
+     * 展示回收站
+     */
+    showTrash() {
+    }
+
+    
+    showCollect () {
+      }
+  
 
     render () {
         return (
@@ -35,7 +40,11 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow">
                     <div className="left white">
-                      <Options data={optiondata}/>
+                       <ul className="public-options">
+                        <span className="header-icon" title="草稿箱" onClick={this.showDraft.bind(this)}><FontAwesomeIcon icon={['far','clipboard']} /></span>
+                        <span className="header-icon" title="收藏夹" onClick={this.showCollect.bind(this)}><FontAwesomeIcon icon={['far','star']} /></span>
+                        <span className="header-icon" title="回收站" onClick={this.showTrash.bind(this)}><FontAwesomeIcon icon={['far','trash-alt']} /></span>
+                      </ul>
                       <div className="imglist">
                         <ul className="component-img-list">
                           <li className="component-img-item">

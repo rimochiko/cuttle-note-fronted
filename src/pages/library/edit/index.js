@@ -3,7 +3,10 @@ import './index.scss';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
+import Tabs from '../../../components/tabs';
 import { Link } from 'react-router-dom';
+
+const TabPane = Tabs.TabPane;
 
 class Page extends Component {
     constructor () {
@@ -68,13 +71,13 @@ class Page extends Component {
     /**
      * 添加文字样式 
      * */
-    addTextStyle (command) {
+    addTextStyle (command, args) {
       let editBox = this.refs.editBox;
       // 获取目前editBox所在光标位置
       console.info(this.state.currentPos);
       editBox.focus();
 
-      var selection = window.getSelection();
+      /*var selection = window.getSelection();
       var range = selection.getRangeAt(0);
       // 光标移动到到原来的位置加上新内容的长度
       range.setStart(this.state.currentContainer, this.state.currentPos)
@@ -83,7 +86,7 @@ class Page extends Component {
       // 清除选定对象的所有光标对象
       selection.removeAllRanges()
       // 插入新的光标对象
-      selection.addRange(range)
+      selection.addRange(range)*/
 
       switch(command){
         case "bold": 
@@ -93,22 +96,23 @@ class Page extends Component {
           document.execCommand('italic',false,null);
           break;
         case "link": 
-          console.log(1);
           this.refs.addLink.toggle();
           let url="";
           if(url) 
             document.execCommand("createlink",false,url);
           break;
         case "listul": 
+          document.execCommand("insertUnorderedList", false);
         break;
         case "listol": 
+          document.execCommand("insertOrderedList", false);
         break;
-        case "heading": 
+        case "title":
+          document.execCommand('formatBlock', false, `<h${args}>`);
         break;
         case "quote":
           document.execCommand('formatBlock', false, '<blockquote>');
           break; 
-        break;
         case "image": 
           this.refs.addImage.toggle();
         break;
@@ -195,17 +199,34 @@ class Page extends Component {
 
             <Modal title="添加图片" ref="addImage">
               <div className="edit-link-body">
-                <div className="input-group">
-                  <label>图片地址</label>
-                  <input type="text" />
-                </div>
-                <div className="input-group">
-                  <label>图片描述</label>
-                  <input type="text" />
-                </div>
-                <div className="input-group">
-                  <button className="radius-btn input-btn">确定</button>
-                </div>
+                <Tabs defaultActiveKey="1">
+                  <TabPane tab="本地上传" key="1">
+                    <div className="input-group">
+                      <label>选择图片</label>
+                      <input type="file" />
+                    </div>
+                    <div className="input-group">
+                      <label>图片描述</label>
+                      <input type="text" />
+                    </div>
+                    <div className="input-group">
+                      <button className="radius-btn input-btn">上传</button>
+                    </div>
+                  </TabPane>
+                  <TabPane tab="网络获取" key="2">
+                    <div className="input-group">
+                      <label>图片地址</label>
+                      <input type="text" />
+                    </div>
+                    <div className="input-group">
+                      <label>图片描述</label>
+                      <input type="text" />
+                    </div>
+                    <div className="input-group">
+                      <button className="radius-btn input-btn">确定</button>
+                    </div>
+                  </TabPane>
+                </Tabs>
               </div>   
             </Modal>
 
@@ -215,37 +236,37 @@ class Page extends Component {
                 <div className="edit-tool">
                   <ul className="ul-tool">
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="粗体"
                         onClick={this.addTextStyle.bind(this, 'bold')}
                         >
                         <FontAwesomeIcon icon="bold"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="斜体"
                         onClick={this.addTextStyle.bind(this, 'italic')}>
                         <FontAwesomeIcon icon="italic"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="无序列表"
                         onClick={this.addTextStyle.bind(this, 'listul')}>
                         <FontAwesomeIcon icon="list-ul"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="有序列表"
                         onClick={this.addTextStyle.bind(this, 'listol')}>
                         <FontAwesomeIcon icon="list-ol"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
                       <div
@@ -253,37 +274,37 @@ class Page extends Component {
                         >
                         <FontAwesomeIcon title="标题" icon="heading"/>
                         <div className="heading-menu">
-                          <h1 onClick={this.addTextStyle.bind(this, 'title', 1)}>一级标题</h1>
-                          <h2 onClick={this.addTextStyle.bind(this, 'title', 2)}>二级标题</h2>
-                          <h3 onClick={this.addTextStyle.bind(this, 'title', 3)}>三级标题</h3>
-                          <h4 onClick={this.addTextStyle.bind(this, 'title', 4)}>四级标题</h4>
+                          <button onClick={this.addTextStyle.bind(this, 'title', 1)}><h1>一级标题</h1></button>
+                          <button onClick={this.addTextStyle.bind(this, 'title', 2)}><h2>二级标题</h2></button>
+                          <button onClick={this.addTextStyle.bind(this, 'title', 3)}><h3>三级标题</h3></button>
+                          <button onClick={this.addTextStyle.bind(this, 'title', 4)}><h4>四级标题</h4></button>
                         </div>
                       </div>
 
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="链接"
                         onClick={this.addTextStyle.bind(this, 'link')}>
                         <FontAwesomeIcon icon="link"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="引用"
                         onClick={this.addTextStyle.bind(this, 'quote')}>
                         <FontAwesomeIcon icon="quote-left"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
-                      <div
+                      <button
                         className="single-tool" 
                         title="代码"
                         onClick={this.addTextStyle.bind(this, 'code')}>
                         <FontAwesomeIcon icon="code"/>
-                      </div>
+                      </button>
                     </li>
                     <li>
                       <div
@@ -342,7 +363,7 @@ class Page extends Component {
                 </div>
                 <div className="edit-tags">
                   <h1 className="section-title">标签</h1>
-                  <input type="text" placeholder="输入标签名..." class="input"/>
+                  <input type="text" placeholder="输入标签名..." className="input"/>
                   <ul className="tags">
                     <li>
                       <span>
