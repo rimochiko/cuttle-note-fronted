@@ -3,42 +3,42 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import {Link} from 'react-router-dom';
 import Tree from '../../../components/tree';
-import Modal from '../../../components/modal'; 
+import Modal from '../../../components/modal';
+import DropDown from '../../../components/dropdown'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 let treeData = [{
   id: 1,
-  name: '我的空间',
+  name: '学习笔记',
   link: '/1',
-  img: require('../../../assets/images/avatar.jpg'),
   isOpen: true,
   child : [{
     id: 11,
-    name: '二级目录1',
+    name: 'GraphQL手册',
     link: '/1-1',
     isOpen: true,
     child : [{
       id: 111,
-      name: '三级目录1',
+      name: 'GraphQL的诞生',
       link: '/1-1-1',
       isOpen: true,
       child : []
     }]
   }, {
     id: 12,
-    name: '二级目录2',
+    name: '计划',
     link: '/1-2',
     isOpen: true,
     child : []
   }]
 }, {
   id: 2,
-  name: '根目录2',
+  name: '会议记录',
   link: '/2',
   isOpen: true,
   child : [{
     id: 21,
-    name: '二级目录1',
+    name: '【2019-04-10】记录',
     link: '/2-1',
     isOpen: true,
     child : []
@@ -211,7 +211,15 @@ let postInfo = {
 }
 
 
-
+let dropdownData = [{
+  id: 'gsds',
+  text: '野原家的空间',
+  link: '/'
+},{
+  id: 'gsds',
+  text: '向日葵班的空间',
+  link: '/'
+}]
 
 class Page extends Component {
     constructor () {
@@ -352,14 +360,16 @@ class Page extends Component {
                      </div>
                     </Modal>
                     <div className="left white">
-                      <ul className="public-options">
-                        <span className="header-icon" title="草稿箱" onClick={this.showDraft.bind(this)}><FontAwesomeIcon icon={['far','clipboard']} /></span>
-                        <span className="header-icon" title="收藏夹" onClick={this.showCollect.bind(this)}><FontAwesomeIcon icon={['far','star']} /></span>
-                        <span className="header-icon" title="回收站" onClick={this.showTrash.bind(this)}><FontAwesomeIcon icon={['far','trash-alt']} /></span>
-                      </ul>
+                      <div className="relate">
+                        <DropDown data={dropdownData}>
+                          <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
+                                <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                        </DropDown>
+                      </div>
                       <div className="tree">
                         <Tree data={treeData} base="/library"/>
                       </div>                 
+
                     </div>
                     <div className="flex-scroll-y">
                       <Modal title="文章信息" ref="info">

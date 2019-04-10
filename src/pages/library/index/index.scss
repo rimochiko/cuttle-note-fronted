@@ -4,8 +4,9 @@
   font-weight: 300;
   padding: 2rem 2rem;
   overflow: scroll;
+  flex: 1;
   .switch {
-      font-size: .9rem;
+      font-size: .85rem;
       color: $fontGray;
       margin-bottom: 1rem;
   }
@@ -133,6 +134,22 @@
           margin: 0 1rem 1rem 0;
       }
   }
+}
+
+.relate {
+    border-bottom: 1px solid #e9e9f4;
+    padding: 1rem 1.8rem;
+    font-size: .8rem;
+    .link-img {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: .5rem;
+        margin-right: 1rem;
+        vertical-align: middle;
+    }
+    .link-svg {
+        margin-left: .5rem;
+    }
 }
 
 

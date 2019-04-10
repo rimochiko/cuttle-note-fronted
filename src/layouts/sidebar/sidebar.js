@@ -52,20 +52,34 @@ class Sidebar extends Component {
         return (
             <div className="public-sidebar">
               <div className="header">
-                <div className="logo" onClick={this.toggleBar}>
-                    <img src={profile.avatar} className="header-avatar"/>
+                  <div className="logo" onClick={this.toggleBar}>
+                      <img src={profile.avatar} className="header-avatar"/>
+                  </div>
+                  <ul className="ul-nav">
+                  {
+                      config.map((item) => {
+                              return <li key={item.name}  className="li-nav">
+                                  <Link to={item.url} className="link-nav" title={item.text}>
+                                      <FontAwesomeIcon icon={item.icon} className="link-icon"/>
+                                  </Link>
+                              </li>
+                      })
+                  }
+                  </ul>
+ 
                 </div>
                 <ul className="ul-nav">
-                {
-                    config.map((item) => {
-                            return <li key={item.name}  className="li-nav">
-                                <Link to={item.url} className="link-nav" title={item.text}>
-                                    <FontAwesomeIcon icon={item.icon} className="link-icon"/>
-                                </Link>
-                            </li>
-                    })
-                }
-                </ul>
+                  <li className="li-nav">
+                    <Link to="/" className="link-nav" title="收藏夹">
+                        <FontAwesomeIcon icon={['far','star']} className="link-icon"/>
+                    </Link>
+                  </li>
+                  <li className="li-nav">
+                    <Link to="/" className="link-nav" title="回收站">
+                        <FontAwesomeIcon icon={['far','trash-alt']} className="link-icon"/>
+                    </Link>
+                  </li>
+                </ul>                 
                 <div className="author-panel"  style={{display: this.state.barStyle}}>
                   <div className="header">
                     <p>我的资料</p>
@@ -119,7 +133,6 @@ class Sidebar extends Component {
                   </div>
                 </div>
               </div>
-            </div>
         );
     }
 }

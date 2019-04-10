@@ -154,9 +154,8 @@ class Page extends Component {
                     </Modal>
 
 
-                    <div className="left">
+                    <div className="left white">
                       <div className="us">
-                        <input type="text" placeholder="搜索人" className="us-input"/>
                         {
                           groupList.map((item) => (
                             <div className="item-us" key={item.id}>
@@ -173,144 +172,36 @@ class Page extends Component {
                       </div>                      
                     </div>
 
-                    <div className="center flex-1 flex-column">
-                        <div className="us-list flex-1">
-                          <div className="header">
-                              <ul className="us-people">
-                               {
-                                 groupMember.map((item) => (
-                                   <li key={item.id}>
-                                     <img src={item.avatar} alt={item.name}/></li>
-                                 ))
-                               }
-                                <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
-                              </ul>
+                    <div className="right flex-column">
+                      <div className="group-box">
+                        <div className="us-about">
+                          <div className="cover">
+                            <img src={require('../../../assets/images/avatar5.jpg')}/>
                           </div>
-                          <div className="us-news">
-                            
-                            <div className="item-news">
-                              <div className="cover-news">
-                                  <img src={require('../../../assets/images/avatar2.jpg')}/>
-                              </div>
-                              <div className="info-news">
-                                <div className="bubble">
-                                  <p className="name">野原向日葵</p>
-                                  嗨，亲们！
-                                </div>
-                                <p className="date">12:09</p>
-                              </div>
-                            </div>
-                            <div className="item-news">
-                              <div className="cover-news">
-                                  <img src={require('../../../assets/images/avatar2.jpg')}/>
-                              </div>
-                              <div className="info-news">
-                                <div className="bubble">
-                                  <p className="name">野原向日葵</p>
-                                  嗨，亲们！
-                                </div>
-                                <p className="date">12:09</p>
-                              </div>
-                            </div>
-                            <div className="item-news mine">
-                              <div className="info-news">
-                                <div className="bubble">
-                                  <p className="name">野原新之助</p>
-                                  我在团队文库中添加了《<a href="#">React精髓</a>》这一章节。
-                                </div>
-                                <p className="date">12:09</p>
-                              </div>
+                          <p className="title">野原家</p>
+                          <p className="des">暂无简介</p>
+                          <div className="us-list">
+                            <div className="header">
+                                <ul className="us-people">
+                                {
+                                  groupMember.map((item) => (
+                                    <li key={item.id}>
+                                      <img src={item.avatar} alt={item.name}/></li>
+                                  ))
+                                }
+                                  <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
+                                </ul>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="msg-send">
-                          <textarea className="msg-input"></textarea>
-                          <ul className="msg-ul">
-                            <li><span className="input-btn radius-btn">发送</span></li>
-                            <li><span className="tool-btn"><FontAwesomeIcon icon={['far', 'smile']}/></span></li>
-                            <li><span className="tool-btn"><FontAwesomeIcon icon="at"/></span></li>
-                            <li><span className="tool-btn"><FontAwesomeIcon icon="paperclip"/></span></li>
-                            <li><span className="tool-btn"><FontAwesomeIcon icon={['far', 'image']}/></span></li>
-                          </ul>
-                        </div>
-                    </div>
-
-                    <div className="other flex-column">
-                      <div className="us-about">
-                        <div className="cover">
-                           <img src={require('../../../assets/images/avatar5.jpg')}/>
-                        </div>
-                        <p className="title">野原家</p>
-                        <p className="des">
-                          <Link to="/library"><FontAwesomeIcon icon="book" />文库</Link>
-                          <span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="database" />统计</span>
-                          <span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span>
-                        </p>
+                          <p className="des">
+                            <Link to="/library"><FontAwesomeIcon icon="book" />文库</Link>
+                            <span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="database" />统计</span>
+                            <span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span>
+                          </p>
+                        </div>                      
                       </div>
-                      <div className="us-task">
-                        <div className="section-overflow">
-                          <p className="title"><span className="today">今天</span> 周二 4月9日</p>
-                          <ul className="ul-us-task">
-                            <li>
-                              <FontAwesomeIcon 
-                                icon={['far','check-square']}
-                                onClick={this.finishTask.bind(this)}/>
-                                <span className="list-text" onClick={this.toggleTask.bind(this)}>完成“React Diff算法分析”</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','check-square']} />
-                                <span className="list-text">团队任务</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队统计</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队管理</span>
-                            </li>
-                          </ul>
-                          <p className="title"><span className="today">明天</span> 周三 4月10日</p>
-                          <ul className="ul-us-task">
-                            <li>
-                              <FontAwesomeIcon icon={['far','check-square']} />
-                                <span className="list-text">完成“React Diff算法分析”</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','check-square']} />
-                                <span className="list-text">团队任务</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队统计</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队管理</span>
-                            </li>
-                          </ul>
-                          <p className="title"><span className="today">明天</span> 周三 4月10日</p>
-                          <ul className="ul-us-task">
-                            <li>
-                              <FontAwesomeIcon icon={['far','check-square']} />
-                                <span className="list-text">完成“React Diff算法分析”</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','check-square']} />
-                                <span className="list-text">团队任务</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队统计</span>
-                            </li>
-                            <li>
-                            <FontAwesomeIcon icon={['far','square']} />
-                                <span className="list-text">团队管理</span>
-                            </li>
-                          </ul>
-                          </div>
-                      </div> 
+                      
+                      
                     </div>
                 </div>
             </div>

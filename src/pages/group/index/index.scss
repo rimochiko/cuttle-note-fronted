@@ -5,22 +5,6 @@
     color: #a3a5b6;
     font-size: .9rem;
 }
-
-.us {
-    font-weight: 300;
-    margin: 2rem 3rem;
-    .us-input {
-        font-weight: 300;
-        border: none;
-        font-size: .9rem;
-        padding: .6rem .8rem;
-        margin-bottom: 1rem;
-        box-sizing: border-box;
-        width: 100%;
-        box-shadow: 0 10px 15px #e9e9f4;
-    }
-}
-
 .item-us {
     display: flex;
     border-radius: .3rem;
@@ -212,11 +196,15 @@
     flex-shrink: 0;
     height: 100vh;
 }
+.group-box {
+    margin: 2rem;
+}
 
 .us-about {
     flex-shrink: 0;
     flex-grow: 0;
     text-align: center;
+    @extend .section;
     .cover {
         margin-bottom: 1rem;
         img {
