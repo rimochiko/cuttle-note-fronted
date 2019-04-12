@@ -23,6 +23,11 @@ import {
   InfoPage
 } from './pages/user';
 
+import {
+  CollectPage,
+  TrashPage
+} from './pages/other';
+
 import './assets/styles/normal.scss'
 
 class App extends Component {
@@ -41,6 +46,8 @@ class App extends Component {
           <Route path="/setting" component={SettingPage} />         
           <Route path="/login" component={LoginPage} />
           <Route path="/info" component={InfoPage} />
+          <Route path="/collect" component={CollectPage} />
+          <Route path="/trash" component={TrashPage} />
         </Switch>
       </Router>
     );

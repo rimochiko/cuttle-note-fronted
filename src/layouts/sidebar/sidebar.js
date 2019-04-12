@@ -70,12 +70,12 @@ class Sidebar extends Component {
                 </div>
                 <ul className="ul-nav">
                   <li className="li-nav">
-                    <Link to="/" className="link-nav" title="收藏夹">
+                    <Link to="/collect" className="link-nav" title="收藏夹">
                         <FontAwesomeIcon icon={['far','star']} className="link-icon"/>
                     </Link>
                   </li>
                   <li className="li-nav">
-                    <Link to="/" className="link-nav" title="回收站">
+                    <Link to="/trash" className="link-nav" title="回收站">
                         <FontAwesomeIcon icon={['far','trash-alt']} className="link-icon"/>
                     </Link>
                   </li>

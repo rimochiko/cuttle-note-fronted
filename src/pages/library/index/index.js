@@ -6,61 +6,150 @@ import Tree from '../../../components/tree';
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
 let treeData = [{
   id: 1,
   name: '学习笔记',
   link: '/1',
-  isOpen: true,
+  isOpen: false,
   child : [{
     id: 11,
     name: 'GraphQL手册',
     link: '/1-1',
-    isOpen: true,
+    isOpen: false,
     child : [{
       id: 111,
       name: 'GraphQL的诞生',
       link: '/1-1-1',
-      isOpen: true,
+      isOpen: false,
       child : []
     }]
   }, {
     id: 12,
     name: '计划',
     link: '/1-2',
-    isOpen: true,
+    isOpen: false,
     child : []
   }]
-}, {
+}, 
+{
   id: 2,
   name: '会议记录',
   link: '/2',
-  isOpen: true,
+  isOpen: false,
   child : [{
     id: 21,
     name: '【2019-04-10】记录',
     link: '/2-1',
-    isOpen: true,
-    child : []
+    isOpen: false,
+    child : [],
+    status: 0
   }]
-}]
-
-let optiondata = [{
-  id: 2,
-  text: '草稿箱',
-  link: '/',
-  icon: ['far','clipboard'],
-}, {
-  id: 3,
-  text: '收藏夹',
-  link: '/',
-  icon: ['far','star']
-}, {
+},
+{
+    id: 3,
+    name: '杂杂碎',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+  }]
+},
+{
   id: 4,
-  text: '回收站',
-  link: '/',
-  icon: ['far','trash-alt']
-}];
+  name: '需求分析',
+  link: '/2',
+  isOpen: false,
+  child : [{
+    id: 21,
+    name: '【2019-04-10】记录',
+    link: '/2-1',
+    isOpen: false,
+    child : []
+}]},
+{
+    id: 5,
+    name: '会议记录11111',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+    }]
+  },
+  {
+      id: 6,
+      name: '会议记录11111',
+      link: '/2',
+      isOpen: false,
+      child : [{
+        id: 21,
+        name: '【2019-04-10】记录',
+        link: '/2-1',
+        isOpen: false,
+        child : []
+      }]
+},
+{
+    id: 7,
+    name: '会议记录11111',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+    }]
+},
+{
+    id: 8,
+    name: '会议记录11111',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+    }]
+},
+{
+    id: 9,
+    name: '会议记录11111',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+    }]
+},
+{
+    id: 10,
+    name: '会议记录11111',
+    link: '/2',
+    isOpen: false,
+    child : [{
+      id: 21,
+      name: '【2019-04-10】记录',
+      link: '/2-1',
+      isOpen: false,
+      child : []
+    }]
+}]
 
 let historyList = [
   {
@@ -99,7 +188,7 @@ let historyList = [
       id: 'rgrg'
     },
     date: '1天前',
-    isCollected: true,
+    isCollected: false,
     type: 2
   },
   {
@@ -359,7 +448,7 @@ class Page extends Component {
                       }                     
                      </div>
                     </Modal>
-                    <div className="left white">
+                    <div className="left flex-column bg-box">
                       <div className="relate">
                         <DropDown data={dropdownData}>
                           <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
@@ -371,7 +460,8 @@ class Page extends Component {
                       </div>                 
 
                     </div>
-                    <div className="flex-scroll-y">
+
+                    <div className="flex-scroll-y white">
                       <Modal title="文章信息" ref="info">
                         <ul>
                           <li>
@@ -387,9 +477,6 @@ class Page extends Component {
                       </Modal>
                       <div className="article">
                           <div className="header">
-                            <ul className="tag">
-                              <li><a href="#">未完结</a></li>
-                            </ul>
                             <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
                             <div className="detail">
                               <p>

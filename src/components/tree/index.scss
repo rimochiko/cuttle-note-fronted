@@ -1,17 +1,13 @@
 $mainColor: #632df8;
 .mck-wrapper-tree {
-    & > .component-tree-list {
-        padding-left: 0;
-    }
 }
 .component-tree-list {
-    padding-left: 1rem;
     .component-tree-item {
-        font-size: .9rem;
+        font-size: .85rem;
 
     }
     .component-tree-btn {
-        padding: .5rem 0;
+        padding: .5rem 1.5em;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -52,15 +48,20 @@ $mainColor: #632df8;
             }
         }
         &:hover {
+            background-color: #ebedf7;
             .btn-add {
                 display: block;
             }
+        }
+        .tip-text {
+            font-size: .7rem;
+            color: #ceced9;
         }
         .btn-add {
             flex-grow: 0;
             flex-shrink: 0;
             display: none;
-            background-color: #e9e9f8;
+            background-color: #fff;
             width: .8rem;
             height: .8rem;
             text-align: center;

@@ -1,11 +1,20 @@
 import React, {Component} from 'react';
 import Sidebar from '../../../layouts/sidebar/sidebar';
-
+import DropDown from '../../../components/dropdown/';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Link} from 'react-router-dom';
 
-
+let dropdownData = [{
+    id: 'gsds',
+    text: '野原家的空间',
+    link: '/'
+  },{
+    id: 'gsds',
+    text: '向日葵班的空间',
+    link: '/'
+  }]
+  
 class Page extends Component {
     constructor () {
         super();
@@ -39,14 +48,31 @@ class Page extends Component {
             <div className="page">
                 <Sidebar />
                 <div className="flex-row overflow">
-                    <div className="left white">
-                       <ul className="public-options">
-                        <span className="header-icon" title="草稿箱" onClick={this.showDraft.bind(this)}><FontAwesomeIcon icon={['far','clipboard']} /></span>
-                        <span className="header-icon" title="收藏夹" onClick={this.showCollect.bind(this)}><FontAwesomeIcon icon={['far','star']} /></span>
-                        <span className="header-icon" title="回收站" onClick={this.showTrash.bind(this)}><FontAwesomeIcon icon={['far','trash-alt']} /></span>
-                      </ul>
+                    <div className="left flex-column bg-box">
+                        <div className="relate">
+                        <DropDown data={dropdownData}>
+                          <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
+                                <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                        </DropDown>
+                      </div>
                       <div className="imglist">
                         <ul className="component-img-list">
+                          <li className="component-img-item">
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
+                          </li>
+                          <li className="component-img-item">
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
+                          </li>
+                          <li className="component-img-item">
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
+                          </li>
+                          <li className="component-img-item">
+                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                              <p className="component-img-text">我的图片1</p></a>
+                          </li>
                           <li className="component-img-item">
                               <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
                               <p className="component-img-text">我的图片1</p></a>
@@ -66,12 +92,9 @@ class Page extends Component {
                         </ul>
                       </div>                      
                     </div>
-                    <div className="right flex-scroll-y">
+                    <div className="right flex-scroll-y white">
                         <div className="photo">
                             <div className="header">
-                                <ul className="tag">
-                                    <li><a href="#">未完结</a></li>
-                                </ul>
                                 <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
                                 <div className="detail">
                                     <p>

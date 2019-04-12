@@ -67,6 +67,25 @@ class Tree extends Component {
     }
     
     /**
+     * 生成创建按钮
+     */
+    generateAddBtn (item, level) {
+        if (item.status === 0) {
+            return (
+                <span className="tip-text">草稿</span>
+            )
+        } else {
+            if (level < 5) {
+                return (
+                    <Link className="btn-add" to="/article/edit">+</Link>
+                )
+            } else {
+                return (<span></span>);
+            }
+        }
+    }
+    
+    /**
      * 判断节点是否为空
      * */
     isNodeEmpty (item) {
@@ -75,23 +94,25 @@ class Tree extends Component {
         return false;  
     }
     
+    
     /**
      * 生成树列表
      * */
-    loopTreeUl (treeData,isOpen) {
+    loopTreeUl (treeData,isOpen, level) {
         if (this.isNodeEmpty(treeData)) return; 
         return treeData.map((item, index) => {
-            let childData = this.loopTreeUl(item.child, item.isOpen);
+            let childData = item.status !== 0 ? this.loopTreeUl(item.child, item.isOpen, level+1) : '';
             let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.child));
-            let itemLink = this.generateLink(item, item.img&&item.img.length > 0);
+            let itemLink = this.generateLink(item, item.img&&item.img.length > 0)
+            let itemAdd = this.generateAddBtn(item, level);
             return (
                 <ul className="component-tree-list" key={item.id} style={{display: (isOpen ? "block" : "none")}}>
                     <li className="component-tree-item" key={item.id}>
-                        <div className="component-tree-btn">
+                        <div className="component-tree-btn" style={{paddingLeft: 32 + level*10 + 'px'}}>
                             <div className="btn-main">{itemIcon}
                                 {itemLink}
                             </div>
-                            <Link className="btn-add" to="/article/edit">+</Link>
+                            { itemAdd }
                         </div>
                         { childData }
                     </li>
@@ -102,7 +123,7 @@ class Tree extends Component {
     
 
     render () {
-        let treeMenu = this.loopTreeUl(this.props.data, true);
+        let treeMenu = this.loopTreeUl(this.props.data, true, 0);
         return (
             <div className="mck-wrapper-tree">
                 { treeMenu }
