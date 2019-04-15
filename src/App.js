@@ -4,7 +4,7 @@ import {
   Route,
   Switch
 } from 'react-router-dom';
-import {HomePage, DashboardPage} from './pages/home';
+import {HomePage} from './pages/home';
 import {
   LibraryPage,
   LibEditPage
@@ -31,20 +31,24 @@ import {
 import './assets/styles/normal.scss'
 
 class App extends Component {
+  componentDidMount(){
+
+  }
   render() {
+    //const {user} = this.props;
     return (
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage}/>
-          <Route path="/dashboard" component={DashboardPage} />
+          <Route path="/dashboard" component={HomePage} />
           <Route path="/library" component={LibraryPage} />
           <Route path="/article/edit" component={LibEditPage} />
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/photo/edit" component={GalleryEditPage} />
           <Route path="/group" component={GroupPage} />
-          <Route path="/register" component={RegisterPage} />
+          <Route path="/register" component={RegisterPage}/>
           <Route path="/setting" component={SettingPage} />         
-          <Route path="/login" component={LoginPage} />
+          <Route path="/login" component={LoginPage}/>
           <Route path="/info" component={InfoPage} />
           <Route path="/collect" component={CollectPage} />
           <Route path="/trash" component={TrashPage} />
@@ -53,5 +57,7 @@ class App extends Component {
     );
   }
 }
+
+
 
 export default App;

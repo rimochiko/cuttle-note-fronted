@@ -193,6 +193,13 @@ class Page extends Component {
         this.getNewsList = this.getNewsList.bind(this);
     }
 
+    componentWillMount () {
+      // 判断是否有登录
+      if (!window.localStorage.getItem('token')) {
+        this.props.history.push('/login');
+      }
+    }
+
     componentDidMount () {
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
