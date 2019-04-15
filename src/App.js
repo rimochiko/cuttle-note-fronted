@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Switch
+  Switch,
+  Redirect
 } from 'react-router-dom';
 import {HomePage} from './pages/home';
 import {
@@ -31,11 +32,18 @@ import {
 import './assets/styles/normal.scss'
 
 class App extends Component {
-  componentDidMount(){
+  
+  constructor () {
+    super();
+  }
 
+  componentWillMount() {
+    // 判断路由
+    
+  }
+  componentDidMount(){
   }
   render() {
-    //const {user} = this.props;
     return (
       <Router>
         <Switch>

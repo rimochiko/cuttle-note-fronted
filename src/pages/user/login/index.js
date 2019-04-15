@@ -101,23 +101,23 @@ class Page extends Component {
    */
   loginUser() {
     const query = `
-      query {
-        userLogin(
-          username: \"${this.state.name}\",
-          password: \"${this.state.password}\"
-        ) {
-          token,
-          username,
-          avatar,
-          nickname,
-          code
-        }
-      }`;
+    mutation {
+      data:
+      userLogin(
+       username: \"${this.state.name}\",
+       password: \"${this.state.password}\") {
+         code,
+         token,
+         username,
+         avatar,
+         nickname
+       }
+     }`;
       
     axios.post('/graphql', {query})
     .then(({data}) => {
       // 登录成功
-      let res = data.data.userSave;
+      let res = data.data.data;
       console.log(res);
       if (res.code === 1) {
         let user = {

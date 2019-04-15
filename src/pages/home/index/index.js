@@ -11,6 +11,9 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 
+import axios from 'axios';
+import { inject, observer } from 'mobx-react';
+
 
 let historyList = [
   {
@@ -186,6 +189,8 @@ let newsList = [
   }
 ]
 
+@inject('userStore')
+@observer
 class Page extends Component {
     constructor () {
         super();
@@ -195,12 +200,33 @@ class Page extends Component {
 
     componentWillMount () {
       // 判断是否有登录
-      if (!window.localStorage.getItem('token')) {
-        this.props.history.push('/login');
-      }
+      let user = JSON.parse(window.localStorage.getItem('user'));
+      const query = `
+      mutation {
+        data:
+        userVerify(username: \"${user.username}\",token: \"${user.token}\")
+      }`;
+        
+      axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        console.log(res);
+        if (res === 1) {
+          // 验证成功
+          this.props.userStore.logIn(user);
+        } else {
+          this.props.history.push('/login');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
     }
 
     componentDidMount () {
+      console.log(this.props.userStore);
+      //let user = JSON.parse(window.localStorage.getItem('user'));
+      //this.props.userStore.logIn(user);
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
        // 绘制图表
@@ -361,7 +387,7 @@ class Page extends Component {
                       <div className="welcome flex-row">
                         <FontAwesomeIcon icon="calendar-alt" className="icon"></FontAwesomeIcon>
                         <div>
-                          <h1>欢迎回来，<span className="name">大饼CTA</span></h1>
+                          <h1>欢迎回来，<span className="name">{this.props.userStore.user.nickname}</span></h1>
                           <p>看看自己的设定任务和团队动态来开始自己的记录吧</p>
                         </div>
                       </div>

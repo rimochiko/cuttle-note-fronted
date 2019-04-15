@@ -26,7 +26,6 @@ class Page extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.userStore.user.username);
     document.title = "注册 - 墨鱼笔记";
     this.drawBackground();
   }
@@ -220,7 +219,7 @@ class Page extends Component {
           nickname: res.nickname,
           avatar: res.avatar
         }
-        //dispatch(logIn(user));
+        this.props.userStore.logIn(user);
         this.props.history.push('/');
       }
     })

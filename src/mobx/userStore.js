@@ -13,12 +13,10 @@ export default class Store {
     }
 
     // @computed ...
-  
-    // @action ...
-    @action test() {
-      console.log(1)
-    }
     @action logIn(user){
       this.user = user;
+      console.log('user:');
+      console.log(user);
+      window.localStorage.setItem('user', JSON.stringify(user));
     }
  }
