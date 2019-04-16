@@ -4,11 +4,9 @@ import {Link, NavLink} from 'react-router-dom';
 import config from './config';
 import './sidebar.scss';
 import axios from 'axios';
+import { inject, observer } from 'mobx-react';
 
 let profile = {
-  avatar: require('../../assets/images/avatar.jpg'),
-  nickname: '九月的风',
-  des: 'Nothing...',
   fansCount: 32,
   fans: [{
     id: 'test1',
@@ -33,6 +31,8 @@ let profile = {
   }]
 }
 
+@inject('userRoot')
+@observer
 class Sidebar extends Component {
     constructor () {
         super();
@@ -49,7 +49,7 @@ class Sidebar extends Component {
     }
 
     componentWillMount() {
-      let user = JSON.parse(window.localStorage.getItem('user'));
+      let user = this.props.rootStore.user;
       this.setState({
         user: {
           nickname: user.nickname,
@@ -66,8 +66,12 @@ class Sidebar extends Component {
       }));
     }
 
-    render () {
+    logOut () {
+      this.props.rootStore.logOut();
+      this.history.push('/login');
+    }
 
+    render () {
         return (
             <div className="public-sidebar">
               <div className="header">
@@ -122,6 +126,23 @@ class Sidebar extends Component {
                       <span>我的关注</span>
                       <ul>
                         {
+                          profile.follow.map((item) => (
+                            <li key={item.id}>
+                              <Link to='/'>
+                                <img src={item.avatar}
+                                    title={item.id}/>
+                              </Link>
+                            </li>
+                          ))
+                        }
+                        <li>+{profile.followCount}</li>
+                      </ul>
+                    </div>
+
+                    <div className="list">
+                      <span>我的粉丝</span>
+                      <ul>
+                      {
                           profile.fans.map((item) => (
                             <li key={item.id}>
                               <Link to='/'>
@@ -131,34 +152,14 @@ class Sidebar extends Component {
                             </li>
                           ))
                         }
-                        
                         <li>+{profile.fansCount}</li>
-                      </ul>
-                    </div>
-
-                    <div className="list">
-                      <span>我的粉丝</span>
-                      <ul>
-                        <li><Link to="/">
-                          <img src={require('../../assets/images/avatar3.jpg')}/>
-                        </Link></li>
-                        <li><Link to="/">
-                          <img src={require('../../assets/images/avatar2.jpg')}/>
-                        </Link></li>
-                        <li><Link to="/">
-                          <img src={require('../../assets/images/avatar6.jpg')}/>
-                        </Link></li>
-                        <li><Link to="/">
-                          <img src={require('../../assets/images/avatar4.jpg')}/>
-                        </Link></li>
-                        <li>+34</li>
                       </ul>
                     </div>
                     
                   </div>
                   <div className="option">
-                    <NavLink to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</NavLink>
-                    <NavLink to="/login" className="radius-btn input-btn"><FontAwesomeIcon icon="sign-out-alt" />退出登录</NavLink>
+                    <button to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</button>
+                    <button className="radius-btn input-btn" onClick={this.logOut.bind(this)}><FontAwesomeIcon icon="sign-out-alt"/>退出登录</button>
                   </div>
                 </div>
               </div>

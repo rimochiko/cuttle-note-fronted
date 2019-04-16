@@ -201,32 +201,36 @@ class Page extends Component {
     componentWillMount () {
       // 判断是否有登录
       let user = JSON.parse(window.localStorage.getItem('user'));
-      const query = `
-      mutation {
-        data:
-        userVerify(username: \"${user.username}\",token: \"${user.token}\")
-      }`;
-        
-      axios.post('/graphql', {query})
-      .then(({data}) => {
-        let res = data.data.data;
-        console.log(res);
-        if (res === 1) {
-          // 验证成功
-          this.props.userStore.logIn(user);
-        } else {
-          this.props.history.push('/login');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      if (user.token) {
+        const query = `
+        mutation {
+          data:
+          userVerify(username: \"${user.username}\",token: \"${user.token}\")
+        }`;
+          
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          console.log(res);
+          if (res === 1) {
+            // 验证成功
+            this.props.userStore.logIn(user);
+          } else {
+            this.props.history.push('/login');
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })        
+      } else {
+        this.props.rootStore.logOut();
+        this.props.history.push('/login');
+      }
     }
 
     componentDidMount () {
-      console.log(this.props.userStore);
-      //let user = JSON.parse(window.localStorage.getItem('user'));
-      //this.props.userStore.logIn(user);
+      // console.log(this.props.userStore);
+
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
        // 绘制图表

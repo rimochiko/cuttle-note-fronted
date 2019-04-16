@@ -22,8 +22,34 @@ class Page extends Component {
         this.changeStatus = this.changeStatus.bind(this);
     }
 
-    componentDidMount() {
+    componentWillMount () {
+      // 判断是否已经登录
+      let user = JSON.parse(window.localStorage.getItem('user'));
+      if (user.token) {
+        const query = `
+        mutation {
+          data:
+          userVerify(username: \"${user.username}\",token: \"${user.token}\")
+        }`;
+          
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          console.log(res);
+          if (res === 1) {
+            // 验证成功
+            this.props.userStore.logIn(user);
+            this.history.push('/');
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })        
+      }
       document.title = "登录 - 墨鱼笔记";
+    }
+
+    componentDidMount() {
       this.drawBackground();
     }
 

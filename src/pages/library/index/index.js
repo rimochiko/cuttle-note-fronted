@@ -298,20 +298,45 @@ let postInfo = {
   }] 
 }
 
-
-let dropdownData = [{
-  id: 'gsds',
-  text: '野原家的空间',
-  link: '/'
-},{
-  id: 'gsds',
-  text: '向日葵班的空间',
-  link: '/'
-}]
-
 class Page extends Component {
     constructor () {
         super();
+        this.setState = {
+          object: '',
+          spaceList: [],
+          posts: [],
+          post: {
+            author: '',
+            content: '',
+            createDate: '',
+            comments: []
+          }
+        }
+    }
+
+    componentWillMount () {
+      // 判断是否有登录
+      if (!this.props.userStore.isLogin()) {
+        this.props.history.push('/login');
+      }
+
+      // 获取用户所拥有的团队
+
+      // 获取用户的文章
+
+      // 获取用户文章的第一篇为active
+
+      let user = this.props.userStore.user;
+      // 初始化
+      // 如果URL的指定不在可访问的空间内
+      this.setState({
+        object: this.props.params.obj || user.username,
+        spaceList: [{
+          id: user.username, 
+          name: user.nickname,
+          avatar: user.avatar || require('../../../assets/images/default.jpg')
+        }].push(this.props.userStore.groupList)
+      })
     }
     
     /** 
@@ -320,167 +345,48 @@ class Page extends Component {
     removePost () {
       this.refs.remove.toggle()
     }
-    
-    /** 
-     * 展示草稿箱
-    */
-    showDraft() {
-      this.refs.draft.toggle()
-    }
 
-    /** 
-     * 展示回收站
-    */
-    showTrash() {
-      this.refs.trash.toggle()
-    }
-
-
-        /** 
-     * 获取列表Icon
-     * */
-    getPostIcon (type) {
-      switch (type) {
-        case 1: return (
-          <FontAwesomeIcon icon="file-alt" />
-        );break;
-        case 2: return (
-          <FontAwesomeIcon icon="file-image" />
-        );
-      }
-    }
-    /**
-     *  获取收藏按钮
-     *  */
-    getPostCollect(isCollected) {
-      if (isCollected) {
-        return (
-          <span className="collect active"><FontAwesomeIcon icon="star"/></span>
-        );
-      } else {
-        return (
-          <span className="collect"><FontAwesomeIcon icon={["far","star"]}/></span>
-        );
-      }
-    }
-    /** 
-     * 获取收藏记录
-     * */
-   getCollectList (item) {
-      return (
-        <div className="item-history" key={item.id}>
-          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
-          <p className="author"><img src={item.author.avatar}/><Link to="/">{item.author.name}</Link></p>
-          <p className="option">
-            {this.getPostCollect(item.isCollected)}
-          </p>
-        </div>
-      )
-    }
-  
-    /** 
-     * 获取草稿箱记录
-     * */
-    getDraftList (item) {
-      return (
-        <div className="item-history" key={item.id}>
-          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
-          <p className="date">{item.date}</p>
-          <p className="option">
-            <span>继续编辑</span>
-            <span>删除</span>
-          </p>
-        </div>
-        
-      )
-    }
-
-        /** 
-     * 获取回收站记录
-     * */
-    getTrashList (item) {
-      return (
-        <div className="item-history" key={item.id}>
-          <p className="info">{this.getPostIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
-          <p className="date">{item.date}</p>
-          <p className="option">
-            <span>恢复</span>
-            <span>彻底删除</span>
-          </p>
-        </div>
-      )
-    }
-
-    showCollect () {
-      this.refs.collect.toggle();
-    }
 
     render () {
         return (
            <div className="page">
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
-                    <Modal title="收藏夹" ref="collect">
-                     <div className="modal-collect">
-                      {
-                        historyList.map((item, index) => {
-                          return this.getCollectList(item);
-                        })
-                      }                     
-                     </div>
+
+                    <Modal title="文章信息" ref="info">
+                      <ul>
+                        <li>
+                          <p>修改时间</p>
+                          <p>修改人</p>
+                        </li>
+                      </ul>
                     </Modal>
-                    <Modal title="草稿箱" ref="draft">
-                     <div className="modal-collect">
-                      {
-                        historyList.map((item, index) => {
-                          return this.getDraftList(item);
-                        })
-                      }                     
-                     </div>
+                    <Modal title="删除文章" ref="remove">
+                        <p>你真的要删除该文章？</p>
+                        <button className="input-btn">取消</button>
+                        <button className="input-btn">确定</button>
                     </Modal>
-                    <Modal title="回收站" ref="trash">
-                     <div className="modal-collect">
-                      {
-                        historyList.map((item, index) => {
-                          return this.getTrashList(item);
-                        })
-                      }                     
-                     </div>
-                    </Modal>
+
                     <div className="left flex-column bg-box">
                       <div className="relate">
-                        <DropDown data={dropdownData}>
+                        <DropDown data={this.state.spaceList} type="switch">
                           <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
                                 <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                         </DropDown>
                       </div>
                       <div className="tree">
-                        <Tree data={treeData} base="/library"/>
-                      </div>                 
-
+                        <Tree data={this.state.post} base="/library"/>
+                      </div>
                     </div>
 
                     <div className="flex-scroll-y white">
-                      <Modal title="文章信息" ref="info">
-                        <ul>
-                          <li>
-                            <p>修改时间</p>
-                            <p>修改人</p>
-                          </li>
-                        </ul>
-                      </Modal>
-                      <Modal title="删除文章" ref="remove">
-                         <p>你真的要删除该文章？</p>
-                         <button className="input-btn">取消</button>
-                         <button className="input-btn">确定</button>
-                      </Modal>
                       <div className="article">
                           <div className="header">
-                            <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
+                            <h1 className="title">{this.state.post.title}</h1>
                             <div className="detail">
                               <p>
-                                <span>创建人：<Link to="/">Seris</Link></span>
-                                <span>创建日期：2019-03-19</span>
+                                <span>创建人：<Link to="/">{this.state.post.author}</Link></span>
+                                <span>创建日期：{this.state.post.createDate}</span>
                               </p>
                               <p>
                                 <span title="文章信息"><FontAwesomeIcon icon="info-circle"/></span>
