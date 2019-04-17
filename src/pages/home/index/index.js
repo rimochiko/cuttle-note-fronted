@@ -198,34 +198,13 @@ class Page extends Component {
         this.getNewsList = this.getNewsList.bind(this);
     }
 
-    componentWillMount () {
+    async componentWillMount () {
       // 判断是否有登录
-      let user = JSON.parse(window.localStorage.getItem('user'));
-      if (user.token) {
-        const query = `
-        mutation {
-          data:
-          userVerify(username: \"${user.username}\",token: \"${user.token}\")
-        }`;
-          
-        axios.post('/graphql', {query})
-        .then(({data}) => {
-          let res = data.data.data;
-          console.log(res);
-          if (res === 1) {
-            // 验证成功
-            this.props.userStore.logIn(user);
-          } else {
-            this.props.history.push('/login');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })        
-      } else {
-        this.props.rootStore.logOut();
-        this.props.history.push('/login');
+      if (await this.props.userStore.isLogin() === false) {
+        console.log('跳转到登录')
+        //this.props.history.push('/login');
       }
+      console.log('1111');
     }
 
     componentDidMount () {

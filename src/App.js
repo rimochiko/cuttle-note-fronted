@@ -49,7 +49,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={HomePage}/>
           <Route path="/dashboard" component={HomePage} />
-          <Route path="/library" component={LibraryPage} />
+          <Route path="/library/:obj?/:owner?/:id?" component={LibraryPage} />
           <Route path="/article/edit" component={LibEditPage} />
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/photo/edit" component={GalleryEditPage} />

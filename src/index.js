@@ -11,8 +11,11 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 
 import { Provider } from 'mobx-react';
 import userStore from './mobx/userStore';
+import postStore from './mobx/postStore';
+
 const stores = {
-  userStore: new userStore()
+  userStore: new userStore(),
+  postStore: new postStore()
 };
 
 

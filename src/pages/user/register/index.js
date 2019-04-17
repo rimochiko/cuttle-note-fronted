@@ -25,29 +25,10 @@ class Page extends Component {
     this.changeStatus = this.changeStatus.bind(this);
   }
 
-  componentWillMount () {
+  async componentWillMount () {
     // 判断是否已经登录
-    let user = JSON.parse(window.localStorage.getItem('user'));
-    if (user.token) {
-      const query = `
-      mutation {
-        data:
-        userVerify(username: \"${user.username}\",token: \"${user.token}\")
-      }`;
-        
-      axios.post('/graphql', {query})
-      .then(({data}) => {
-        let res = data.data.data;
-        console.log(res);
-        if (res === 1) {
-          // 验证成功
-          this.props.userStore.logIn(user);
-          this.history.push('/');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })        
+    if(await this.props.userStore.isLogin() === true) {
+      this.props.history.push('/'); 
     }
     document.title = "注册 - 墨鱼笔记";
   }
@@ -126,7 +107,7 @@ class Page extends Component {
       // 验证用户名是否存在
       const query = `query {
             isExist:
-            isUserNone(username: \"${this.state.name}\")}`;
+            isUserNone(userId: \"${this.state.name}\")}`;
 
       axios.post('/graphql', {query})
       .then(({data}) => {
@@ -220,13 +201,14 @@ class Page extends Component {
     const { dispatch } = this.props
     const query = `
       mutation {
+        data:
         userSave(
-          username: \"${this.state.name}\",
+          userId: \"${this.state.name}\",
           password: \"${this.state.password}\",
           mail: \"${this.state.mail}\"
         ) {
           token,
-          username,
+          userId,
           avatar,
           nickname,
           code
@@ -236,12 +218,12 @@ class Page extends Component {
     axios.post('/graphql', {query})
     .then(({data}) => {
       // 注册成功
-      let res = data.data.userSave;
+      let res = data.data.data;
       console.log(res);
       if (res.code === 1) {
         let user = {
           token: res.token,
-          username: res.username,
+          userId: res.userId,
           nickname: res.nickname,
           avatar: res.avatar
         }
@@ -267,7 +249,7 @@ class Page extends Component {
                 <p className="des">欢迎加入我们:)</p>
                 <div className="form-useropt">
                   <div className="icon-input">
-                      <FontAwesomeIcon icon="user" />
+                      <FontAwesomeIcon icon="envolope" />
                       <span className="tip" style={{opacity: this.state.isMailTipHide ? 0:1}}>{this.state.mailTip}</span>
                       <input style={{color: this.state.isMailTipHide ? '#666':'#fff'}}
                              type="text" 

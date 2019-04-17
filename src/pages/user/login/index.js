@@ -22,29 +22,10 @@ class Page extends Component {
         this.changeStatus = this.changeStatus.bind(this);
     }
 
-    componentWillMount () {
+    async componentWillMount () {
       // 判断是否已经登录
-      let user = JSON.parse(window.localStorage.getItem('user'));
-      if (user.token) {
-        const query = `
-        mutation {
-          data:
-          userVerify(username: \"${user.username}\",token: \"${user.token}\")
-        }`;
-          
-        axios.post('/graphql', {query})
-        .then(({data}) => {
-          let res = data.data.data;
-          console.log(res);
-          if (res === 1) {
-            // 验证成功
-            this.props.userStore.logIn(user);
-            this.history.push('/');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })        
+      if(await this.props.userStore.isLogin() === true) {
+        this.props.history.push('/'); 
       }
       document.title = "登录 - 墨鱼笔记";
     }
@@ -130,11 +111,11 @@ class Page extends Component {
     mutation {
       data:
       userLogin(
-       username: \"${this.state.name}\",
+       userId: \"${this.state.name}\",
        password: \"${this.state.password}\") {
          code,
          token,
-         username,
+         userId,
          avatar,
          nickname
        }
@@ -148,12 +129,18 @@ class Page extends Component {
       if (res.code === 1) {
         let user = {
           token: res.token,
-          username: res.username,
+          userId: res.userId,
           nickname: res.nickname,
           avatar: res.avatar
         }
         this.props.userStore.logIn(user);
         this.props.history.push('/');
+      } else {
+        this.setState({
+          isPassTipHide: false,
+          passwordTip: '密码填写错误',
+          isDisabled: true
+        })
       }
     })
     .catch((err) => {
@@ -176,7 +163,7 @@ class Page extends Component {
                     <div className="icon-input">
                       <FontAwesomeIcon icon="user" />
                       <span className="tip" style={{opacity: this.state.isNameTipHide ? 0:1}}>{this.state.nameTip}</span>
-                      <input 
+                      <input style={{color: this.state.isNameTipHide ? '#666':'#fff'}}
                              type="text" 
                              value={this.state.loginName} 
                              onChange={(e) => this.changeStatus(e, 'name')}
@@ -186,7 +173,7 @@ class Page extends Component {
                     <div className="icon-input">
                       <FontAwesomeIcon icon="key" />
                       <span className="tip" style={{opacity: this.state.isPassTipHide ? 0:1}}>{this.state.passwordTip}</span>
-                      <input  
+                      <input style={{color: this.state.isPassTipHide ? '#666':'#fff'}} 
                              type="password" 
                              value={this.state.loginPassword} 
                              onChange={(e) => this.changeStatus(e, 'password')}

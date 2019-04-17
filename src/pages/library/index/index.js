@@ -1,11 +1,20 @@
 import React, {Component} from 'react';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
-import {Link} from 'react-router-dom';
+import {
+  Link,
+  Switch,
+  Route
+} from 'react-router-dom';
 import Tree from '../../../components/tree';
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { inject, observer } from 'mobx-react';
+
+import Article from '../article';
+import Dashboard from '../dashboard';
+import axios from 'axios';
 
 let treeData = [{
   id: 1,
@@ -298,11 +307,21 @@ let postInfo = {
   }] 
 }
 
+const USER = "user",
+      GROUP = "group";
+
+@inject('userStore')
+@observer
 class Page extends Component {
     constructor () {
         super();
-        this.setState = {
-          object: '',
+        this.state = {
+          object: {
+            id: '',
+            nickname: '',
+            avatar: ''
+          },
+          isAuth: false,
           spaceList: [],
           posts: [],
           post: {
@@ -312,47 +331,153 @@ class Page extends Component {
             comments: []
           }
         }
+        this.getOwnerInfo = this.getOwnerInfo.bind(this);
+        this.getPostList = this.getPostList.bind(this);
     }
 
-    componentWillMount () {
+    async componentWillMount () {
+      let userStore = this.props.userStore;
       // 判断是否有登录
-      if (!this.props.userStore.isLogin()) {
+      if (await userStore.isLogin() === false) {
         this.props.history.push('/login');
+      }
+      let user = userStore.user;
+      // 先判断URL
+      let params = {
+        owner:  (this.props.params && this.props.params.owner) || user.userId, 
+        obj: (this.props.params && this.props.params.obj) || USER,
+        id: (this.props.params && this.props.params.id)
       }
 
       // 获取用户所拥有的团队
+      await userStore.getGroup();
+      // 处理GroupList
+      let groupList = userStore.groupList && userStore.groupList.map((item) => {
+        console.log(item);
+        return {
+          id: item.id,
+          img: item.avatar || require('../../../assets/images/default_g.jpg'),
+          text: item.nickname,
+          link: `/library/group/{item.id}`  
+        }
+      })
 
-      // 获取用户的文章
-
-      // 获取用户文章的第一篇为active
-
-      let user = this.props.userStore.user;
-      // 初始化
+      // 获取当前空间主人信息
+      let owner;
+      if (params.owner === 'user.userId') {
+        owner = {
+          id: user.userId, 
+          text: user.nickname,
+          avatar: user.avatar || require('../../../assets/images/default.jpg')
+        }
+      } else {
+        // 发送请求获取
+        owner = this.getOwnerInfo(params);
+      }
+      
       // 如果URL的指定不在可访问的空间内
       this.setState({
-        object: this.props.params.obj || user.username,
+        object: owner,
         spaceList: [{
-          id: user.username, 
-          name: user.nickname,
-          avatar: user.avatar || require('../../../assets/images/default.jpg')
-        }].push(this.props.userStore.groupList)
+          id: user.userId, 
+          text: user.nickname,
+          avatar: user.avatar || require('../../../assets/images/default.jpg'),
+          link: '/library/'
+        }].concat(groupList)
       })
+      console.log(this.state.object);
+    }
+    
+    /**
+     * 获取当前主人的信息
+     * @param {*} params 
+     */
+    getOwnerInfo (params) {
+      const query = params.obj === USER ? `
+       query {
+         data:
+         userEasy(
+           id=\"${params.owner}\"
+         )
+       }`:
+       `query {
+         data:
+         groupEasy(
+           id=\"${params.owner}\"
+         )
+       }`;
+      await axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        console.log(res.code);
+        if(res.code === 1) {
+          this.setState({
+            object: {
+              id: res.id,
+              nickname: res.nickname,
+              avatar: res.avatar
+            }
+          })
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+    
+    /**
+     * 获取空间文章列表
+     */
+    getPostList () {
+      const query = params.obj === USER ? `
+      query {
+        data:
+        userPosts(
+          userId=\"${params.owner}\",
+          type: 0
+        )
+      }`:
+      `query {
+        data:
+        groupPosts(
+          groupId=\"${params.owner}\",
+          type: 0
+        )
+      }`;
+     await axios.post('/graphql', {query})
+     .then(({data}) => {
+       let res = data.data.data;
+       console.log(res.code);
+       if(res && res.length >= 0) {
+         this.setState({
+           posts: res
+         })
+       }
+     })
+     .catch((err) => {
+       console.log(err);
+     })
     }
     
     /** 
      * 删除文章
     */
-    removePost () {
+    showRemovePost () {
       this.refs.remove.toggle()
     }
 
+    /**
+     * 文章信息
+     */
+    showInfoPost (){
+      this.refs.info.toggle()
+    }
 
     render () {
         return (
            <div className="page">
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
-
                     <Modal title="文章信息" ref="info">
                       <ul>
                         <li>
@@ -370,93 +495,28 @@ class Page extends Component {
                     <div className="left flex-column bg-box">
                       <div className="relate">
                         <DropDown data={this.state.spaceList} type="switch">
-                          <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
-                                <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                          <img src={this.state.object.avatar || require('../../../assets/images/default.jpg')} className="link-img"/>
+                          {this.state.object.text}的空间
+                          <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                         </DropDown>
                       </div>
                       <div className="tree">
-                        <Tree data={this.state.post} base="/library"/>
+                        <Tree data={this.state.posts} base="/library"/>
                       </div>
                     </div>
 
                     <div className="flex-scroll-y white">
-                      <div className="article">
-                          <div className="header">
-                            <h1 className="title">{this.state.post.title}</h1>
-                            <div className="detail">
-                              <p>
-                                <span>创建人：<Link to="/">{this.state.post.author}</Link></span>
-                                <span>创建日期：{this.state.post.createDate}</span>
-                              </p>
-                              <p>
-                                <span title="文章信息"><FontAwesomeIcon icon="info-circle"/></span>
-                                <Link title="编辑" to="/article/edit"><FontAwesomeIcon icon="pen"/></Link>
-                                <span title="删除" onClick={this.removePost.bind(this)}><FontAwesomeIcon icon="trash-alt"/></span>
-                              </p>
-                            </div>
-                          </div>
-                          <div className="body">
-                            <div className="content">
-                              
-                            </div>
-                            <div className="extra">
-                              <ul className="extra-ul">
-                                <li><FontAwesomeIcon icon={["far","eye"]}></FontAwesomeIcon> 11</li>
-                                <li><FontAwesomeIcon icon={["far","thumbs-up"]}></FontAwesomeIcon> 0</li>
-                              </ul>
-                              <ul className="extra-ul">
-                                <li><FontAwesomeIcon icon={["far", "star"]}></FontAwesomeIcon> 收藏</li>
-                                <li><FontAwesomeIcon icon="share-alt"></FontAwesomeIcon> 分享</li>
-                              </ul>
-                            </div>
-                          </div>
-                          
-
-                          <div className="comments">
-                            <h1 className="section-title">我要评论</h1>
-                            <div className="input-comment-box">
-                              <textarea className="input-textarea"></textarea>
-                              <div className="input-btn-box">
-                                <input type="submit" text="提交" className="input-btn radius-btn"/>
-                              </div>
-                            </div>
-
-                            <div className="list-comment-box">
-                              <h1 className="section-title">全部评论（{postInfo.comments.length}）</h1>
-                              <ul className="ul-comment-single">
-                                {
-                                  postInfo.comments.map((item) => {
-                                    if (item.to) {
-                                      return (
-                                        <li className="li-comment-single" key={item.id}>
-                                          <img src={item.from.avatar} />
-                                          <div className="author-comment">
-                                            <Link to="/">{item.from.nickname}</Link> 回复 <Link to="/">{item.to.nickname}</Link>：
-                                            {item.content}
-                                            <span className="date"> {item.date}</span>
-                                          </div>
-                                          <span className="btn-reply">回复</span>
-                                        </li>                                      
-                                      )
-                                    } else {
-                                      return (
-                                        <li className="li-comment-single" key={item.id}>
-                                          <img src={item.from.avatar} />
-                                          <div className="author-comment">
-                                            <Link to="/">{item.from.nickname}</Link>：
-                                            {item.content}
-                                            <span className="date"> {item.date}</span>
-                                          </div>
-                                          <span className="btn-reply">回复</span>
-                                        </li>        
-                                      )
-                                    }
-                                  })
-                                }
-                              </ul>
-                            </div>
-                          </div>
-                      </div>
+                      <Switch>
+                        <Route path="/article" exact component={Dashboard}/>
+                        <Route path="/article(/:obj/:owner/:id)"
+                               render={(props) => (
+                               <Article
+                                  {...props} 
+                                  removePost={this.showRemovePost.bind(this)}
+                                  infoPost={this.showInfoPost.bind(this)}
+                                />)} 
+                        />
+                      </Switch>
                     </div>
                 </div>
             </div>

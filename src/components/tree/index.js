@@ -100,7 +100,7 @@ class Tree extends Component {
      * */
     loopTreeUl (treeData,isOpen, level) {
         if (this.isNodeEmpty(treeData)) return; 
-        return treeData.map((item, index) => {
+        return treeData.map((item) => {
             let childData = item.status !== 0 ? this.loopTreeUl(item.child, item.isOpen, level+1) : '';
             let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.child));
             let itemLink = this.generateLink(item, item.img&&item.img.length > 0)

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {Link, NavLink} from 'react-router-dom';
+import {Link, NavLink, withRouter} from 'react-router-dom';
 import config from './config';
 import './sidebar.scss';
 import axios from 'axios';
@@ -31,7 +31,7 @@ let profile = {
   }]
 }
 
-@inject('userRoot')
+@inject('userStore')
 @observer
 class Sidebar extends Component {
     constructor () {
@@ -40,7 +40,7 @@ class Sidebar extends Component {
           isBarOpen: true,
           user: {
             nickname: '',
-            username: '',
+            userId: '',
             avatar: '',
             des: ''
           }
@@ -49,11 +49,11 @@ class Sidebar extends Component {
     }
 
     componentWillMount() {
-      let user = this.props.rootStore.user;
+      let user = this.props.userStore.user;
       this.setState({
         user: {
           nickname: user.nickname,
-          username: user.username,
+          userId: user.userId,
           avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg')
         }
       })
@@ -67,8 +67,8 @@ class Sidebar extends Component {
     }
 
     logOut () {
-      this.props.rootStore.logOut();
-      this.history.push('/login');
+      this.props.userStore.logOut();
+      this.props.history.push('/login');
     }
 
     render () {
@@ -167,4 +167,4 @@ class Sidebar extends Component {
     }
 }
 
-export default Sidebar;
+export default withRouter(Sidebar);
