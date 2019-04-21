@@ -17,12 +17,22 @@ class Section extends Component {
                 isLike: false,
                 isCollect: false
             },
+            isAuth: false,
             comments: []
         }
     }
 
+    componentWillUpdate (nextProps) {
+        if (this.props.post && (nextProps.post !== this.props.post)) {
+            this.setState({
+                post: nextProps.post,
+                isAuth: nextProps.isAuth
+            })
+        }
+    }
+
     generateBtn () {
-        if (this.props.isAuth) {
+        if (this.state.isAuth) {
             return (
                 <p>
                     <span title="文章信息" onClick={this.props.infoPost}>
@@ -54,8 +64,8 @@ class Section extends Component {
                 <h1 className="title">{this.state.post.title}</h1>
                 <div className="detail">
                     <p>
-                        <span>创建人：<Link to="/">{this.state.post.author}</Link></span>
-                        <span>创建日期：{this.state.post.createDate}</span>
+                        <span>创建人：<Link to={`/library/${this.state.post.author.id}`}>{this.state.post.author.nickname}</Link></span>
+                        <span>创建日期：{this.state.post.createTime}</span>
                     </p>
                     {
                         this.generateBtn()
@@ -64,7 +74,7 @@ class Section extends Component {
                 </div>
                 <div className="body">
                 <div className="content">
-                    {this.post.content}
+                    {this.state.post.content}
                 </div>
                 <div className="extra">
                     <ul className="extra-ul">
@@ -72,7 +82,8 @@ class Section extends Component {
                     <li><FontAwesomeIcon icon={["far","thumbs-up"]}></FontAwesomeIcon> {this.state.post.likeNum}</li>
                     </ul>
                     <ul className="extra-ul">
-                    <li><FontAwesomeIcon icon={["far", "star"]}></FontAwesomeIcon> 收藏</li>
+                    <li>
+                        <FontAwesomeIcon icon={["far", "star"]}></FontAwesomeIcon> 收藏</li>
                     <li><FontAwesomeIcon icon="share-alt"></FontAwesomeIcon> 分享</li>
                     </ul>
                 </div>

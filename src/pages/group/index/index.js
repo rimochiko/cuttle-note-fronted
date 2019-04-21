@@ -4,7 +4,7 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
-
+import Switch from '../../../components/switch'; 
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +23,11 @@ let dropdownData = [{
   id: 'gsds',
   text: '向日葵班的空间',
   link: '/'
+},{
+  id: '0_add',
+  text: '创建新团队',
+  link: '/',
+  click: ''
 }]
 
 let newsList = [
@@ -154,13 +159,6 @@ class Page extends Component {
    }
 
   /**
-   * 任务详细面板
-   */
-  toggleTask () {
-    this.refs.task.toggle();
-  }
-
-  /**
    * 完成任务
    */
   finishTask () {
@@ -275,6 +273,10 @@ class Page extends Component {
     });
   }
 
+  toggleCreateGroup () {
+    this.refs.createGroup.toggle();
+  }
+
 
     render () {
         return (
@@ -302,43 +304,125 @@ class Page extends Component {
                       </div>
                     </Modal>
 
-
-                    <Modal title="团队统计" ref="statistics">
-                      
+                    <Modal title="团队成员" ref="statistics">
+                      <div className="member-manage">
+                        <table>
+                          <tr>
+                            <td>成员</td>
+                            <td>加入日期</td>
+                            <td>权限</td>
+                            <td></td>
+                          </tr>
+                            <td>
+                              <img src={require('../../../assets/images/avatar2.jpg')} width="32"/>
+                              <div className="info">
+                                <p className="main">测试</p>
+                                <p className="des">test111</p>
+                              </div>
+                            </td>
+                            <td>
+                              <p>2019-03-11</p>
+                            </td>
+                            <td><p>管理员</p></td> 
+                            <td>
+                               <FontAwesomeIcon icon="trash" />
+                            </td>
+                        </table>
+                      </div>
                     </Modal>
 
-                    <Modal title="任务详情" ref="task">
-                      <p>标题：完成“React Diff算法分析”</p>
-                      <p>说明：暂无说明</p>
-                      <p>截至日期：2019-02-12</p>
-                      <p>状态：待完成</p>
-                      <p>关联文档：</p>  
-                    </Modal>
-
-                    <Modal title="团队设置" ref="setting">
+                    <Modal title="创建小组" ref="createGroup">
                       <div className="settings-detail">
-                        <div className="input-group">
-                          <label className="input-label">组名</label>
-                          <input className="input-text" type="text" placeholder="请输入昵称"/>
-                          <span className="input-mark">必填项</span>
-                        </div>
+                        <div className="flex-row">
+                          <div className="flex-column input-side">
+                            <div className="input-group">
+                              <label className="input-label">小组域名</label>
+                              <input className="input-text" type="text" placeholder="请输入域名"/>
+                              <span className="input-mark">必填项</span>
+                            </div>
 
-                        <div className="input-group">
-                          <label className="input-label">小组简介</label>
-                          <textarea className="input-area" type="text" placeholder=""/>
-                          <span className="input-mark">必填项</span>
-                        </div>
+                            <div className="input-group">
+                              <label className="input-label">小组名称</label>
+                              <input className="input-text" type="text" placeholder="请输入昵称"/>
+                              <span className="input-mark">必填项</span>
+                            </div>
 
-                        <div className="input-group">
-                          <label className="input-label">小组头像</label>
-                          <div className="two-side">
-                              <img src={require('../../../assets/images/avatar.jpg')} className="input-img"/>
+                            <div className="input-group">
+                              <label className="input-label">小组简介</label>
+                              <textarea className="input-area" type="text" placeholder="介绍一下你的小组吧！50字以内"/>
+                              <span className="input-mark">非必填项</span>
+                            </div>
+
+                            <div className="input-group mini-group">
+                              <div>
+                                <label className="input-label">小组是否私密</label>
+                                <span className="input-mark">私密小组的图文库只有成员能浏览</span>
+                              </div>
+                              <Switch />
+                            </div> 
+                          </div>
+
+                          <div className="input-group">
+                            <label className="input-label">小组头像</label>
+                            <div className="two-side">
+                              <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
                               <div className="input-file-box">
                                   <input className="file-input" type="file" placeholder="请输入昵称"/>
                                   <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                               </div>
+                            </div>
+                           <span className="input-mark">非必填项</span>
                           </div>
-                          <span className="input-mark">必填项</span>
+                        </div>
+
+                        <div className="input-group">
+                          <input className="input-btn radius-btn" type="submit" text="确认" />
+                        </div>
+                      </div>
+                    </Modal>
+
+                    <Modal title="团队设置" ref="setting">
+                    <div className="settings-detail">
+                        <div className="flex-row">
+                          <div className="flex-column input-side">
+                            <div className="input-static-group">
+                              <label className="input-label">小组域名</label>
+                              <div className="input-static">
+                                <p className="input-pure-text">185******59</p>
+                              </div>
+                            </div>
+                            <div className="input-group">
+                              <label className="input-label">小组名称</label>
+                              <input className="input-text" type="text" placeholder="请输入昵称"/>
+                              <span className="input-mark">必填项</span>
+                            </div>
+
+                            <div className="input-group">
+                              <label className="input-label">小组简介</label>
+                              <textarea className="input-area" type="text" placeholder="介绍一下你的小组吧！50字以内"/>
+                              <span className="input-mark">非必填项</span>
+                            </div>
+
+                            <div className="input-group mini-group">
+                              <div>
+                                <label className="input-label">小组是否私密</label>
+                                <span className="input-mark">私密小组的图文库只有成员能浏览</span>
+                              </div>
+                              <Switch />
+                            </div> 
+                          </div>
+
+                          <div className="input-group">
+                            <label className="input-label">小组头像</label>
+                            <div className="two-side">
+                              <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
+                              <div className="input-file-box">
+                                  <input className="file-input" type="file" placeholder="请输入昵称"/>
+                                  <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
+                              </div>
+                            </div>
+                           <span className="input-mark">非必填项</span>
+                          </div>
                         </div>
 
                         <div className="input-group">
@@ -349,13 +433,19 @@ class Page extends Component {
                   
                   <div className="flex-column  flex-scroll-y">
                     <Header />
-                    <div className="group-switch">
-                      <DropDown data={dropdownData}>
-                          <img src={require('../../../assets/images/avatar6.jpg')} className="link-img"/>
-                          野原家
-                          <FontAwesomeIcon icon="caret-down" className="link-svg"/>
-                      </DropDown>
+                    <div className="group-header">
+                      <div className="group-switch">
+                        <DropDown data={dropdownData}>
+                            <img src={require('../../../assets/images/avatar6.jpg')} className="link-img"/>
+                            野原家
+                            <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                        </DropDown>
+                      </div>
+                      <div className="group-add" onClick={this.toggleCreateGroup.bind(this)}>
+                        创建团队
+                      </div>                  
                     </div>
+
                     
                     <div className="flex-row">
                       <div className="group-box right flex-column">
@@ -366,20 +456,7 @@ class Page extends Component {
                             </div>
                             <p className="title">野原家</p>
                             <p className="des">暂无简介</p>
-                          </div>
-
-                          <div className="group-links">
-                            <h1 className="normal-title">操作通道</h1>
-                            <ul className="ul-list-link">
-                              <li><Link to="/library"><FontAwesomeIcon icon="book" />文库</Link></li>
-                              <li><Link to="/library"><FontAwesomeIcon icon="image" />图库</Link></li>
-                              <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="database" />统计</span></li>
-                              <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
-                            </ul>    
-                          </div>   
-
-                          <div className="us-list">
-                              <h1 className="normal-title">团队成员(5/10)</h1>
+                            <div className="us-list">
                               <ul className="us-people">
                                 {
                                   groupMember.map((item) => (
@@ -389,7 +466,18 @@ class Page extends Component {
                                 }
                                 <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
                               </ul>
+                            </div>
                           </div>
+
+                          <div className="group-links">
+                            <h1 className="normal-title">操作通道</h1>
+                            <ul className="ul-list-link">
+                              <li><Link to="/library"><FontAwesomeIcon icon="book" />文库</Link></li>
+                              <li><Link to="/library"><FontAwesomeIcon icon="image" />图库</Link></li>
+                              <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
+                              <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
+                            </ul>    
+                          </div>   
                       </div>
 
                       <div className="flex-column group-main">

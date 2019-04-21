@@ -232,10 +232,14 @@ class Page extends Component {
                 <Sidebar />
                 <div className="main flex-column">
                     <Header />
+                    <div className="page-header">
+                      <h1 className="normal-title">我的回收站</h1>
+                      <div className="empty-btn">
+                        全部清空
+                      </div>
+                    </div>
                     <div className="public-body flex-column">    
-
                           <div className="trash-box wrapper">
-                              <h1 className="normal-title">我的回收站</h1>
                               <div className="item-list">
                               {
                                 TrashList.map((item, index) => {
@@ -244,7 +248,13 @@ class Page extends Component {
                               }
                               </div>
                           </div>
-                      
+                          <ul className="ul-page">
+                            <li><Link to="/">&lt;</Link></li>
+                            <li className="active"><Link to="/">1</Link></li>
+                            <li><Link to="/">2</Link></li>
+                            <li><Link to="/">3</Link></li>
+                            <li><Link to="/">&gt;</Link></li>
+                          </ul>
                    </div>
                 </div>
             </div>

@@ -15,149 +15,7 @@ import { inject, observer } from 'mobx-react';
 import Article from '../article';
 import Dashboard from '../dashboard';
 import axios from 'axios';
-
-let treeData = [{
-  id: 1,
-  name: '学习笔记',
-  link: '/1',
-  isOpen: false,
-  child : [{
-    id: 11,
-    name: 'GraphQL手册',
-    link: '/1-1',
-    isOpen: false,
-    child : [{
-      id: 111,
-      name: 'GraphQL的诞生',
-      link: '/1-1-1',
-      isOpen: false,
-      child : []
-    }]
-  }, {
-    id: 12,
-    name: '计划',
-    link: '/1-2',
-    isOpen: false,
-    child : []
-  }]
-}, 
-{
-  id: 2,
-  name: '会议记录',
-  link: '/2',
-  isOpen: false,
-  child : [{
-    id: 21,
-    name: '【2019-04-10】记录',
-    link: '/2-1',
-    isOpen: false,
-    child : [],
-    status: 0
-  }]
-},
-{
-    id: 3,
-    name: '杂杂碎',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-  }]
-},
-{
-  id: 4,
-  name: '需求分析',
-  link: '/2',
-  isOpen: false,
-  child : [{
-    id: 21,
-    name: '【2019-04-10】记录',
-    link: '/2-1',
-    isOpen: false,
-    child : []
-}]},
-{
-    id: 5,
-    name: '会议记录11111',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-    }]
-  },
-  {
-      id: 6,
-      name: '会议记录11111',
-      link: '/2',
-      isOpen: false,
-      child : [{
-        id: 21,
-        name: '【2019-04-10】记录',
-        link: '/2-1',
-        isOpen: false,
-        child : []
-      }]
-},
-{
-    id: 7,
-    name: '会议记录11111',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-    }]
-},
-{
-    id: 8,
-    name: '会议记录11111',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-    }]
-},
-{
-    id: 9,
-    name: '会议记录11111',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-    }]
-},
-{
-    id: 10,
-    name: '会议记录11111',
-    link: '/2',
-    isOpen: false,
-    child : [{
-      id: 21,
-      name: '【2019-04-10】记录',
-      link: '/2-1',
-      isOpen: false,
-      child : []
-    }]
-}]
+import qlQuery from './graphql';
 
 let historyList = [
   {
@@ -310,7 +168,7 @@ let postInfo = {
 const USER = "user",
       GROUP = "group";
 
-@inject('userStore')
+@inject('userStore', 'postStore')
 @observer
 class Page extends Component {
     constructor () {
@@ -319,7 +177,8 @@ class Page extends Component {
           object: {
             id: '',
             nickname: '',
-            avatar: ''
+            avatar: '',
+            type: USER
           },
           isAuth: false,
           spaceList: [],
@@ -336,48 +195,33 @@ class Page extends Component {
     }
 
     async componentWillMount () {
-      let userStore = this.props.userStore;
       // 判断是否有登录
-      if (await userStore.isLogin() === false) {
+      if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
       }
+      let params = this.analysisParams(this.props);
+      await this.getGroup();
+      await this.fetchOwnerData(params);
+      await this.fetchIdData(params);
+    }
+
+    async getGroup () {
+      let userStore = this.props.userStore;
       let user = userStore.user;
-      // 先判断URL
-      let params = {
-        owner:  (this.props.params && this.props.params.owner) || user.userId, 
-        obj: (this.props.params && this.props.params.obj) || USER,
-        id: (this.props.params && this.props.params.id)
-      }
 
       // 获取用户所拥有的团队
       await userStore.getGroup();
       // 处理GroupList
       let groupList = userStore.groupList && userStore.groupList.map((item) => {
-        console.log(item);
         return {
           id: item.id,
-          img: item.avatar || require('../../../assets/images/default_g.jpg'),
+          avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
           text: item.nickname,
-          link: `/library/group/{item.id}`  
+          link: `/library/group/${item.id}`  
         }
       })
 
-      // 获取当前空间主人信息
-      let owner;
-      if (params.owner === 'user.userId') {
-        owner = {
-          id: user.userId, 
-          text: user.nickname,
-          avatar: user.avatar || require('../../../assets/images/default.jpg')
-        }
-      } else {
-        // 发送请求获取
-        owner = this.getOwnerInfo(params);
-      }
-      
-      // 如果URL的指定不在可访问的空间内
       this.setState({
-        object: owner,
         spaceList: [{
           id: user.userId, 
           text: user.nickname,
@@ -385,72 +229,145 @@ class Page extends Component {
           link: '/library/'
         }].concat(groupList)
       })
-      console.log(this.state.object);
+    }
+    
+    /**
+     * 获取左侧栏目数据
+     */
+    async fetchOwnerData (params) {
+      let userStore = this.props.userStore;
+      let user = userStore.user;
+
+      // 获取当前空间主人信息
+      let owner;
+      if (params.owner === user.userId) {
+        owner = {
+          id: user.userId, 
+          name: user.nickname,
+          avatar: user.avatar || require('../../../assets/images/default.jpg'),
+          type: USER
+        }
+      } else {
+        // 发送请求获取
+        owner = await this.getOwnerInfo(params);
+        owner.type = params.obj
+      }
+      // 如果URL的指定不在可访问的空间内
+      this.setState({
+        object: owner
+      })
+
+      // 给isAuth赋值
+      this.state.spaceList.forEach((item) => {
+        if (item.id === owner.id) {
+          this.setState({
+            isAuth: true
+          })
+        }
+      })
+
+      // 获取文章列表
+      this.getPostList(params);
+    }
+
+    async fetchIdData (params) {
+      if(params.id) {
+        const query = qlQuery.getOnePost({
+          userId: this.props.userStore.user.userId,
+          postId: params.id,
+          token: this.props.userStore.user.token 
+        });
+        await axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if(res.code === 1) {
+            // 请求成功
+            this.setState({
+              post: res.post
+            })
+          } else {
+            console.log("请求文章失败")
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
     }
     
     /**
      * 获取当前主人的信息
-     * @param {*} params 
      */
-    getOwnerInfo (params) {
+    async getOwnerInfo (params) {
+      let owner = {};
+      console.log("params：")
+      console.log(params);
       const query = params.obj === USER ? `
        query {
          data:
          userEasy(
-           id=\"${params.owner}\"
-         )
+           id:\"${params.owner}\"
+         ) {
+          avatar
+          id
+          nickname
+        }
        }`:
        `query {
          data:
          groupEasy(
-           id=\"${params.owner}\"
-         )
+           id:\"${params.owner}\"
+         ) {
+           id
+           avatar
+           nickname
+         }
        }`;
       await axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        console.log(res.code);
-        if(res.code === 1) {
-          this.setState({
-            object: {
-              id: res.id,
-              nickname: res.nickname,
-              avatar: res.avatar
-            }
-          })
+        if(res.id) {
+          owner = {
+            id: res.id,
+            name: res.nickname,
+            avatar: res.avatar,
+            type: params.obj
+          }
         }
       })
       .catch((err) => {
         console.log(err);
       })
+      return owner;
     }
     
     /**
      * 获取空间文章列表
      */
-    getPostList () {
-      const query = params.obj === USER ? `
-      query {
-        data:
-        userPosts(
-          userId=\"${params.owner}\",
-          type: 0
-        )
-      }`:
-      `query {
-        data:
-        groupPosts(
-          groupId=\"${params.owner}\",
-          type: 0
-        )
-      }`;
+    async getPostList (params) { 
+      const query = params.obj === USER ?
+      qlQuery.userPostQuery({
+         userId: this.props.userStore.user.userId,
+         token: this.props.userStore.user.token,
+         type: 0,
+         author: params.owner        
+      }):
+      qlQuery.groupPostQuery({
+        userId: this.props.userStore.user.userId,
+        token: this.props.userStore.user.token,
+        type: 0,
+        groupId: params.owner  
+      });
      await axios.post('/graphql', {query})
      .then(({data}) => {
        let res = data.data.data;
-       console.log(res.code);
-       if(res && res.length >= 0) {
+       if(res.code === 1) {
          this.setState({
-           posts: res
+           posts: res.posts
+         })
+       } else {
+         this.setState({
+           isAuth: false
          })
        }
      })
@@ -465,6 +382,71 @@ class Page extends Component {
     showRemovePost () {
       this.refs.remove.toggle()
     }
+
+    async removePost (params) {
+      const query = params && params.obj === USER ? 
+      qlQuery.userDelPostQuery({
+          userId:this.props.userStore.user.userId,
+          postId: params.id,
+          token:this.props.userStore.user.token
+      })
+      : 
+      qlQuery.groupDelPostQuery({
+        userId:this.props.userStore.user.userId,
+        postId: params.id,
+        token:this.props.userStore.user.token,
+        groupId:params.owner
+      });
+
+      await axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res === 1) {
+          // 删除成功
+        } else {
+          // 删除失败
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+    
+    /**
+     * 分析路由参数
+     */
+    analysisParams(props) {
+      let match = props.match.params;
+      return {
+        owner:  match.owner || props.userStore.user.userId, 
+        obj: match.obj || USER,
+        id: match.id
+      }
+    }
+
+
+    async componentWillUpdate(nextProps) {
+      let prevMatch = this.props.match.params;
+      let nextMatch = nextProps.match.params
+      if (prevMatch === nextMatch) {
+        return;
+      }
+      let params = {
+        owner:  nextMatch.owner || nextProps.userStore.user.userId, 
+        obj: nextMatch.obj || USER,
+        id: nextMatch.id
+      }
+      console.log(params);
+      if (params.obj !== prevMatch.obj) {
+        await this.fetchOwnerData(params);
+        await this.fetchIdData(params);
+      } else if (params.owner !== prevMatch.owner) {
+        await this.fetchOwnerData(params);
+        await this.fetchIdData(params);
+      } else if (params.id !== prevMatch.id) {
+        await this.fetchIdData(params);
+      }
+   }
 
     /**
      * 文章信息
@@ -489,32 +471,41 @@ class Page extends Component {
                     <Modal title="删除文章" ref="remove">
                         <p>你真的要删除该文章？</p>
                         <button className="input-btn">取消</button>
-                        <button className="input-btn">确定</button>
+                        <button className="input-btn" onClick={this.removePost}>确定</button>
                     </Modal>
 
                     <div className="left flex-column bg-box">
                       <div className="relate">
-                        <DropDown data={this.state.spaceList} type="switch">
-                          <img src={this.state.object.avatar || require('../../../assets/images/default.jpg')} className="link-img"/>
-                          {this.state.object.text}的空间
-                          <FontAwesomeIcon icon="caret-down" className="link-svg"/>
-                        </DropDown>
+                        <div className="switch">
+                          <DropDown data={this.state.spaceList} type="switch">
+                            <img src={this.state.object.avatar || require('../../../assets/images/default.jpg')} className="link-img"/>
+                            {this.state.object.name}的空间
+                            <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                          </DropDown>                        
+                        </div>
+                        <div className="option">
+                          <Link to="/article/edit">
+                            <FontAwesomeIcon icon="plus" />
+                          </Link>
+                        </div>
                       </div>
                       <div className="tree">
-                        <Tree data={this.state.posts} base="/library"/>
+                        <Tree data={this.state.posts} base="library" owner={this.state.object} activeId={this.props.match.params && this.props.match.params.id}/>
                       </div>
                     </div>
 
                     <div className="flex-scroll-y white">
                       <Switch>
-                        <Route path="/article" exact component={Dashboard}/>
-                        <Route path="/article(/:obj/:owner/:id)"
-                               render={(props) => (
-                               <Article
-                                  {...props} 
-                                  removePost={this.showRemovePost.bind(this)}
-                                  infoPost={this.showInfoPost.bind(this)}
-                                />)} 
+                        <Route path="/library/:obj?/:owner?" exact component={Dashboard}/>
+                        <Route path="/library/:obj/:owner/:id"
+                          render={(props) => (
+                          <Article
+                            {...props} 
+                            removePost={this.showRemovePost.bind(this)}
+                            infoPost={this.showInfoPost.bind(this)}
+                            post={this.state.post}
+                            isAuth={this.state.isAuth}
+                          />)} 
                         />
                       </Switch>
                     </div>

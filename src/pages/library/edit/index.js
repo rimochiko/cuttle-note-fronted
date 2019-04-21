@@ -19,6 +19,10 @@ class Page extends Component {
         }
     }
 
+    componentDidMount() {
+      console.log(this.props);
+    }
+
     /**
      * 获取选中文本
     */

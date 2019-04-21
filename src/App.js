@@ -26,7 +26,8 @@ import {
 
 import {
   CollectPage,
-  TrashPage
+  TrashPage,
+  SearchPage
 } from './pages/other';
 
 import './assets/styles/normal.scss'
@@ -54,12 +55,13 @@ class App extends Component {
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/photo/edit" component={GalleryEditPage} />
           <Route path="/group" component={GroupPage} />
-          <Route path="/register" component={RegisterPage}/>
-          <Route path="/setting" component={SettingPage} />         
-          <Route path="/login" component={LoginPage}/>
+          <Route path="/setting" component={SettingPage} />  
           <Route path="/info" component={InfoPage} />
           <Route path="/collect" component={CollectPage} />
-          <Route path="/trash" component={TrashPage} />
+          <Route path="/trash" component={TrashPage} />  
+          <Route path="/search" component={SearchPage} />        
+          <Route path="/register" component={RegisterPage}/>   
+          <Route path="/login" component={LoginPage}/>
         </Switch>
       </Router>
     );

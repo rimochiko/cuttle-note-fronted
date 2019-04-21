@@ -40,7 +40,7 @@ class Tabs extends Component {
                          ) 
                       } else {
                         return (
-                            <li key={item.key} onCLick={this.toggleActive.bind(this, item.key)}>{item.name}</li>
+                            <li key={item.key} onClick={this.toggleActive.bind(this, item.key)}>{item.name}</li>
                         ) 
                       }
                   })

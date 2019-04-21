@@ -1,0 +1,38 @@
+.mck-switch {
+  position: relative;
+  input[type="checkbox"] {
+    opacity: 0;
+    width: 46px;
+    height: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+  }
+  .mck-switch-container {
+    background: #ccc;
+    border: 3px solid #ccc;
+    position: relative;
+    width: 40px;
+    height: 14px;
+    border-radius: 10px;
+    transition: all .2s;
+    .mck-switch-radio {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #fff;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+    }
+    &.active {
+      background-color: #4c68fa;
+      border-color: #4c68fa;
+      .mck-switch-radio {
+        left: unset;
+        right: 0;
+      }
+    }
+  }
+}

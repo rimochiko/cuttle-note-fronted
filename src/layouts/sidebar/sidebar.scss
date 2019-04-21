@@ -6,7 +6,7 @@ $borderColor: #e9e9f4;
 .public-sidebar {
     width: 5rem;
     height: 100vh;
-    min-height: 20rem;
+    min-height: 28rem;
     flex-shrink: 0;
     box-sizing: border-box;
     background-color: $bgColor;
@@ -30,6 +30,7 @@ $borderColor: #e9e9f4;
         display: none;
         position: absolute;
         height: 100vh;
+        min-height: 28rem;
         padding: 0 3rem;
         top: 0;
         left: 5rem;
@@ -159,6 +160,7 @@ $borderColor: #e9e9f4;
         }
         &.active {
             color: #474747;
+            background-color: #e9e9f8;
         }
         &:hover {
             color: #474747;

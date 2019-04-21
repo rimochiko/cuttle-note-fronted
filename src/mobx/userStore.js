@@ -72,18 +72,20 @@ export default class Store {
         const query = `
         query {
           data:
-          groupEasy(userId: \"${this.user.userId}\",token: \"${this.user.token}\") {
-            id,
-            avatar,
-            nickname
+          groupMine(userId: \"${this.user.userId}\",token: \"${this.user.token}\") {
+            code,
+            group {
+              id,
+              avatar,
+              nickname
+            }
           }
         }`;
         await axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
-          if (res && res.length >= 0) {
-            this.groupList = res;
-            console.log('团队数据获取')
+          if (res.code === 1) {
+            this.groupList = res.group;
           } else {
             this.groupList = [];
           }

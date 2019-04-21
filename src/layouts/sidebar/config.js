@@ -3,7 +3,8 @@ export default [
         text: '主页',
         name: 'home',
         url: '/',
-        icon: 'home'
+        icon: 'home',
+        isExact: true
     },
     {
         text: '文库',

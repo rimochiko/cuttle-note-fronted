@@ -30,7 +30,7 @@
         img {
             width: 6rem;
             height: 6rem;
-            border-radius: 50%;
+            border-radius: .5rem;
             box-shadow: 0 10px 15px #e9e9f4;
         }
     }
@@ -56,12 +56,14 @@
 
 
 .us-list {
-    padding: 2rem;
-    margin-top: 2rem;
-    @extend .section;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    width: 13.5rem;
     .us-people {
     display: flex;
-    margin-top: 1rem;
+    border: 1px dashed $normalGray;
+    border-radius: .5rem;
+    padding: .5rem;
     li {
         margin-right: .5rem;
         img {
@@ -118,29 +120,50 @@
  
 } 
 
-.group-switch {
+.group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin: 2rem 3rem 0;
     font-weight: 300;
-    font-size: .9rem;
-    .link-img {
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: .5rem;
-        margin-right: .5rem;
-        vertical-align: middle;
+    .group-switch {
+        padding: .5rem 1rem;
+        font-size: .9rem;
+        @extend .section;
+        .link-img {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: .5rem;
+            margin-right: .5rem;
+            vertical-align: middle;
+        }
+        .link-svg {
+            margin-left: .5rem;
+            color: #7f83b8; 
+        }
     }
-    .link-svg {
-        margin-left: .5rem;
-        color: #7f83b8; 
+    .group-add {
+        height: 2rem;
+        padding: 0 1.2rem;
+        display: flex;
+        align-items: center;
+        color: #FFF; 
+        font-size: .85rem;
+        cursor: pointer;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 15px #eeeef8;
+        background-image: linear-gradient(to bottom,#4c68fa, #4c8efa);
     }
 }
 
+
 .add-mem {
+    padding: 1rem 3rem;
     .input {
         display: block;
         border: 1px solid #e9e9f4;
         padding: .6rem;
-        width: 18rem;
+        width: 25rem;
     }
     .btns {
         text-align: center;
@@ -152,7 +175,7 @@
         li {
             display: flex;
             align-items: center;
-            width: 18rem;
+            width: 25rem;
             border-bottom:  1px solid #e9e9f4;
             padding: .4rem;
             font-size: .9rem;
@@ -166,6 +189,10 @@
     }    
 }
 
+.member-manage {
+    padding: 1rem 3rem;
+    height: 30rem;
+}
 
 .group-main {
     margin: 2rem 3rem 2rem 0;

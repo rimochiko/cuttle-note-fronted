@@ -49,12 +49,19 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow">
                     <div className="left flex-column bg-box">
-                        <div className="relate">
-                        <DropDown data={dropdownData}>
-                          <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
-                                <FontAwesomeIcon icon="caret-down" className="link-svg"/>
-                        </DropDown>
-                      </div>
+                    <div className="relate">
+                        <div className="switch">
+                            <DropDown data={dropdownData}>
+                            <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
+                                    <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                            </DropDown>                      
+                        </div>
+                        <div className="option">
+                          <Link to="/article/edit">
+                            <FontAwesomeIcon icon="plus" />
+                          </Link>
+                        </div>
+                      </div>                        
                       <div className="imglist">
                         <ul className="component-img-list">
                           <li className="component-img-item">

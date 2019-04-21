@@ -246,11 +246,6 @@ class Page extends Component {
                 <Sidebar />
                 <div className="main flex-column">
                     <Header />
-                    <div className="page-header">
-                      <h1 className="normal-title">我的收藏</h1>
-                      <div>
-                      </div>
-                    </div>
                     <div className="public-body flex-column">    
                           <div className="collect-box wrapper">
                             <h1 className="normal-title">我的收藏</h1>

@@ -1,15 +1,34 @@
 @import '../../../assets/styles/public.scss';
 
+.page-header {
+    margin: 3rem 3rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .normal-title {
+        font-size: 1.4rem;
+        font-weight: 300;
+    }
+}
 
+.empty-btn {
+    height: 2rem;
+    padding: 0 1.2rem;
+    display: flex;
+    align-items: center;
+    color: #FFF; 
+    font-size: .85rem;
+    cursor: pointer;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 15px #eeeef8;
+    background-image: linear-gradient(to bottom,#4c68fa, #4c8efa);
+}
 
 .trash-box {
     flex: 1;
     padding: 2rem;
     font-weight: 300;
     @extend .section;
-    .item-list {
-        margin-top: 2rem;
-    }
     .item-trash {
         padding: .6rem 0 .6rem 0;
         width: 100%;

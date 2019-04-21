@@ -7,13 +7,14 @@
 
 .main {
     height: 100vh;
+    min-height: 28rem;
     overflow-y: scroll;
     flex: 1;
 }
 
 .public-body {
     flex: 1;
-    padding: 3rem 3rem;
+    padding: 1.5rem 3rem 2rem;
 }
 
 .left {
@@ -220,6 +221,7 @@
         }
         .body {
             color: #8493b8;
+            line-height: 1.8;
         }
     }
 }

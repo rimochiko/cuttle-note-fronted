@@ -11,8 +11,8 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
-          name: '',
-          password: '',
+          name: '111111',
+          password: '111111',
           nameTip: '用户名',
           passwordTip: '密码',
           isNameTipHide: false,
@@ -165,7 +165,7 @@ class Page extends Component {
                       <span className="tip" style={{opacity: this.state.isNameTipHide ? 0:1}}>{this.state.nameTip}</span>
                       <input style={{color: this.state.isNameTipHide ? '#666':'#fff'}}
                              type="text" 
-                             value={this.state.loginName} 
+                             value={this.state.name} 
                              onChange={(e) => this.changeStatus(e, 'name')}
                              onBlur={this.judgeInput.bind(this, 'name')}
                              onFocus={this.changeTip.bind(this, 'name')}/>
@@ -175,7 +175,7 @@ class Page extends Component {
                       <span className="tip" style={{opacity: this.state.isPassTipHide ? 0:1}}>{this.state.passwordTip}</span>
                       <input style={{color: this.state.isPassTipHide ? '#666':'#fff'}} 
                              type="password" 
-                             value={this.state.loginPassword} 
+                             value={this.state.password} 
                              onChange={(e) => this.changeStatus(e, 'password')}
                              onBlur={this.judgeInput.bind(this, 'password')}
                              onFocus={this.changeTip.bind(this, 'password')}/>

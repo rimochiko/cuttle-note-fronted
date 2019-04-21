@@ -26,6 +26,36 @@ $iconColor: #9190b4;
         color: #9190b4;
         font-size: .9rem;
     }
+    .search-box {
+        position: relative;
+        margin-left: 1.5rem;
+        .input-search {
+            position: relative;
+            width: 1rem;
+            padding-bottom: .3rem;
+            border: none;
+            border-bottom: 1.5px solid transparent;
+            color: #FFF;
+            font-size: .9rem;
+            transition: all .2s;
+            &:focus {
+                width: 10rem;
+                border-bottom-color: #cacde6;
+                color: #9190b4;
+                &::-webkit-input-placeholder { /* WebKit browsers */
+                    color: #999;
+                }
+            }
+            &::-webkit-input-placeholder { /* WebKit browsers */
+                color: #fff;
+            }
+        }
+        .header-icon {
+            position: absolute;
+            right: 0;
+            pointer-events: none;
+        }
+    }
 }
 
 .public-options {

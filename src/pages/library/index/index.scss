@@ -2,21 +2,35 @@
 
 
 .relate {
-    margin: 1.5rem auto 0.5rem;
-    padding: 0.5rem 1rem;
-    @extend .section;
+    margin: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: 300;
     font-size: .9rem;
-    .link-img {
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: .5rem;
-        margin-right: .5rem;
-        vertical-align: middle;
+    .switch {
+        padding: 0.5rem 1rem;
+        font-size: .8rem;
+        @extend .section;
+        .link-img {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: .5rem;
+            margin-right: .5rem;
+            vertical-align: middle;
+        }
+        .link-svg {
+            margin-left: .5rem;
+            color: #7f83b8; 
+        }        
     }
-    .link-svg {
-        margin-left: .5rem;
-        color: #7f83b8; 
+    .option {
+        a {
+            display: block;
+            @extend .section;
+            padding: .6rem;
+            color: #7f83b8;
+        }
     }
 }
 

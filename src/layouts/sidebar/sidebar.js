@@ -82,7 +82,8 @@ class Sidebar extends Component {
                   {
                       config.map((item) => {
                         return <li key={item.name}  className="li-nav">
-                            <NavLink to={item.url} 
+                            <NavLink exact={item.isExact}
+                                     to={item.url} 
                                      className="link-nav" 
                                      title={item.text} 
                                      activeClassName="active">
@@ -158,7 +159,7 @@ class Sidebar extends Component {
                     
                   </div>
                   <div className="option">
-                    <button to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</button>
+                    <Link to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</Link>
                     <button className="radius-btn input-btn" onClick={this.logOut.bind(this)}><FontAwesomeIcon icon="sign-out-alt"/>退出登录</button>
                   </div>
                 </div>

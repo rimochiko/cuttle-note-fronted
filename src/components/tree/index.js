@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './index.scss';
@@ -7,18 +7,91 @@ import './index.scss';
 class Tree extends Component {
     constructor () {
         super();
+        this.state = {
+            data: [],
+            activeId: null
+        }
         this.toggleTree = this.toggleTree.bind(this);
         this.generateIcon = this.generateIcon.bind(this);
         this.loopTreeUl = this.loopTreeUl.bind(this);
         this.isNodeEmpty = this.isNodeEmpty.bind(this);
-        this.generateLink = this.generateLink.bind(this)
+        this.generateLink = this.generateLink.bind(this);
+    }
+
+    componentWillUpdate (nextProps) {
+        if (nextProps.owner !== this.props.owner || nextProps.data !== this.props.data) {
+            let data = nextProps.data.slice(),
+                activeId = parseInt(nextProps.activeId);
+            let flat = [], i, len;
+            
+            this.initTreeData(data, flat, activeId);
+
+            for(i = 0, len = flat.length; i < len; i++ ) {
+                if (flat[i].id === activeId) {
+                    break;
+                }
+            }
+            flat.length = i + 1;
+            console.log(flat);
+            console.log('----------')
+            if(activeId) {
+                this.calOpenData(flat, true);
+            }
+            this.setState({
+                data: data,
+                activeId: activeId
+            }); 
+        }             
+    }
+
+    calOpenData (data, isContinue) {
+        if(!isContinue || !data || data.length <= 0 || !data[data.length-1])
+        return;
+
+        let length = data.length;
+        console.log(data[length-1]);
+        let parentId = data[length - 1].parentId;
+        let i = 0;
+
+        for(; i < length; i++) {
+            if (data[i].id === parentId) {
+                console.log('find');
+                break;
+            }
+        }
+        if (i < length) {
+            data[i].isOpen = true;
+            data.length = i + 1;
+        }
+        
+        if (!(data[i] && data[i].parentId)) {
+            isContinue = false;
+        }
+        this.calOpenData(data, isContinue);
+    }
+
+    initTreeData (arr, flat, activeId) {
+        if (!arr || arr.length <= 0) {
+            return;
+        }
+        let ownerId = this.props.owner.id,
+            ownerType = this.props.owner.type,
+            base = this.props.base;
+        arr.forEach((item) => {
+            item.isOpen = false;
+            item.link = `/${base}/${ownerType}/${ownerId}/${item.id}`
+            if(activeId && item) {
+                flat.push(item);
+            }
+            this.initTreeData(item.children, flat, activeId);
+        })
     }
 
     /**
      * 折叠树形目录
      * */
     toggleTree (e, item) {
-        if (this.isNodeEmpty(item.child)) {
+        if (this.isNodeEmpty(item.children)) {
             return false;
         }
         item.isOpen = !item.isOpen;
@@ -57,11 +130,11 @@ class Tree extends Component {
     generateLink (item, hasImg) {
         if (hasImg) {
             return (
-                <Link to={this.props.base + item.link}><img src={item.img} className="link-img"/>{item.name}</Link>
+                <NavLink to={item.link}><img src={item.img} className="link-img"/>{item.name}</NavLink>
             )
         } else {
             return (
-                <Link to={this.props.base + item.link}>{item.name}</Link>
+                <NavLink to={item.link} activeClassName="active">{item.title}</NavLink>
             )
         }
     }
@@ -77,7 +150,13 @@ class Tree extends Component {
         } else {
             if (level < 5) {
                 return (
-                    <Link className="btn-add" to="/article/edit">+</Link>
+                    <Link className="btn-add" 
+                          to={{
+                            pathname: '/article/edit',
+                            query: {
+                                parentId: item.id
+                            }
+                          }}>+</Link>
                 )
             } else {
                 return (<span></span>);
@@ -101,8 +180,8 @@ class Tree extends Component {
     loopTreeUl (treeData,isOpen, level) {
         if (this.isNodeEmpty(treeData)) return; 
         return treeData.map((item) => {
-            let childData = item.status !== 0 ? this.loopTreeUl(item.child, item.isOpen, level+1) : '';
-            let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.child));
+            let childData = item.status !== 0 ? this.loopTreeUl(item.children, item.isOpen, level+1) : '';
+            let itemIcon = this.generateIcon(item, this.isNodeEmpty(item.children));
             let itemLink = this.generateLink(item, item.img&&item.img.length > 0)
             let itemAdd = this.generateAddBtn(item, level);
             return (
@@ -123,7 +202,7 @@ class Tree extends Component {
     
 
     render () {
-        let treeMenu = this.loopTreeUl(this.props.data, true, 0);
+        let treeMenu = this.loopTreeUl(this.state.data, true, 0);
         return (
             <div className="mck-wrapper-tree">
                 { treeMenu }

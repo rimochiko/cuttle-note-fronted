@@ -18,7 +18,8 @@ $mainColor: #632df8;
         a {
            display: flex;
            align-items: center;
-           color: #3e4077; 
+           color: #3e4077;
+           &.active, 
            &:hover {
             color: $mainColor;
            }

@@ -22,7 +22,7 @@ let historyList = [
     link: '/',
     author: {
       name: '前端小姐姐',
-      avatar: 'https://tvax4.sinaimg.cn/crop.0.0.1242.1242.180/005NMivaly8ffc6s0p58bj30yi0yi0un.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'ssdfe'
     },
     date: '15分钟前',
@@ -35,7 +35,7 @@ let historyList = [
     link: '/',
     author: {
       name: 'heyKid',
-      avatar: 'https://tva3.sinaimg.cn/crop.0.0.1242.1242.50/e084652ajw8f2hj7kztoxj20yi0yijsd.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'grgrh'
     },
     date: '34分钟前',
@@ -48,7 +48,7 @@ let historyList = [
     link: '/',
     author: {
       name: '小郑哥',
-      avatar: 'https://ww2.sinaimg.cn/bmiddle/005Afflpgy1g1cucjpez6j30j60j675n.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'rgrg'
     },
     date: '1天前',
@@ -61,7 +61,7 @@ let historyList = [
     link: '/',
     author: {
       name: '歌非',
-      avatar: 'https://tvax3.sinaimg.cn/crop.0.0.996.996.50/dcedbca1ly8fv8o71kltwj20ro0rot9s.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'trrtr'
     },
     date: '1天前',
@@ -74,7 +74,7 @@ let historyList = [
     link: '/',
     author: {
       name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'sedes'
     },
     date: '1天前',
@@ -129,7 +129,7 @@ let newsList = [
     link: '/',
     author: {
       name: '小郑哥',
-      avatar: 'https://ww2.sinaimg.cn/bmiddle/005Afflpgy1g1cucjpez6j30j60j675n.jpg',
+      avatar: require('../../../assets/images/avatar4.jpg'),
       id: 'rgrg'
     },
     date: '1天前',
@@ -201,10 +201,8 @@ class Page extends Component {
     async componentWillMount () {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
-        console.log('跳转到登录')
-        //this.props.history.push('/login');
+        this.props.history.push('/login');
       }
-      console.log('1111');
     }
 
     componentDidMount () {

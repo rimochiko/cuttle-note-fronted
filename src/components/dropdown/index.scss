@@ -14,14 +14,15 @@ $mainColor: #632df8;
         display: none;
         position: absolute;
         bottom: 0;
-        right: 0;
+        left: 0;
         transform: translateY(100%);
         background: #FFF;
         box-shadow: 0 0 5px #ddd;
         box-sizing: border-box;
         border-radius: .5rem;
         .mck-dropdown-item {
-            svg {
+            svg,
+            img {
                 margin-right: .5rem;
             }
             a {
@@ -29,8 +30,8 @@ $mainColor: #632df8;
                 color: #c4c6cc;
                 line-height: 1.8;
                 white-space: nowrap;
-                padding: .6rem 1.2rem;
-                font-size: .9rem;
+                padding: .5rem 1rem;
+                font-size: .8rem;
                 transition: all .2s;
                 &:hover {
                     color: $mainColor;
@@ -40,6 +41,8 @@ $mainColor: #632df8;
             img {
                 width: 1.5rem;
                 height: 1.5rem;
+                border-radius: .3rem;
+                vertical-align: middle;
             }
         }
     }

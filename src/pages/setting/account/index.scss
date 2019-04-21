@@ -1,8 +1,16 @@
 @import '../../../assets/styles/public.scss';
 .settings-detail {
     padding: 3rem 3rem 0;
+    .input-side {
+        margin-right: 2rem;
+    }
     .input-group {
        margin-bottom: 2rem;
+       &.mini-group {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
        .input-label {
            display: block;
            width: 100%;
