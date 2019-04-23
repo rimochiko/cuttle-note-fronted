@@ -248,7 +248,6 @@ class Page extends Component {
                     <Header />
                     <div className="public-body flex-column">    
                           <div className="collect-box wrapper">
-                            <h1 className="normal-title">我的收藏</h1>
                             <div className="item-list">
                             {
                               CollectList.map((item, index) => {

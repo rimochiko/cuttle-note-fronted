@@ -17,154 +17,6 @@ import Dashboard from '../dashboard';
 import axios from 'axios';
 import qlQuery from './graphql';
 
-let historyList = [
-  {
-    id: 1,
-    title: '嗨，你真的懂this吗？',
-    link: '/',
-    author: {
-      name: '前端小姐姐',
-      avatar: 'https://tvax4.sinaimg.cn/crop.0.0.1242.1242.180/005NMivaly8ffc6s0p58bj30yi0yi0un.jpg',
-      id: 'ssdfe'
-    },
-    date: '15分钟前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 2,
-    title: '一个Vue引发的性能问题',
-    link: '/',
-    author: {
-      name: 'heyKid',
-      avatar: 'https://tva3.sinaimg.cn/crop.0.0.1242.1242.50/e084652ajw8f2hj7kztoxj20yi0yijsd.jpg',
-      id: 'grgrh'
-    },
-    date: '34分钟前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 3,
-    title: '是否要做Code Review？与BAT资深架构...',
-    link: '/',
-    author: {
-      name: '小郑哥',
-      avatar: 'https://ww2.sinaimg.cn/bmiddle/005Afflpgy1g1cucjpez6j30j60j675n.jpg',
-      id: 'rgrg'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 4,
-    title: '《深入react技术栈》之样式处理',
-    link: '/',
-    author: {
-      name: '歌非',
-      avatar: 'https://tvax3.sinaimg.cn/crop.0.0.996.996.50/dcedbca1ly8fv8o71kltwj20ro0rot9s.jpg',
-      id: 'trrtr'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 5,
-    title: '9102了，你还不会移动端真机调试？',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 6,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 7,
-    title: '最让程序员自豪的事情是什么？',
-    link: '/',
-    author: {
-      name: '此人已失踪',
-      avatar: 'https://tvax1.sinaimg.cn/crop.0.0.996.996.50/006I03Dqly8fzprit6axsj30ro0ro0ua.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 8,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  }
-]
-
-let postInfo = {
-  id: '132',
-  author: {
-    id: 'seris',
-    nickname: 'seris'
-  },
-  createDate: '2018-12-31',
-  lastDate: '2019-02-12',
-  lastAuthor: {
-    id: 'seris',
-    nickname: 'seris'    
-  },
-  content: '',
-  comments: [{
-    id: 1,
-    from: {
-      id: 'dsjds',
-      nickname: '九月的风',
-      avatar: require('../../../assets/images/avatar1.jpg')
-    },  
-    to: null,
-    content: 'vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。',
-    date: '2018-12-31'
-  }, {
-    id: 2,
-    from: {
-      id: 'dsjds',
-      nickname: '九月的风',
-      avatar: require('../../../assets/images/avatar1.jpg')
-    },
-    to: {
-      id: 'dsjds',
-      nickname: '大神',
-      avatar: require('../../../assets/images/avatar2.jpg')
-    },
-    avatar: require('../../../assets/images/avatar2.jpg'),
-    content: 'vue2.x采用Object.defineProperty()实现数据劫持，但是并不能劫持到数组长度变化等，是通过创建一个数组的继承类来重写pop()、push()等方法来实现对数组监听的。',
-    date: '2018-12-31'
-  }] 
-}
-
 const USER = "user",
       GROUP = "group";
 
@@ -184,6 +36,7 @@ class Page extends Component {
           spaceList: [],
           posts: [],
           post: {
+            id: '',
             author: '',
             content: '',
             createDate: '',
@@ -199,6 +52,7 @@ class Page extends Component {
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
       }
+      document.title="文库 - 墨鱼笔记";
       let params = this.analysisParams(this.props);
       await this.getGroup();
       await this.fetchOwnerData(params);
@@ -270,6 +124,9 @@ class Page extends Component {
       this.getPostList(params);
     }
 
+    /**
+     * 获取文章
+     */
     async fetchIdData (params) {
       if(params.id) {
         const query = qlQuery.getOnePost({
@@ -382,27 +239,28 @@ class Page extends Component {
     showRemovePost () {
       this.refs.remove.toggle()
     }
-
-    async removePost (params) {
-      const query = params && params.obj === USER ? 
+    async removePost () {
+      const query = this.state.object.type === USER ? 
       qlQuery.userDelPostQuery({
           userId:this.props.userStore.user.userId,
-          postId: params.id,
+          postId: this.state.post.id,
           token:this.props.userStore.user.token
       })
       : 
       qlQuery.groupDelPostQuery({
         userId:this.props.userStore.user.userId,
-        postId: params.id,
+        postId: this.state.post.id,
         token:this.props.userStore.user.token,
-        groupId:params.owner
+        groupId:this.state.object.id
       });
 
       await axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        if(res === 1) {
+        if(res) {
           // 删除成功
+          let match = this.props.match.params;
+          this.props.history.push(`library/${match.obj}/`);
         } else {
           // 删除失败
         }
@@ -411,6 +269,7 @@ class Page extends Component {
         console.log(err);
       })
     }
+
     
     /**
      * 分析路由参数
@@ -455,6 +314,16 @@ class Page extends Component {
       this.refs.info.toggle()
     }
 
+    getDeleteTip () {
+      if (this.state.object.type === GROUP) {
+        return "删除将会导致其他团队成员无法浏览，确定要执行？";
+      }
+      if (this.state.post.status === 0) {
+        return "草稿文章会被直接删除，确定要执行？"
+      }
+      return "确定要移入回收站？（15天内可恢复）";
+    }
+
     render () {
         return (
            <div className="page">
@@ -469,9 +338,18 @@ class Page extends Component {
                       </ul>
                     </Modal>
                     <Modal title="删除文章" ref="remove">
-                        <p>你真的要删除该文章？</p>
-                        <button className="input-btn">取消</button>
-                        <button className="input-btn" onClick={this.removePost}>确定</button>
+                        <div className="normal-modal-inner">
+                          <p>{this.getDeleteTip()}</p>
+                          <p className="des">*拥有子文档的文档无法直接删除</p>
+                          <button className="input-btn radius-btn"
+                                  onClick={()=> {
+                                    this.refs.remove.toggle()
+                                  }}>取消
+                          </button>
+                          <button className="input-btn radius-btn"
+                                  onClick={this.removePost.bind(this)}>确定
+                          </button>
+                        </div>
                     </Modal>
 
                     <div className="left flex-column bg-box">
@@ -484,7 +362,7 @@ class Page extends Component {
                           </DropDown>                        
                         </div>
                         <div className="option">
-                          <Link to="/article/edit">
+                          <Link to="/article/edit" title="创建新文章">
                             <FontAwesomeIcon icon="plus" />
                           </Link>
                         </div>

@@ -5,19 +5,31 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Link} from 'react-router-dom';
 
-let dropdownData = [{
-    id: 'gsds',
-    text: '野原家的空间',
-    link: '/'
-  },{
-    id: 'gsds',
-    text: '向日葵班的空间',
-    link: '/'
-  }]
-  
+import { inject, observer } from 'mobx-react';
+import axios from 'axios';
+
+
+@inject('userStore', 'postStore')
+@observer
 class Page extends Component {
     constructor () {
         super();
+        this.state = {
+            posts: [],
+            object: {
+                id: '',
+                name: '',
+                avatar: '',
+                type: ''
+            },
+            post: {
+                author: '',
+                content: '',
+                createDate: '',
+                comments: []
+            },
+            spaceList: []
+        }
     }
 
         /** 
@@ -51,62 +63,47 @@ class Page extends Component {
                     <div className="left flex-column bg-box">
                     <div className="relate">
                         <div className="switch">
-                            <DropDown data={dropdownData}>
-                            <img src={require('../../../assets/images/avatar.jpg')} className="link-img"/>我的空间
-                                    <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+                            <DropDown data={this.state.spaceList}>
+                            <img src={this.state.object.avatar}
+                                 className="link-img"/>
+                                {this.state.object.nickname}的空间
+                                <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                             </DropDown>                      
                         </div>
                         <div className="option">
-                          <Link to="/article/edit">
+                          <Link to="/photo/edit">
                             <FontAwesomeIcon icon="plus" />
                           </Link>
                         </div>
                       </div>                        
                       <div className="imglist">
                         <ul className="component-img-list">
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
-                          <li className="component-img-item">
-                              <a href="#"><img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
-                              <p className="component-img-text">我的图片1</p></a>
-                          </li>
+                          {
+                              this.state.posts.map((item) => {
+                                  return (
+                                  <li className="component-img-item">
+                                    <Link to="/">
+                                      <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                                      <p className="component-img-text">
+                                        {item.title}
+                                      </p>
+                                    </Link>
+                                   </li>    
+                                  )
+                              })
+                          }
+                          
                         </ul>
                       </div>                      
                     </div>
                     <div className="right flex-scroll-y white">
                         <div className="photo">
                             <div className="header">
-                                <h1 className="title">我如何零基础转行成为一个自信的前端</h1>
+                                <h1 className="title">{this.state.post.title}</h1>
                                 <div className="detail">
                                     <p>
-                                        <span>创建人：<Link to="/">Seris</Link></span>
-                                        <span>创建日期：2019-03-19</span>
+                                        <span>创建人：<Link to="/">{this.state.post.author}</Link></span>
+                                        <span>创建日期：{this.state.post.createDate}</span>
                                     </p>
                                     <p>
                                         <span><FontAwesomeIcon icon="info-circle"/></span>

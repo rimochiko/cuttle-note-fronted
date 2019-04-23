@@ -95,11 +95,11 @@ function groupPostQuery (args) {
 
 function userDelPostQuery (args) {
     return `
-    query {
+    mutation {
       data:
-      userDeletePost(
+      postDelete(
         userId:\"${args.userId}\",
-        postId:\"${args.postId}\",
+        postId:${args.postId},
         token:\"${args.token}\"
       )
     }`
@@ -107,11 +107,11 @@ function userDelPostQuery (args) {
 
 function groupDelPostQuery (args) {
     return `
-    query {
+    mutation {
         data:
-        groupDeletePost(
+        postDelete(
             userId:\"${args.userId}\",
-            postId:\"${args.postId}\",
+            postId:${args.postId},
             token:\"${args.token}\",
             groupId:\"${args.groupId}\",
         )
@@ -129,6 +129,7 @@ function getOnePost (args) {
     ) {
       code,
       post {
+        id,
         author {
           nickname,
           id
@@ -150,7 +151,11 @@ function getOnePost (args) {
         likeNum
         isLike
         viewNum
-        isCollect
+        isCollect,
+        parent,
+        status,
+        auth,
+        type
       }
     }
   }

@@ -249,7 +249,7 @@ class Page extends Component {
                 <p className="des">欢迎加入我们:)</p>
                 <div className="form-useropt">
                   <div className="icon-input">
-                      <FontAwesomeIcon icon="envolope" />
+                      <FontAwesomeIcon icon="envelope" />
                       <span className="tip" style={{opacity: this.state.isMailTipHide ? 0:1}}>{this.state.mailTip}</span>
                       <input style={{color: this.state.isMailTipHide ? '#666':'#fff'}}
                              type="text" 

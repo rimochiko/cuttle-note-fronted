@@ -4,6 +4,7 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
 import { Link } from 'react-router-dom';
+import G6 from '@antv/g6';
 
 class Page extends Component {
     constructor () {

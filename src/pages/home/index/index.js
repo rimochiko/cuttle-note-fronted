@@ -203,6 +203,7 @@ class Page extends Component {
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
       }
+      document.title="我的首页 - 墨鱼笔记";
     }
 
     componentDidMount () {

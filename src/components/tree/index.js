@@ -32,8 +32,6 @@ class Tree extends Component {
                 }
             }
             flat.length = i + 1;
-            console.log(flat);
-            console.log('----------')
             if(activeId) {
                 this.calOpenData(flat, true);
             }
@@ -49,7 +47,6 @@ class Tree extends Component {
         return;
 
         let length = data.length;
-        console.log(data[length-1]);
         let parentId = data[length - 1].parentId;
         let i = 0;
 

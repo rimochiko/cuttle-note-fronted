@@ -4,72 +4,124 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
 import Tabs from '../../../components/tabs';
+import Switch from '../../../components/switch';
 import { Link } from 'react-router-dom';
+import { inject, observer } from 'mobx-react';
+import Qlquery from './graphql';
+import axios from 'axios';
 
 const TabPane = Tabs.TabPane;
 
+const USER = "user",
+      GROUP = "group";
+
+@inject('userStore')
+@observer
 class Page extends Component {
     constructor () {
         super();
         this.state = {
-          articleContent: '1111',
-          currentPos: 0,
-          currentContainer: null,
-          lastSaveTime: 1033
+          title: '',
+          isAuth: 0,
+          content: '',
+          lastSaveTime: null,
+          lastSaveUser: {
+            id: '',
+            name: ''
+          },
+          postId: null,
+          parentId: null,
+          space: {
+            id: '',
+            name: '',
+            type: ''
+          },
+          draftTime: null,
+          blurTime: null,
+          blur: 0,
+          markdown: ''
         }
     }
 
-    componentDidMount() {
+    async componentWillReceiveProps () {
+
+    }
+
+    async componentWillMount () {
+      // 判断是否有登录
+      if (await this.props.userStore.isLogin() === false) {
+        this.props.history.push('/login');
+      }
       console.log(this.props);
-    }
 
-    /**
-     * 获取选中文本
-    */
-    getSelectedText () {
-      var html = "";
-      if (typeof window.getSelection != 'undefined') {
-        var select = window.getSelection();
-        if (select.rangeCount) {
-          let container = document.createElement('div');
-          for (var i = 0, len = select.rangeCount; i < len; i++) {
-            container.appendChild(select.getRangeAt(i).cloneContents());
+      if (this.props.location.query && this.props.location.query.postId) {
+        document.title = "编辑文章 - 墨鱼笔记";
+        this.setState({
+          postId: this.props.location.query.postId,
+          parentId: this.props.location.query.parentId
+        })
+
+        // 如果有postId，说明是编辑文档，要先获取文档内容
+        const query = Qlquery.getOnePost({
+          userId: this.props.userStore.user.userId,
+          postId: this.state.postId,
+          token: this.props.userStore.user.token 
+        });
+        await axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if(res.code === 1) {
+            // 请求成功
+            let space = {
+                id: '',
+                name: '',
+                type: ''            
+            };
+            let post = res.post;
+            if (res.post.belongGroup) {
+              space.id = post.belongGroup.id;
+              space.name = post.belongGroup.nickname;
+              space.type = "group"
+            } else {
+              space.id = post.author.id;
+              space.name = post.author.nickname;
+              space.type = "user";
+            }
+            this.setState({
+              title: res.post.title,
+              isAuth: res.post.isAuth,
+              content: res.post.content,
+              lastSaveTime: res.post.recentTime,
+              lastSaveUser: res.post.recentUser,
+              postId: res.post.id,
+              parentId: res.post.parent,
+              space: space
+            })
+          } else {
+            console.log("请求文章失败")
           }
-          html = container.innerHTML;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      } else {
+        document.title = "创建新文章 - 墨鱼笔记";
+        console.log(this.props);
+        let space =  {
+          id: this.props.userStore.user.userId,
+          name: this.props.userStore.user.nickname,
+          type: "user"            
         }
-      } else if (typeof document.selection != "undefined") {
-        if (document.selection.type == "Text") {
-          html = document.selection.createRange().htmlText;
-        }
+        console.log(space);
+        this.setState({
+          space: space,
+          parentId: this.props.location.query && this.props.location.query.parentId || null
+        });
       }
-      return html;
     }
 
-    /**
-     * 获取鼠标光标所在位置
-    */
-    getLastCursor (element) {
-      console.log('blur');
-      let currentPos = 0,
-          currentContainer = null;
-      if (document.selection) {
-        console.log('selection');
-        // IE
-        let selectRange = document.selection.createRange();
-        selectRange.moveStart('character', -element.value.length);
-        currentPos = selectRange.text.length;
-      } else if (element.selectionStart || element.selectionStart == '0') {
-        console.log('selectionStart');
-        currentPos = element.selectionStart;
-      } else if (window.getSelection) {
-        currentPos = window.getSelection().getRangeAt(0).startOffset;
-        currentContainer = window.getSelection().getRangeAt(0).commonAncestorContainer;
-      }
-      console.log(currentPos);
-      this.setState({
-        currentPos,
-        currentContainer
-      })
+    componentDidMount () {
+      this.refs.editBox.innerHTML = this.state.post && this.state.post.content || '';
     }
 
     /**
@@ -78,19 +130,7 @@ class Page extends Component {
     addTextStyle (command, args) {
       let editBox = this.refs.editBox;
       // 获取目前editBox所在光标位置
-      console.info(this.state.currentPos);
       editBox.focus();
-
-      /*var selection = window.getSelection();
-      var range = selection.getRangeAt(0);
-      // 光标移动到到原来的位置加上新内容的长度
-      range.setStart(this.state.currentContainer, this.state.currentPos)
-      // 光标开始和光标结束重叠
-      range.collapse(true)
-      // 清除选定对象的所有光标对象
-      selection.removeAllRanges()
-      // 插入新的光标对象
-      selection.addRange(range)*/
 
       switch(command){
         case "bold": 
@@ -129,11 +169,15 @@ class Page extends Component {
 			}
     }
 
-    addBoldStyle () {
-      let editBox = this.refs.editBox;
-      editBox.focus();
-      console.log(document.execCommand('bold',false,null));
+
+    componentWillUnmount () {
+      this.setState({
+        draftTime: null,
+        blurTime: null,
+        blur: 0,
+      })
     }
+
 
     textStyleCommand (e, command) {
       var command = {
@@ -180,11 +224,175 @@ class Page extends Component {
 
     }
 
+    /**
+     * 保存草稿
+     */
+    async saveDraft () {
+      if (!this.state.postId) {
+        const query = Qlquery.createPost({
+          token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            title: this.state.title,
+            content: this.state.content,
+            isAuth: this.state.isAuth,
+            publish: 0,
+            parentId: this.state.parentId
+        });
+
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res.code === 1) {
+            this.setState({
+              postId: res.postId,
+              lastSaveTime: res.date
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      } else {
+        // 修改post状态
+        const query = Qlquery.updatePost({
+            postId: this.state.postId,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            title: this.state.title,
+            content: this.state.content,
+            isAuth: this.state.isAuth,
+            publish: 0,
+            parentId: this.state.parentId
+        });
+
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res.code === 1) {
+            this.setState({
+              lastSaveTime: res.date
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
+    }
+
+    /**
+     * 发布文章
+     */
+    async publishPost () {
+      if (!this.state.postId) {
+        const query = Qlquery.createPost({
+          token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            title: this.state.title,
+            content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
+            isAuth: this.state.isAuth,
+            publish: 1,
+            parentId: this.state.parentId
+        });
+
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res.code === 1) {
+            // 跳转页面
+            this.props.history.push(`/library/user/${this.props.userStore.user.userId}/${res.postId}`)
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      } else {
+        // 修改post状态
+        const query = Qlquery.updatePost({
+            postId: this.state.postId,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            title: this.state.title,
+            content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
+            isAuth: this.state.isAuth,
+            publish: 1
+        });
+
+        axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res.code === 1) {
+            this.props.history.push(`/library/user/${this.props.userStore.user.userId}/${res.postId}`)
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }      
+    }
+
+    /**
+     * 开始聚焦编辑
+     */
+    editGetFocus () {
+      // 开启定时器，1分钟保存一次
+      if (!this.state.draftTime) {
+        this.setState({
+          draftTime: setTimeout(() => {
+            this.setState({
+              content: this.refs.editBox && this.refs.editBox.innerHTML.replace('"', '&quot;'),
+            });
+            this.saveDraft();
+          }, 60000)
+        })
+      }
+
+      // 加锁编辑
+    }
+
+    /**
+     * 离开聚焦
+     */
+    editGetBlur () {
+        this.setState({
+          blurTime: setTimeout(() => {
+            this.setState ({
+              content: this.refs.editBox && this.refs.editBox.innerHTML.replace('"', '&quot;'),
+              blur: this.state.blur + 1
+            })
+            if (this.state.blur > 60) {
+              this.setState({
+                draftTime: null
+              })
+            }
+          }, 1000)
+        })        
+    }
+
+    changTitle (e) {
+      this.setState({
+        title: e.target.value
+      })
+    }
+
+    toggleMarkdown () {
+      this.refs.markdown.toggle();
+    }
+
+    toggleMoreSetting () {
+      this.refs.setting.toggle();
+    }
+
     render () {
         return (
           <div className="page">
           <Sidebar />
             <div className="flex-row overflow flex-1">
+            <Modal title="转为Markdown" ref="markdown">
+              <div className="markdown-show">
+               {this.state.markdown}
+              </div>
+            </Modal>
             <Modal title="添加链接" ref="addLink">
               <div className="edit-link-body">
                 <div className="input-group">
@@ -199,6 +407,27 @@ class Page extends Component {
                   <button className="radius-btn input-btn">确定</button>
                 </div>
               </div>   
+            </Modal>
+
+            <Modal title="高级设置" ref="setting">
+                <div className="edit-menu">
+                  <div className="edit-setting-column">
+                    <span className="btn-text">父级文档</span>
+                        <input type="text" placeholder="搜索ID" className="input"/>
+                        <ul className="ul-add-mem">
+                          <li>测试测试</li>
+                        </ul>
+                    <span className="des">影响权限设置</span>
+                  </div>
+
+                  <div className="edit-setting flex-row">
+                    <div className="flex-column edit-left">
+                      <span className="text">是否私密</span>
+                      <span className="des">私密文章无关系者无权查看</span>
+                    </div>
+                    <Switch />                  
+                  </div>
+                </div>
             </Modal>
 
             <Modal title="添加图片" ref="addImage">
@@ -236,7 +465,11 @@ class Page extends Component {
 
             <div className="edit-page flex-1">
               <div className="edit-header">
-                <input type="text" placeholder="输入文章标题" className="title"/>
+                <input type="text"
+                       placeholder="输入文章标题" 
+                       className="title" 
+                       defaultValue={this.state.title}
+                       onChange={this.changTitle.bind(this)}/>
                 <div className="edit-tool">
                   <ul className="ul-tool">
                     <li>
@@ -330,54 +563,36 @@ class Page extends Component {
                   <ul className="ul-tool">
                     <li>
                       <div className="single-tool" 
-                           title="Markdown语法">
+                           title="Markdown语法"
+                           onClick={this.toggleMarkdown.bind(this)}>
                            <FontAwesomeIcon icon={['fab','markdown']}/>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="single-tool" 
-                           title="全屏模式">
-                           <FontAwesomeIcon icon="expand-arrows-alt"/>
+                           
                       </div>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div className="edit-body" contentEditable ref="editBox" onBlur={this.getLastCursor.bind(this)}>
+              <div className="edit-body"
+                   contentEditable ref="editBox"
+                   onBlur={this.editGetBlur.bind(this)}
+                   onFocus={this.editGetFocus.bind(this)}
+                   dangerouslySetInnerHTML={{
+                     __html: this.state.content
+                   }}
+                   >
                 
               </div>
               <div className="edit-footer">
-                <p>最近一次保存 {this.state.lastSaveTime}</p>
+                <p>
+                  <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
+                  {this.state.space.name}
+                  </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}</p>
                 <div className="btns-box">
-                  <button className="radius-btn sub-btn">保存到草稿箱</button>
-                  <button className="radius-btn input-btn">发布</button>
+                  <button className="radius-btn sub-btn" onClick={this.saveDraft.bind(this)}>保存到草稿箱</button>
+                  <button className="radius-btn input-btn" onClick={this.publishPost.bind(this)}>发布</button>
                 </div>
               </div>
             </div>
-            
-              <div className="flex-column edit-side">
-                <div className="edit-menu">
-                  <div className="section-title">
-                    <h1 className="text">文章目录</h1>
-                    <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                  </div>
-                  <div className="detail">
-                    <Link to="/">我的空间</Link> / <Link to="/">笔记</Link> / <Link to="/">2019-01-23</Link>
-                  </div>
-                </div>
-                <div className="edit-tags">
-                  <h1 className="section-title">标签</h1>
-                  <input type="text" placeholder="输入标签名..." className="input"/>
-                  <ul className="tags">
-                    <li>
-                      <span>
-                        日记
-                      </span>
-                      <FontAwesomeIcon icon="times" />
-                    </li>
-                  </ul>
-                </div>
-              </div>
                 
             </div>
           </div>

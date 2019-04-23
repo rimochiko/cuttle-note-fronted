@@ -189,9 +189,44 @@
     }    
 }
 
+.flex-align {
+    align-items: center;
+}
+
 .member-manage {
-    padding: 1rem 3rem;
+    font-weight: 300;
+    padding: 1rem 0rem 1rem 2rem;
     height: 30rem;
+    .member-table {
+        color: #3e4077;
+        th {
+            text-align: left;
+            padding: 1rem 1rem 1.5rem 0;
+        }
+        td {
+            text-align: left;
+            padding: 0.5rem 3em 0.5rem 0;
+            font-size: .9rem;
+            vertical-align: middle;
+            &.icon {
+                font-size: 1.2rem;
+                color: #7f83b8;
+            }
+        }
+        .avatar {
+            border-radius: 50%;
+            height: 2.5rem;
+            width: 2.5rem;
+            margin-right: 1rem;
+        }
+        .text {
+            margin: 0 2rem 0.5rem 0;
+        }
+        .des {
+            font-size: .85rem;
+            color: #8493b8;
+        }
+    }
 }
 
 .group-main {
