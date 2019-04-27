@@ -163,7 +163,7 @@ class Page extends Component {
        query {
          data:
          userEasy(
-           id:\"${params.owner}\"
+           id:"${params.owner}"
          ) {
           avatar
           id
@@ -173,7 +173,7 @@ class Page extends Component {
        `query {
          data:
          groupEasy(
-           id:\"${params.owner}\"
+           id:"${params.owner}"
          ) {
            id
            avatar

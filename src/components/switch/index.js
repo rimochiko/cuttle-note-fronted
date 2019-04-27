@@ -16,7 +16,7 @@ class Switch extends Component {
         this.setState({
             ischecked: !this.state.ischecked
         });
-        console.log(this.state.ischecked)
+        this.props.toggle && this.props.toggle(this.state.ischecked);
     }
     render () {
         return (

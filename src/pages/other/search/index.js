@@ -244,10 +244,20 @@ class Page extends Component {
         return (
             <div className="page">
                 <Sidebar />
-                <div className="main flex-column">
+                <div className="flex-column flex-1">
                     <Header />
-                    <div className="public-body flex-column">    
-                          <div className="collect-box wrapper">
+                    <div className="flex-row">
+                      <div className="left">
+                        <ul className="menu-ul">
+                          <li><Link to="/" className="active">文章<span>11</span></Link></li>
+                          <li><Link to="/">图<span>0</span></Link></li>
+                          <li><Link to="/">团队<span>0</span></Link></li>
+                          <li><Link to="/">用户<span>0</span></Link></li>
+                        </ul>
+                      </div>
+
+                      <div className="flex-column flex-1">    
+                          <div className="search-res-box wrapper">
                             <div className="item-list">
                             {
                               CollectList.map((item, index) => {
@@ -263,8 +273,9 @@ class Page extends Component {
                             <li><Link to="/">3</Link></li>
                             <li><Link to="/">&gt;</Link></li>
                           </ul>
-                   </div>
-                   
+                     </div>
+                    
+                    </div>
                 </div>
             </div>
         );

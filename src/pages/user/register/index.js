@@ -107,7 +107,7 @@ class Page extends Component {
       // 验证用户名是否存在
       const query = `query {
             isExist:
-            isUserNone(userId: \"${this.state.name}\")}`;
+            isUserNone(userId: "${this.state.name}")}`;
 
       axios.post('/graphql', {query})
       .then(({data}) => {
@@ -170,7 +170,7 @@ class Page extends Component {
       // 验证邮箱是否存在
       const query = `query {
         isExist:
-        isMailNone(mail: \"${this.state.mail}\")}`;
+        isMailNone(mail: "${this.state.mail}")}`;
         
       axios.post('/graphql', {query})
       .then(({data}) => {
@@ -203,9 +203,9 @@ class Page extends Component {
       mutation {
         data:
         userSave(
-          userId: \"${this.state.name}\",
-          password: \"${this.state.password}\",
-          mail: \"${this.state.mail}\"
+          userId: "${this.state.name}",
+          password: "${this.state.password}",
+          mail: "${this.state.mail}"
         ) {
           token,
           userId,

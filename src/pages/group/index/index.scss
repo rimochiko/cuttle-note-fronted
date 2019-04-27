@@ -269,3 +269,17 @@
         }
     }
 }
+
+.group-no-tip {
+    padding: 10rem 0;
+    font-weight: 300;
+    color: #aaa;
+    text-align: center;
+    .title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .des {
+        font-size: 1.2rem;
+    }
+}

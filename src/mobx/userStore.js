@@ -26,7 +26,7 @@ export default class Store {
         const query = `
         mutation {
           data:
-          userVerify(userId: \"${user.userId}\",token: \"${user.token}\")
+          userVerify(userId: "${user.userId}",token: "${user.token}")
         }`;
           
         await axios.post('/graphql', {query})
@@ -50,7 +50,11 @@ export default class Store {
     
     // 登录
     @action logIn(user){
-      this.user = user;
+      this.user = {
+        token: user.token,
+        userId: user.userId,
+        avatar: user.avatar ? `http://localhost:8080/static/${user.avatar}` : ''
+      }
       window.localStorage.setItem('user', JSON.stringify(user));
     }
     
@@ -72,7 +76,7 @@ export default class Store {
         const query = `
         query {
           data:
-          groupMine(userId: \"${this.user.userId}\",token: \"${this.user.token}\") {
+          groupMine(userId: "${this.user.userId}",token: "${this.user.token}") {
             code,
             group {
               id,
@@ -85,6 +89,10 @@ export default class Store {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
+            let group = res.group;
+            group.forEach((item) => {
+              item.avatar = item.avatar ? `http://localhost:8080/static/group/${item.avatar}` : ''
+            })
             this.groupList = res.group;
           } else {
             this.groupList = [];

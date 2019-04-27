@@ -111,8 +111,8 @@ class Page extends Component {
     mutation {
       data:
       userLogin(
-       userId: \"${this.state.name}\",
-       password: \"${this.state.password}\") {
+       userId: "${this.state.name}",
+       password: "${this.state.password}") {
          code,
          token,
          userId,

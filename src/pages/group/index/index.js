@@ -125,6 +125,7 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
+          statistics: '',
           groupList: [],
           group: {
             name: '',
@@ -133,21 +134,105 @@ class Page extends Component {
             avatar: '',
             members: []
           },
-          temp: {
-            id: '',
-            name: '',
-            des: '',
-            avatar: '',
-            public: false
-          },
-          roleId: 0 
+          tId: '',
+          tName: '',
+          tDes: '',
+          tAvatar: '',
+          tPublic: false,
+          tIdTip: '',
+          tNameTip: '',
+          isAuth: 0 
         }
         this.getNewsList = this.getNewsList.bind(this);
     }
 
-    componentWillMount() {
+    async componentWillMount() {
+      // 判断是否有登录
+      if (await this.props.userStore.isLogin() === false) {
+        this.props.history.push('/login');
+      }
       document.title="团队 - 墨鱼笔记";
+      let userStore = this.props.userStore;
+      let params = this.props.match.params;
+      await userStore.getGroup();
+
+      if(userStore.groupList.length) {
+        let group;
+        if (!(params && params.id)) {
+          group =  {
+            name: userStore.groupList[0].nickname,
+            des: userStore.groupList[0].des,
+            id: userStore.groupList[0].id,
+            avatar: userStore.groupList[0].avatar || null
+          };
+        } else {
+          // 如果域名有团队
+          userStore.groupList.forEach((item) => {
+            if (item.id === params.id) {
+              group = item;
+            }
+          })
+          
+          // 如果group不存在，要请求group的信息
+          if (!group) {
+            const query = 
+            `query {
+              data:
+              groupEasy(
+                id:"${params.id}\
+              ) {
+                id
+                avatar
+                nickname
+              }
+            }`;
+           await axios.post('/graphql', {query})
+           .then(({data}) => {
+             let res = data.data.data;
+             if(res.id) {
+               group = {
+                 id: res.id,
+                 name: res.nickname,
+                 avatar: `http://localhost:8080/static/group/${res.avatar}`
+               }
+             }
+           })
+           .catch((err) => {
+             console.log(err);
+           })
+          }
+        }
+
+        let groupList = userStore.groupList.map((item) => {
+          return {
+            id: item.id,
+            text: item.nickname,
+            avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
+            link: `/group/${item.id}`
+          }
+        })
+        console.log(groupList);
+       
+        this.setState({
+          groupList: groupList,
+          group: {
+            name: group.name,
+            des: group.des,
+            id: group.id,
+            avatar: group.avatar || null
+          }
+        })
+
+      }
     }
+    
+    /**
+     * 获取团队首页信息
+     */
+    fetchGroupData () {
+      // 获取团队成员、团队数据、团队动态
+    }
+    
     
     /** 
      * 添加成员面板
@@ -206,88 +291,230 @@ class Page extends Component {
     </div>
     );
   }
+
+  /**
+   * 生成团队操作按钮
+   */
+  generateOptions () {
+    // 
+    if (this.state.isAuth === 0) {
+      return (
+        <ul className="ul-list-link">
+          <li><Link to={`/library/group/${this.state.group}`}><FontAwesomeIcon icon="book" />文库</Link></li>
+          <li><Link to={`/gallery/group/${this.state.group}`}><FontAwesomeIcon icon="image" />图库</Link></li>
+          <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
+          <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
+        </ul>
+      )
+    } else {
+      return (
+        <ul className="ul-list-link">
+          <li><Link to={`/library/group/${this.state.group}`}><FontAwesomeIcon icon="book" />文库</Link></li>
+          <li><Link to={`/gallery/group/${this.state.group}`}><FontAwesomeIcon icon="image" />图库</Link></li>
+          <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
+        </ul> 
+      )
+    }
+  }
+
+  /**
+   * 生成团队主模块
+   */
+  generateGroupMain () {
+    if (this.state.groupList.length) {
+      return (
+      <div className="flex-row">
+         <div className="group-box right flex-column">
+            <div className="us-about">
+              <div className="cover">
+                <img src={ this.state.group.avatar || require('../../../assets/images/default_g.jpg')}/>
+              </div>
+              <p className="title">{this.state.group.name}</p>
+              <p className="des">{this.state.group.des || '暂无简介'}</p>
+              <div className="us-list">
+                <ul className="us-people">
+                  {
+                    this.state.group.members&&this.state.group.members.map((item) => (
+                      <li key={item.id}>
+                        <img src={item.avatar} alt={item.name}/></li>
+                    ))
+                  }
+                  <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
+                </ul>
+              </div>
+             </div>
+
+            <div className="group-links">
+              <h1 className="normal-title">操作通道</h1>
+              {
+                this.generateOptions()
+              }   
+            </div> `  
+        </div>
+
+        <div className="flex-column group-main">
+          <div className="group-statistics">
+                <div className="section-title">
+                  <h1 className="text">数据统计</h1>
+                  <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
+                </div>
+                <div className="flex-row">
+                  <div className="group-statist-detail">
+                    <div className="item-statist">
+                      <p className="data">123</p>
+                      <p className="name">文章</p>
+                    </div>
+                    <div className="item-statist">
+                      <p className="data">26</p>
+                      <p className="name">文章</p>
+                    </div>
+                    <div className="item-statist">
+                      <p className="data">17</p>
+                      <p className="name">评论</p>
+                    </div>
+                    <div className="item-statist">
+                      <p className="data">1454</p>
+                      <p className="name">浏览</p>
+                    </div>
+                  </div>
+                  <div className="statist-graph" id="statist-graph"></div>
+                </div>
+            </div>
+            <div className="news">
+              <div className="section-title">
+                <h1 className="text">团队动态</h1>
+                <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
+              </div>
+              {
+                newsList.map((item, index) => {
+                  return this.getNewsList(item);
+                })
+              }
+            </div>
+          </div>
+      </div>
+      )
+    } else {
+      return (
+        <div className="group-no-tip">
+          <p className="title">你还没有加入任何团队哦！</p>
+          <p className="des">你可以创建新团队，也可以进行搜索申请加入团队</p>
+        </div>
+      )
+    }
+  }
+  
+  /**
+   * 生成切换栏
+   */
+  generateSwitch () {
+    if (this.state.groupList.length) {
+      return (
+        <div className="group-switch">
+          <DropDown data={this.state.groupList}>
+              <img src={this.state.group.avatar || require('../../../assets/images/default_g.jpg')} className="link-img"/>
+              {this.state.group.name}
+              <FontAwesomeIcon icon="caret-down" className="link-svg"/>
+          </DropDown>
+        </div>
+      )
+    }
+  }
   
   componentDidMount () {
     // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.getElementById('statist-graph'));
+    //var myChart = echarts.init(document.getElementById('statist-graph'));
     // 绘制图表
-    myChart.setOption({
-     tooltip : {
-       trigger: 'axis',
-       axisPointer: {
-           type: 'cross',
-           label: {
-               backgroundColor: '#6a7985'
-           }
-       }
-   },
-   legend: {
-       data:['浏览量','人气量','记录次数']
-   },
-   toolbox: {
-       feature: {
-           saveAsImage: {}
-       }
-   },
-   grid: {
-       left: '3%',
-       right: '4%',
-       bottom: '3%',
-       containLabel: true,
-       backgroundColor: '#f7f7fb'
-   },
-   xAxis : [
-       {
-           type : 'category',
-           boundaryGap : false,
-           data : ['周一','周二','周三','周四','周五','周六','周日']
-       }
-   ],
-   yAxis : [
-       {
-           type : 'value'
-       }
-   ],
-   series : [{
-           name:'记录次数',
-           type:'line',
-           smooth: true,
-           stack: '总量',
-           areaStyle: {color:'#d3d3e7'},
-           lineStyle: {color:'#d3d3e7'},
-           data:[5, 2, 0, 6, 2, 3, 6]
-       },
-       {
-           name:'浏览量',
-           type:'line',
-           stack: '总量',
-           smooth: true,
-           areaStyle: {color: '#ff8ba7'},
-           lineStyle: {color:'#ff8ba7'},
-           data:[120, 132, 101, 134, 90, 230, 210]
-       },
-       {
-           name:'人气量',
-           type:'line',
-           smooth: true,
-           stack: '总量',
-           areaStyle: {color: '#4c71f9'},
-           lineStyle: {color: '#4c71f9'},
-           data:[54, 18, 61, 34, 90, 30, 10]
-       }]
-    });
+    // myChart.setOption({});
   }
 
   toggleCreateGroup () {
+    this.setState({
+      tId: '',
+      tName: '',
+      tDes: '',
+      tAvatar: '',
+      tPublic: false,
+      tIdTip: '',
+      tNameTip: ''
+    })
     this.refs.createGroup.toggle();
+
   }
 
    /**
     * 创建一个团队
     */
    createGroup (args) {
+     const query = `
+     mutation {
+      data:
+      groupSave(
+          token: "${this.props.userStore.user.token}",
+          userId: "${this.props.userStore.user.userId}",
+          groupId: "${this.state.tId}",
+          des: "${this.state.tDes}",
+          name: "${this.state.tName}",
+          auth: ${this.state.tPublic ? 1 : 0},
+          avatar: "${this.state.tAvatar}"
+      )
+     }
+    `
+     axios({
+        url: '/graphql',
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+     })
+     .then(({data})=> {
+       let res = data.data.data;
+       if (res === 1) {
+         // 创建成功
+         let id = this.state.tId;
+         this.setState({
+          tId: '',
+          tName: '',
+          tDes: '',
+          tAvatar: '',
+          tPublic: false,
+          tIdTip: '',
+          tNameTip: ''
+        });
+         this.props.history.push(`/group/${id}`)
+       } else {
 
+       }
+     })
    }
+
+   checkGroupId () {
+     const query = `
+     query {
+       data:
+       isGroupExist(
+         id: "${this.state.tId}"
+       )
+     }
+     `
+     axios.post('/graphql', {query})
+     .then(({data}) => {
+       let res = data.data.data;
+       if (res) {
+         // 团队名存在
+         this.setState({
+           tIdTip: '团队域名已存在'
+         })
+       } else {
+         // 团队名不存在
+         this.setState({
+           tIdTip: ''
+         })
+       }
+     })
+   }
+
     render () {
         return (
           <div className="page">
@@ -298,7 +525,7 @@ class Page extends Component {
                         <input type="text" placeholder="搜索ID" className="input"/>
                         <ul className="ul-add-mem">
                         {
-                          this.state.group.members.map((item) => {
+                          this.state.group.members&&this.state.group.members.map((item) => {
                             return (
                             <li key={item.id}>
                               <img src={item.avatar} title={item.name}/>
@@ -317,12 +544,14 @@ class Page extends Component {
                     <Modal title="团队成员" ref="statistics">
                       <div className="member-manage">
                         <table className="member-table">
+                        <tbody>
                           <tr>
                             <th>成员</th>
                             <th>加入日期</th>
                             <th>权限</th>
                             <th></th>
                           </tr>
+                          <tr>
                             <td>
                               <div className="flex-row flex-align">
                                 <img src={require('../../../assets/images/avatar2.jpg')}
@@ -340,6 +569,8 @@ class Page extends Component {
                             <td className="icon">
                                <FontAwesomeIcon icon={["far", "trash-alt"]} />
                             </td>
+                            </tr>
+                            </tbody>
                         </table>
                       </div>
                     </Modal>
@@ -349,12 +580,18 @@ class Page extends Component {
                         <div className="flex-row">
                           <div className="flex-column input-side">
                             <div className="input-group">
-                              <label className="input-label">小组域名</label>
+                              <label className="input-label" 
+                                     >小组域名</label>
                               <input className="input-text"
                                      type="text" 
                                      placeholder="请输入域名"
-                                     ref="createId"/>
-                              <span className="input-mark">必填项</span>
+                                     onChange={(e) => {
+                                       this.setState({
+                                         tId: e.target.value
+                                       })
+                                     }}
+                                     onBlur={this.checkGroupId.bind(this)}/>
+                              <span className="input-mark">{this.state.tIdTip || "必填项"}</span>
                             </div>
 
                             <div className="input-group">
@@ -362,8 +599,19 @@ class Page extends Component {
                               <input className="input-text" 
                                      type="text" 
                                      placeholder="请输入昵称"
-                                     ref="createName"/>
-                              <span className="input-mark">必填项</span>
+                                     onChange={(e) => {
+                                      this.setState({
+                                        tName: e.target.value
+                                      })
+                                    }}
+                                    onBlur={()=>{
+                                      if (this.state.tName && this.state.tName.length > 12) {
+                                        this.setState({
+                                          tNameTip: '团队名称超过了12个字符'
+                                        })
+                                      }
+                                    }}/>
+                              <span className="input-mark">{this.state.tNameTip || "必填项，12个字符以内"}</span>
                             </div>
 
                             <div className="input-group">
@@ -371,7 +619,11 @@ class Page extends Component {
                               <textarea className="input-area" 
                                         type="text" 
                                         placeholder="介绍一下你的小组吧！50字以内"
-                                        ref="createDes"/>
+                                        onChange={(e) => {
+                                          this.setState({
+                                            tDes: e.target.value
+                                          })
+                                        }}/>
                               <span className="input-mark">非必填项</span>
                             </div>
 
@@ -395,13 +647,20 @@ class Page extends Component {
                           <div className="input-group">
                             <label className="input-label">小组头像</label>
                             <div className="two-side">
-                              <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
+                              <img src={this.state.tAvatar || require('../../../assets/images/default_g.jpg')} className="input-img"/>
                               <div className="input-file-box">
                                   <input className="file-input" 
-                                         type="file" 
-                                         placeholder="请输入昵称"
-                                         onChange={() => {
-                                           
+                                         type="file"
+                                         accept="image/jpeg,image/x-png"
+                                         onChange={(e) => {
+                                          let file = e.target.files[0],
+                                              reader = new FileReader();
+                                          reader.readAsDataURL(file);
+                                          reader.onload = (e) => {
+                                            this.setState({
+                                              tAvatar: e.target.result
+                                            })
+                                          } 
                                          }}/>
                                   <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                               </div>
@@ -432,7 +691,7 @@ class Page extends Component {
                               <input className="input-text"
                                      type="text" 
                                      placeholder="请输入昵称" 
-                                     value={this.state.group.name}/>
+                                     defaultValue={this.state.group.name}/>
                               <span className="input-mark">必填项</span>
                             </div>
 
@@ -441,7 +700,7 @@ class Page extends Component {
                               <textarea className="input-area" 
                                         type="text" 
                                         placeholder="介绍一下你的小组吧！50字以内" 
-                                        value={this.state.group.des}/>
+                                        defaultValue={this.state.group.des}/>
                               <span className="input-mark">非必填项</span>
                             </div>
 
@@ -480,96 +739,16 @@ class Page extends Component {
                   <div className="flex-column  flex-scroll-y">
                     <Header />
                     <div className="group-header">
-                      <div className="group-switch">
-                        <DropDown data={this.state.groupList}>
-                            <img src={require('../../../assets/images/avatar6.jpg')} className="link-img"/>
-                            野原家
-                            <FontAwesomeIcon icon="caret-down" className="link-svg"/>
-                        </DropDown>
-                      </div>
+                      {
+                        this.generateSwitch()
+                      }
                       <div className="group-add" onClick={this.toggleCreateGroup.bind(this)}>
                         创建团队
                       </div>                  
                     </div>
-
-                    
-                    <div className="flex-row">
-                      <div className="group-box right flex-column">
-
-                          <div className="us-about">
-                            <div className="cover">
-                              <img src={ this.state.group.avatar || require('../../../assets/images/default_g.jpg')}/>
-                            </div>
-                            <p className="title">{this.state.group.name}</p>
-                            <p className="des">{this.state.group.des || '暂无简介'}</p>
-                            <div className="us-list">
-                              <ul className="us-people">
-                                {
-                                  this.state.group.members.map((item) => (
-                                    <li key={item.id}>
-                                      <img src={item.avatar} alt={item.name}/></li>
-                                  ))
-                                }
-                                <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
-                              </ul>
-                            </div>
-                          </div>
-
-                          <div className="group-links">
-                            <h1 className="normal-title">操作通道</h1>
-                            <ul className="ul-list-link">
-                              <li><Link to={`/library/group/${this.state.group}`}><FontAwesomeIcon icon="book" />文库</Link></li>
-                              <li><Link to={`/gallery/group/${this.state.group}`}><FontAwesomeIcon icon="image" />图库</Link></li>
-                              <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
-                              <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
-                            </ul>    
-                          </div>   
-                      </div>
-
-                      <div className="flex-column group-main">
-                        <div className="group-statistics">
-                              <div className="section-title">
-                                <h1 className="text">数据统计</h1>
-                                <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                              </div>
-                              <div className="flex-row">
-                                <div className="group-statist-detail">
-                                  <div className="item-statist">
-                                    <p className="data">123</p>
-                                    <p className="name">文章</p>
-                                  </div>
-                                  <div className="item-statist">
-                                    <p className="data">26</p>
-                                    <p className="name">文章</p>
-                                  </div>
-                                  <div className="item-statist">
-                                    <p className="data">17</p>
-                                    <p className="name">评论</p>
-                                  </div>
-                                  <div className="item-statist">
-                                    <p className="data">1454</p>
-                                    <p className="name">浏览</p>
-                                  </div>
-                                </div>
-                                <div className="statist-graph" id="statist-graph"></div>
-                              </div>
-                          </div>
-
-
-                          <div className="news">
-                            <div className="section-title">
-                              <h1 className="text">团队动态</h1>
-                              <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                            </div>
-                            {
-                              newsList.map((item, index) => {
-                                return this.getNewsList(item);
-                              })
-                            }
-                          </div>
-                      </div>
-                    </div>
-                  
+                     {
+                       this.generateGroupMain()
+                     }
                   </div>
                 </div>
             </div>

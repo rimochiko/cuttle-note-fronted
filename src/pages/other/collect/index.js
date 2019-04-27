@@ -42,8 +42,8 @@ class Page extends Component {
       query {
         data:
         collectPosts(
-          userId: \"${this.props.userStore.user.userId}\",
-          token: \"${this.props.userStore.user.token}\"
+          userId: "${this.props.userStore.user.userId}",
+          token: "${this.props.userStore.user.token}"
         ) {
           code,
           posts {
@@ -87,8 +87,8 @@ class Page extends Component {
             data:
             postUncollect (
                 postId: ${id},
-                token: \"${this.props.userStore.user.token}\",
-                userId: \"${this.props.userStore.user.userId}\"
+                token: "${this.props.userStore.user.token}",
+                userId: "${this.props.userStore.user.userId}"
             )
           }
         `

@@ -10,10 +10,10 @@ function createPost (args) {
         mutation {
             data:
             userTextPostSave (
-                token: \"${args.token}\",
-                userId: \"${args.userId}\",
-                title: \"${args.title || '无标题'}\",
-                content: \"${args.content}\",
+                token: "${args.token}",
+                userId: "${args.userId}",
+                title: "${args.title || '无标题'}",
+                content: "${args.content}",
                 isAuth: ${args.Auth ? args.Auth : 1},
                 publish: ${args.publish},
                 parentId: ${args.parentId}
@@ -28,10 +28,10 @@ function createPost (args) {
         mutation {
             data:
             userTextPostSave (
-                token: \"${args.token}\",
-                userId: \"${args.userId}\",
-                title: \"${args.title || '无标题'}\",
-                content: \"${args.content}\",
+                token: "${args.token}",
+                userId: "${args.userId}",
+                title: "${args.title || '无标题'}",
+                content: "${args.content}",
                 isAuth: ${args.Auth ? args.Auth : 1},
                 publish: ${args.publish}
             ) {
@@ -50,10 +50,10 @@ function updatePost (args) {
         data:
         userTextPostUpdate (
             postId: ${args.postId},
-            token: \"${args.token}\",
-            userId: \"${args.userId}\",
-            title: \"${args.title || '无标题'}\",
-            content: \"${args.content}\",
+            token: "${args.token}",
+            userId: "${args.userId}",
+            title: "${args.title || '无标题'}",
+            content: "${args.content}",
             isAuth: ${args.Auth ? args.Auth : 1},
             publish: ${args.publish},
         ) {
@@ -69,9 +69,9 @@ function getOnePost (args) {
     query {
       data:
       post(
-        userId:\"${args.userId}\",
+        userId:"${args.userId}",
         postId: ${args.postId},
-        token: \"${args.token}\"
+        token: "${args.token}"
       ) {
         code,
         post {

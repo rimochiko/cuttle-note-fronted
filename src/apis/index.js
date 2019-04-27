@@ -18,7 +18,7 @@ function fetchPost (apiObj, apiType, body) {
     let args = API[apiObj][apiType].args;
     let arr = args.map((key => {
       console.log(key);
-      return `${key}:\"${body[key]}\"`;
+      return `${key}:"${body[key]}"`;
     }));
     console.log(arr);
     console.log(arr.join(','));
@@ -48,7 +48,7 @@ function fetchGet (apiObj, apiType, body) {
   let args = API[apiObj][apiType].args;
   let arr = args.map((key => {
     console.log(key);
-    return `${key}:\"${body[key]}\"`;
+    return `${key}:"${body[key]}"`;
   }));
   // 发送内容
   let content = `{

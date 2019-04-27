@@ -52,8 +52,8 @@ class Section extends Component {
             data:
             postLike (
                 postId: ${this.state.post.id},
-                token: \"${this.props.userStore.user.token}\",
-                userId: \"${this.props.userStore.user.userId}\"
+                token: "${this.props.userStore.user.token}",
+                userId: "${this.props.userStore.user.userId}"
             )
           }
         `
@@ -87,8 +87,8 @@ class Section extends Component {
             data:
             postUnlike (
                 postId: ${this.state.post.id},
-                token: \"${this.props.userStore.user.token}\",
-                userId: \"${this.props.userStore.user.userId}\"
+                token: "${this.props.userStore.user.token}",
+                userId: "${this.props.userStore.user.userId}"
             )
           }
         `
@@ -120,8 +120,8 @@ class Section extends Component {
             data:
             postCollect (
                 postId: ${this.state.post.id},
-                token: \"${this.props.userStore.user.token}\",
-                userId: \"${this.props.userStore.user.userId}\"
+                token: "${this.props.userStore.user.token}",
+                userId: "${this.props.userStore.user.userId}"
             )
           }
         `
@@ -153,8 +153,8 @@ class Section extends Component {
             data:
             postUncollect (
                 postId: ${this.state.post.id},
-                token: \"${this.props.userStore.user.token}\",
-                userId: \"${this.props.userStore.user.userId}\"
+                token: "${this.props.userStore.user.token}",
+                userId: "${this.props.userStore.user.userId}"
             )
           }
         `

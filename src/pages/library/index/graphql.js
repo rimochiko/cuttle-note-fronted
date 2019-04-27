@@ -11,10 +11,10 @@ function userPostQuery (args) {
     query {
       data:
       userPosts(
-       userId: \"${args.userId}\",
-       token: \"${args.token}\",
+       userId: "${args.userId}",
+       token: "${args.token}",
        type: ${args.type},
-       author: \"${args.author}\"
+       author: "${args.author}"
      ) {
        code,
        posts {
@@ -54,10 +54,10 @@ function groupPostQuery (args) {
     query {
       data:
       groupPosts(
-       userId: \"${args.userId}\",
-       token: \"${args.token}\",
+       userId: "${args.userId}",
+       token: "${args.token}",
        type: ${args.type},
-       groupId: \"${args.groupId}\"
+       groupId: "${args.groupId}"
      ) {
        code,
        posts {
@@ -98,9 +98,9 @@ function userDelPostQuery (args) {
     mutation {
       data:
       postDelete(
-        userId:\"${args.userId}\",
+        userId:"${args.userId}",
         postId:${args.postId},
-        token:\"${args.token}\"
+        token:"${args.token}"
       )
     }`
 }
@@ -110,10 +110,10 @@ function groupDelPostQuery (args) {
     mutation {
         data:
         postDelete(
-            userId:\"${args.userId}\",
+            userId:"${args.userId}",
             postId:${args.postId},
-            token:\"${args.token}\",
-            groupId:\"${args.groupId}\",
+            token:"${args.token}",
+            groupId:"${args.groupId}",
         )
     }`
 }
@@ -123,9 +123,9 @@ function getOnePost (args) {
   query {
     data:
     post(
-      userId:\"${args.userId}\",
+      userId:"${args.userId}",
       postId:${args.postId},
-      token: \"${args.token}\"
+      token: "${args.token}"
     ) {
       code,
       post {
