@@ -15,6 +15,7 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 
+import Qlquery from './graphql';
 
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
@@ -141,6 +142,8 @@ class Page extends Component {
           tPublic: false,
           tIdTip: '',
           tNameTip: '',
+          searchText: '',
+          searchList: [],
           isAuth: 0 
         }
         this.getNewsList = this.getNewsList.bind(this);
@@ -175,18 +178,7 @@ class Page extends Component {
           
           // 如果group不存在，要请求group的信息
           if (!group) {
-            const query = 
-            `query {
-              data:
-              groupEasy(
-                id:"${params.id}\
-              ) {
-                id
-                avatar
-                nickname
-              }
-            }`;
-           await axios.post('/graphql', {query})
+           await Qlquery.getGroupEasy(params)
            .then(({data}) => {
              let res = data.data.data;
              if(res.id) {
@@ -211,7 +203,14 @@ class Page extends Component {
             link: `/group/${item.id}`
           }
         })
-        console.log(groupList);
+        // 获取团队成员
+        await Qlquery.getMembers({
+          groupId: group.id
+        })
+        .then(({data}) => {
+          let res = data.data.data;
+          group.members = res || [];
+        })
        
         this.setState({
           groupList: groupList,
@@ -219,7 +218,8 @@ class Page extends Component {
             name: group.name,
             des: group.des,
             id: group.id,
-            avatar: group.avatar || null
+            avatar: group.avatar || null,
+            members: group.members
           }
         })
 
@@ -245,6 +245,16 @@ class Page extends Component {
      * 管理团队面板
     */
    toggleSetting () {
+     let group = this.state.group;
+     this.setState({
+      tId: group.id,
+      tName: group.name,
+      tDes: group.des,
+      tAvatar: group.avatar,
+      tPublic: group.public,
+      tIdTip: '',
+      tNameTip: '',
+     })
      this.refs.setting.toggle();
    }
    
@@ -253,6 +263,25 @@ class Page extends Component {
     */
    toggleStatistics () {
      this.refs.statistics.toggle();
+   }
+
+   /**
+    * 搜索用户
+    * @param {*} type 
+    */
+   async searchUser () {
+     let user = this.props.userStore.user;
+     await Qlquery.searchUsers({
+       token: user.token,
+       userId: user.userId,
+       search: this.state.searchText
+     })
+     .then(({data}) => {
+       let res = data.data.data;
+       this.setState({
+         searchList: res
+       })
+     })
    }
 
   getNewsIcon (type) {
@@ -473,15 +502,7 @@ class Page extends Component {
        if (res === 1) {
          // 创建成功
          let id = this.state.tId;
-         this.setState({
-          tId: '',
-          tName: '',
-          tDes: '',
-          tAvatar: '',
-          tPublic: false,
-          tIdTip: '',
-          tNameTip: ''
-        });
+         this.toggleCreateGroup();
          this.props.history.push(`/group/${id}`)
        } else {
 
@@ -522,10 +543,17 @@ class Page extends Component {
                 <div className="flex-row flex-1 overflow">
                     <Modal title="添加成员" ref="addMem">
                       <div className="add-mem">
-                        <input type="text" placeholder="搜索ID" className="input"/>
+                        <input type="text"
+                               placeholder="搜索ID" 
+                               className="input"
+                               onChange={(e) => {
+                                 this.setState({
+                                   searchText: e.target.value.trim()
+                                 })
+                               }}/>
                         <ul className="ul-add-mem">
                         {
-                          this.state.group.members&&this.state.group.members.map((item) => {
+                          this.state.group.searchList&&this.state.group.searchList.map((item) => {
                             return (
                             <li key={item.id}>
                               <img src={item.avatar} title={item.name}/>
@@ -544,34 +572,60 @@ class Page extends Component {
                     <Modal title="团队成员" ref="statistics">
                       <div className="member-manage">
                         <table className="member-table">
-                        <tbody>
-                          <tr>
-                            <th>成员</th>
-                            <th>加入日期</th>
-                            <th>权限</th>
-                            <th></th>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="flex-row flex-align">
-                                <img src={require('../../../assets/images/avatar2.jpg')}
-                                    className="avatar"/>
-                                <div className="info">
-                                  <p className="text">测试</p>
-                                  <p className="des">test111</p>
-                                </div>                              
-                              </div>
-                            </td>
-                            <td>
-                              <p>2019-03-11</p>
-                            </td>
-                            <td><p>管理员</p></td> 
-                            <td className="icon">
-                               <FontAwesomeIcon icon={["far", "trash-alt"]} />
-                            </td>
+                          <tbody>
+                            <tr>
+                              <th>成员</th>
+                              <th>加入日期</th>
+                              <th>权限</th>
+                              <th></th>
                             </tr>
-                            </tbody>
+                            <tr>
+                              <td className="member">
+                                <div className="flex-row flex-align">
+                                  <img src={require('../../../assets/images/avatar2.jpg')}
+                                      className="avatar"
+                                      alt=""/>
+                                  <div className="info">
+                                    <p className="text">测试</p>
+                                    <p className="des">test111</p>
+                                  </div>                              
+                                </div>
+                              </td>
+                              <td>
+                                <p>2019-03-11</p>
+                              </td>
+                              <td><p>管理员</p></td> 
+                              <td className="icon">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="flex-row flex-align">
+                                  <img src={require('../../../assets/images/avatar2.jpg')}
+                                      className="avatar"
+                                      alt=""/>
+                                  <div className="info">
+                                    <p className="text">测试</p>
+                                    <p className="des">test111</p>
+                                  </div>                              
+                                </div>
+                              </td>
+                              <td>
+                                <p>2019-03-11</p>
+                              </td>
+                              <td>
+                                <select className="mck-select">
+                                  <option>管理员</option>
+                                  <option>一般用户</option>
+                                </select>
+                              </td> 
+                              <td className="icon">
+                                <FontAwesomeIcon icon={["far", "trash-alt"]} />
+                              </td>
+                            </tr>
+                          </tbody>
                         </table>
+                        <button className="input-btn radius-btn">确认修改</button>
                       </div>
                     </Modal>
 
@@ -634,7 +688,7 @@ class Page extends Component {
                               </div>
                               <Switch 
                                 isChecked="this.state.temp.public"
-                                onChange={() => {
+                                toggle={() => {
                                   this.setState({
                                     temp: {
                                       public: !this.state.temp.public
@@ -688,10 +742,21 @@ class Page extends Component {
                             </div>
                             <div className="input-group">
                               <label className="input-label">小组名称</label>
-                              <input className="input-text"
+                              <input className="input-text" 
                                      type="text" 
-                                     placeholder="请输入昵称" 
-                                     defaultValue={this.state.group.name}/>
+                                     placeholder="请输入昵称"
+                                     onChange={(e) => {
+                                      this.setState({
+                                        tName: e.target.value
+                                      })
+                                    }}
+                                    onBlur={()=>{
+                                      if (this.state.tName && this.state.tName.length > 12) {
+                                        this.setState({
+                                          tNameTip: '团队名称超过了12个字符'
+                                        })
+                                      }
+                                    }}/>
                               <span className="input-mark">必填项</span>
                             </div>
 
@@ -699,8 +764,12 @@ class Page extends Component {
                               <label className="input-label">小组简介</label>
                               <textarea className="input-area" 
                                         type="text" 
-                                        placeholder="介绍一下你的小组吧！50字以内" 
-                                        defaultValue={this.state.group.des}/>
+                                        placeholder="介绍一下你的小组吧！50字以内"
+                                        onChange={(e) => {
+                                          this.setState({
+                                            tDes: e.target.value
+                                          })
+                                        }}/>
                               <span className="input-mark">非必填项</span>
                             </div>
 
@@ -709,29 +778,53 @@ class Page extends Component {
                                 <label className="input-label">小组是否私密</label>
                                 <span className="input-mark">私密小组的图文库只有成员能浏览</span>
                               </div>
-                              <Switch />
+                              <Switch 
+                                isChecked="this.state.temp.public"
+                                toggle={() => {
+                                  this.setState({
+                                    temp: {
+                                      public: !this.state.temp.public
+                                    }
+                                  })
+                                }}/>
                             </div> 
-                          </div>
 
-                          <div className="input-group">
-                            <label className="input-label">小组头像</label>
-                            <div className="two-side">
-                              <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
-                              <div className="input-file-box">
-                                  <input className="file-input" type="file" placeholder="请输入昵称"/>
-                                  <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
-                              </div>
+                            <div className="input-group">
+                              <button className="input-btn radius-btn">确认</button>
                             </div>
-                           <span className="input-mark">非必填项</span>
-
-                           <label className="input-label">其他选项</label>
-                           <button className="normal-btn radius-btn">解散小组</button>
-                           <span className="input-mark">操作不可逆，小组文库图库都不会保留</span>
                           </div>
+                         
+                         <div className="flex-column">
+                            <div className="input-group">
+                              <label className="input-label">小组头像</label>
+                              <div className="two-side">
+                                <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
+                                <div className="input-file-box">
+                                  <input className="file-input" 
+                                         type="file"
+                                         accept="image/jpeg,image/x-png"
+                                         onChange={(e) => {
+                                          let file = e.target.files[0],
+                                              reader = new FileReader();
+                                          reader.readAsDataURL(file);
+                                          reader.onload = (e) => {
+                                            this.setState({
+                                              tAvatar: e.target.result
+                                            })
+                                          } 
+                                         }}/>
+                                  <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
+                                </div>
+                              </div>
+                              <span className="input-mark">非必填项</span>
+                            </div>
+                            
+                            <div className="input-group">
+                              <label className="input-label">其他选项</label>
+                              <button className="normal-btn radius-btn">解散小组</button>
+                              <span className="input-mark">操作不可逆，小组文库图库都不会保留</span>
+                            </div>
                         </div>
-
-                        <div className="input-group">
-                           <button className="input-btn radius-btn">确认</button>
                         </div>
                       </div>
                     </Modal>

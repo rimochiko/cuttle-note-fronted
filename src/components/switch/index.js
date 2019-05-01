@@ -9,22 +9,27 @@ class Switch extends Component {
     constructor () {
         super();
         this.state = {
-            ischecked: false
+            isChecked: false
         }
+    }
+    componentDidMount () {
+        this.setState({
+            isChecked: this.props.isChecked
+        })
     }
     toggle () {
         this.setState({
-            ischecked: !this.state.ischecked
+            isChecked: !this.state.isChecked
         });
-        this.props.toggle && this.props.toggle(this.state.ischecked);
+        this.props.toggle && this.props.toggle(this.state.isChecked);
     }
     render () {
         return (
             <div className="mck-switch">
-              <input type="checkbox" onChange={this.toggle.bind(this)}/>
+              <input type="checkbox" onChange={this.toggle.bind(this)} defaultChecked={this.state.isChecked}/>
               <div className={cs({
                     'mck-switch-container': true,
-                    'active': this.state.ischecked 
+                    'active': this.state.isChecked 
               })}>
                 <div className="mck-switch-radio"></div>
               </div>

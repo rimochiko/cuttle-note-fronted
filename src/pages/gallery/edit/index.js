@@ -5,200 +5,314 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
 import { Link } from 'react-router-dom';
 import G6 from '@antv/g6';
+const Minimap = require('@antv/g6/build/grid');
 
 class Page extends Component {
     constructor () {
         super();
+        this.state = {
+          graph: null,
+          textEdit: {
+            x: 0,
+            y: 0,
+            status: 0,
+            id: null
+          },
+          canvasPos: {
+            x: 0,
+            y: 0
+          },
+          data: {
+            nodes: [{
+              id: 'customer',
+              label: 'customer',
+              x: 200,
+              y: 200,
+              shape: 'rect',
+              size: [60, 40]
+          }, {
+              id: 'customer_id',
+              label: 'customer_id',
+              x: 120,
+              y: 160,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'name',
+              label: 'name',
+              x: 140,
+              y: 100,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'address',
+              label: 'address',
+              x: 180,
+              y: 60,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'email',
+              label: 'email',
+              x: 240,
+              y: 110,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'order',
+              label: 'order',
+              x: 400,
+              y: 200,
+              shape: 'rect',
+              size: [60, 40]
+          }, {
+              id: 'order_id',
+              label: 'order_id',
+              x: 320,
+              y: 130,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'order_status',
+              label: 'order_status',
+              x: 380,
+              y: 80,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'total_price',
+              label: 'total_price',
+              x: 440,
+              y: 150,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'employee',
+              label: 'employee',
+              x: 380,
+              y: 380,
+              shape: 'rect',
+              size: [60, 40]
+          }, {
+              id: 'employee_id',
+              label: 'employee_id',
+              x: 320,
+              y: 440,
+              shape: 'ellipse',
+              size: [80, 40]
+          }, {
+              id: 'title',
+              label: 'title',
+              x: 440,
+              y: 440,
+              shape: 'ellipse',
+              size: [80, 40]
+          }],
+            edges: [{
+              id: 'c_id',
+              source: 'customer',
+              target: 'customer_id'
+          }, {
+              id: 'c_name',
+              source: 'customer',
+              target: 'name'
+          }, {
+              id: 'c_address',
+              source: 'customer',
+              target: 'address'
+          }, {
+              id: 'c_email',
+              source: 'customer',
+              target: 'email'
+          }, {
+              id: 'o_id',
+              source: 'order',
+              target: 'order_id'
+          }, {
+              id: 'o_price',
+              source: 'order',
+              target: 'total_price'
+          }, {
+              id: 'o_status',
+              source: 'order',
+              target: 'order_status'
+          }, {
+              id: 'c_o',
+              source: 'customer',
+              target: 'order',
+              relation: 'places',
+              sourceEntity: '1',
+              targetEntity: 'N',
+              shape: 'relation'
+          }, {
+              id: 'o_e',
+              source: 'employee',
+              target: 'order',
+              relation: 'finalize',
+              sourceEntity: '1',
+              targetEntity: 'N',
+              shape: 'relation'
+          }, {
+              id: 'e_id',
+              source: 'employee',
+              target: 'employee_id'
+          }, {
+              id: 'e_title',
+              source: 'employee',
+              target: 'title'
+          }]
+          }
+        }
+    }
+    setTextEditPosition(x, y, text, id,status) {
+      if (status === 0) {
+        this.refs.textTool.innerHTML = '';
+        this.setState({
+          textEdit: {
+            x: 0,
+            y: 0,
+            status: 0,
+            id: null
+          }
+        });
+      } else {
+        this.refs.textTool.innerHTML = text;
+        let width = this.refs.textTool.clientWidth,
+        height = this.refs.textTool.clientHeight;
+        console.log(width, height)
+        this.setState({
+          textEdit: {
+            x: x,
+            y: y,
+            status: 1,
+            id: id
+          }
+        });
+      }
+      console.log(this.state);
+    }
+
+    // 文字编辑完毕
+    textToolBlur () {
+      // 更新data
+      let data = this.state.data.nodes.slice(0);
+      for (let i = 0, len = data.length; i < len; i++) {
+        if (data[i].id === this.state.textEdit.id) {
+          data[i].label = this.refs.textTool.innerText;
+          break;
+        }
+      }
+      this.setState({
+        data: {
+          nodes: data,
+          edges: this.state.data.edges
+        },
+        textEdit: {
+          x: 0,
+          y: 0,
+          status: 0,
+          id: null
+        }
+      })
+      this.state.graph.changeData(this.state.data);
+    }
+
+    // 获取canvas的边距
+    getCanvasPos () {
+      this.setState({
+        x: this.refs.editGraph.offsetLeft,
+        y: this.refs.editGraph.offsetTop
+      });
+    }
+
+    componentWillMount () {
+      let that = this;
+      G6.registerBehavior('text-node', {
+        getEvents() {
+          return {
+            'node:dblclick': 'onDbClick',
+          };
+        },
+        onDbClick(e) {
+          const graph = this.graph;
+          console.log(graph);
+          const item = e.item;
+          const modal = item.getModel();
+          console.log(item);
+          that.setTextEditPosition(
+            modal.x,
+            modal.y,
+            modal.label,
+            modal.id,
+            1
+          )
+          that.refs.textTool.focus();
+        }
+      });
+
+      // 封装点击添加边的交互
+      G6.registerBehavior('click-add-edge', {
+        getEvents() {
+          return {
+            'node:click': 'onClick' , 
+            mousemove: 'onMousemove'
+          };
+        },
+        onClick(ev) {
+          const node = ev.item;
+          const graph = this.graph;
+          const point = {x: ev.x, y: ev.y};
+          const model = node.getModel();
+          // 如果在添加边的过程中，再次点击另一个节点，结束边的添加
+          if (this.addingEdge && this.edge) {
+            graph.updateItem(this.edge, {
+              target: model.id
+            });
+            this.edge = null;
+            this.addingEdge = false;
+          } else {
+            // 点击节点，触发增加边
+            this.edge = graph.addItem('edge', {
+              source: model.id,
+              target: point
+            });
+            this.addingEdge = true;
+          }
+        },
+        onMousemove(ev) {
+          const point = {x: ev.x, y: ev.y};
+          if (this.addingEdge && this.edge) {
+            // 增加边的过程中，移动时边跟着移动
+            this.graph.updateItem(this.edge, {
+              target: point
+            });
+          }
+        }
+      });
     }
 
     componentDidMount () {
-      this.drawBackground(this.refs.caMain);
+      const minimap = new Minimap();
 
-      this.drawShape(this.refs.caText, 'text', {
-        text: 'Text',
-        style: 'bold 16px Arial',
-        x: 25,
-        y: 35
-      });
-      this.drawShape(this.refs.caRound, 'round', {
-        radius: 15,
-        width: 50,
-        height: 50
-      });
-      this.drawShape(this.refs.caRectangle, 'rect', {
-        x: 10,
-        y: 15,
-        width: 30,
-        height: 20
-      });
-      this.drawShape(this.refs.caNote, 'note', {
-        x: 15,
-        y: 13,
-        width: 20,
-        height: 26
-      });
-      this.drawShape(this.refs.caTriangle, 'triangle', {
-        x1: 25,
-        y1: 10,
-        x2: 10,
-        y2: 20,
-        x3: 40,
-        y3: 20
-      });
-      this.drawShape(this.refs.caRoundRect, 'roundRect', {
-        x: 10,
-        y: 15,
-        width: 30,
-        height: 20 
-      });
-    }
-
-    // 绘制背景
-    drawBackground (cvs) {
-      let ctx = cvs.getContext('2d');
-      ctx.lineWidth=0.5;
-      ctx.strokeStyle="#E8E8E8";
-
-      // 绘制竖线
-      var x=0,y=0;
-      for(var i=0;i<=68;i++)
-      {
-        if (i%4===0) {
-          ctx.lineWidth=1
-        } else {
-          ctx.lineWidth=0.5;
+      const graph = new G6.Graph({
+        container: 'edit-graph',
+        width: 1020,
+        height: 600,
+        plugins: [ minimap ],
+        modes: {
+          default: ['drag-canvas', 'zoom-canvas'],
+          edit: ['drag-canvas', 
+                 'drag-node',  
+                 'text-node']
         }
-        x=i*15;
-        y=0;
-        ctx.beginPath();
-        ctx.moveTo(x,y);
-        y=1020;
-        ctx.lineTo(x,y);
-        ctx.stroke();
-        ctx.closePath();
-      }
-      // 绘制横线
-      for(var j=0;j<=45;j++)
-      {
-        if (j%4===0) {
-          ctx.lineWidth=1
-        } else {
-          ctx.lineWidth=0.5;
-        }
-        x=0;
-        y=j*15;
-        ctx.beginPath();
-        ctx.moveTo(x,y);
-        x=1020;
-        ctx.lineTo(x,y);
-        ctx.stroke();
-        ctx.closePath();
-      }
+      });
 
-    }
-
-    // 绘制图形
-    drawShape (cvs, type, args) {
-      let ctx = cvs.getContext('2d');
-      ctx.lineWidth=1;
-      
-      switch (type) {
-        case "round": 
-          this.drawRound(ctx, args);
-          break;
-        case "text":
-          this.drawText(ctx, args);
-          break;
-        case 'rect':
-          this.drawRectangle(ctx, args);
-          break;
-        case 'note':
-          this.drawNote(ctx, args);
-          break;
-        case "triangle": 
-          this.drawTriangle(ctx, args);
-          break;
-        case 'roundRect':
-          this.drawRoundRect(ctx, args);
-          break;
-      }
-    }
-    
-    // 绘制圆形
-    drawRound (ctx, args) {
-      let x = args.width / 2;
-      let y = args.height / 2;
-      ctx.beginPath();
-      ctx.arc(x, y, args.radius, 0, 2*Math.PI, true);
-      ctx.closePath();
-      ctx.stroke();
-    }
-
-    // 绘制矩形
-    drawRectangle (ctx, args) {
-      ctx.fillStyle = args.fill || '#fff';
-      ctx.strokeStyle = args.stroke || 'black';
-      ctx.rect(args.x, args.y, args.width, args.height);
-      ctx.fillRect(args.x, args.y, args.width, args.height);
-      ctx.stroke();
-    }
-    
-    // 绘制便签
-    drawNote (ctx, args) {
-      ctx.fillStyle = args.fill || '#ffffaa';
-      ctx.strokeStyle = args.stroke || 'black';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(args.x, args.y);
-      ctx.lineTo(args.x + args.width - 5, args.y);
-      ctx.lineTo(args.x + args.width, args.y + 5);
-      ctx.lineTo(args.x + args.width, args.y + args.height);
-      ctx.lineTo(args.x , args.y + args.height);
-      ctx.lineTo(args.x, args.y);
-      ctx.closePath();
-      ctx.stroke();
-    }
-
-    // 绘制文字
-    drawText (ctx, args) {
-      ctx.font = args.style || 'bold 12px Arial';
-      ctx.textAlign = args.align || 'center';
-      ctx.textBaseline = args.baseline || 'bottom';
-      ctx.fillStyle = args.fill || '#000';
-      ctx.strokeText(args.text, args.x, args.y);
-      // ctx.fillText(args.text, args.x, args.y)
-    }
-
-    // 绘制圆角矩形
-    drawRoundRect (ctx, args) {
-      ctx.fillStyle = args.fill || '#fff';
-      ctx.strokeStyle = args.stroke || 'black';
-      let x = args.x,
-          y = args.y,
-          height = args.height,
-          width = args.width,
-          radius = 3;
-      ctx.beginPath();
-      ctx.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 3 / 2);
-      ctx.lineTo(width - radius + x, y);
-      ctx.arc(width - radius + x, radius + y, radius, Math.PI * 3 / 2, Math.PI * 2);
-      ctx.lineTo(width + x, height + y - radius);
-      ctx.arc(width - radius + x, height - radius + y, radius, 0, Math.PI * 1 / 2);
-      ctx.lineTo(radius + x, height +y);
-      ctx.arc(radius + x, height - radius + y, radius, Math.PI * 1 / 2, Math.PI);
-      ctx.closePath();
-      ctx.stroke();
-    }
-    
-    // 绘制三角形
-    drawTriangle (ctx, args) {
-      ctx.beginPath();
-      ctx.moveTo(args.x1, args.y1);
-      ctx.lineTo(args.x2, args.y2);
-      ctx.lineTo(args.x3, args.y3);
-      ctx.lineTo(args.x1, args.y1);
-      ctx.closePath();
-      ctx.stroke();
+      graph.changeData(this.state.data);
+      graph.setMode('edit');
+      this.setState({
+        graph: graph
+      })
+      this.getCanvasPos();
     }
 
 
@@ -265,23 +379,32 @@ class Page extends Component {
               </div>
               <div className="flex-row flex-1 overflow">
                 <div className="chart-edit-shapes">
-                  <div className="chart-shape-group">
-                    <span className="section-title">基本图形</span>
-                    <canvas width="50" height="50" ref="caText" shapename="text"></canvas>
-                    <canvas width="50" height="50" ref="caNote" shapename="note"></canvas>
-                    <canvas width="50" height="50" ref="caRound" shapename="round"></canvas>
-                    <canvas width="50" height="50" ref="caRectangle" shapename="rectangle"></canvas>
-                    <canvas width="50" height="50" ref="caRoundRect" shapename="roundRectangle"></canvas>
-                    <canvas width="50" height="50" ref="caTriangle" shapename="triangle"></canvas>
-                    <canvas width="50" height="50" ref="caDiamond" shapename="diamond"></canvas>
-                    <canvas width="50" height="50" ref="caCloud" shapename="cloud"></canvas>
-                    <canvas width="50" height="50" ref="caDialog" shapename="dialog"></canvas>
-                  </div>
-                    
+                    <ul className="chart-shape-group">
+                      <li className="shape"
+                          onClick={this.addRect.bind(this)}>
+                       <img src={require('../../../assets/images/tool/rec.svg')} alt="矩形"/>
+                      </li>
+                      <li className="shape"
+                          onClick={this.addCircle.bind(this)}>
+                        <img src={require('../../../assets/images/tool/circle.svg')} alt="圆形"/>
+                      </li>
+                      <li className="shape"
+                          onClick={this.addEllips.bind(this)}>
+                        <img src={require('../../../assets/images/tool/ellip.svg')} alt="椭圆"/>
+                      </li>
+                    </ul>                    
                 </div>
-                <div className="chart-edit-canvas flex-1">
-                  <div className="edit-canvas">
-                    <canvas width="1020" height="600" ref="caMain"></canvas>
+                <div className="chart-edit-canvas">
+                  <div className="edit-canvas" id="edit-graph" ref="editGraph">
+                    <div contentEditable 
+                      ref="textTool"
+                      id="text-tool"
+                      onBlur={this.textToolBlur.bind(this)} 
+                      style={{
+                          left: this.state.textEdit.x + 'px', 
+                          top: this.state.textEdit.y + 'px',
+                          display: this.state.textEdit.status === 0 ? 'none' : 'block'
+                    }}></div>
                   </div>
                 </div>
               </div>

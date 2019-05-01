@@ -53,20 +53,34 @@
 
 
 .chart-edit-shapes {
-    overflow-y: scroll;
-    width: 16.25rem;
+    width: 3rem;
     flex-shrink: 0;
     height: 100%;
     flex-grow: 0;
+    background-color: #f7f7fb;
     .chart-shape-group {
-        padding: 1.5rem;
-        .section-title {
-            color: #a3a5b6;
+        margin: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .shape {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #7f83b8;
             font-size: .9rem;
-            margin-bottom: 1rem;
-        }
-        canvas {
-            background:rgba(255,255,255,0);
+            height: 2rem;
+            width: 2rem;
+            margin: .2rem 0;
+            border-radius: .3rem;
+            cursor: pointer;
+            @extend .transition;
+            img {
+                width: 1.5rem;
+            }
+            &:hover {
+                background: #e9e9f8;
+            }
         }
     }
 }
@@ -74,7 +88,9 @@
 .chart-edit-canvas {
     overflow: scroll;
     background-color: #D8D8D8;
+    flex: 1;
     .edit-canvas {
+        position: relative;
         margin: 32px;
         padding: 16px;
         width: 1020px;
@@ -86,5 +102,12 @@
         }
         background-color: #f4f4f4;
         box-shadow: 0 10px 15px #ddd;
+    }
+    #text-tool {
+        position: absolute;
+        background: #FFF;
+        font-size: 12px;
+        font-weight: normal;
+        padding: .2rem .5rem;
     }
 }

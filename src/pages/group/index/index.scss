@@ -196,7 +196,7 @@
 .member-manage {
     font-weight: 300;
     padding: 1rem 0rem 1rem 2rem;
-    height: 30rem;
+    overflow-y: scroll;
     .member-table {
         color: #3e4077;
         th {
@@ -205,13 +205,16 @@
         }
         td {
             text-align: left;
-            padding: 0.5rem 3em 0.5rem 0;
+            padding: 1rem 3em 1rem 0;
             font-size: .9rem;
             vertical-align: middle;
             &.icon {
-                font-size: 1.2rem;
+                font-size: 1rem;
                 color: #7f83b8;
             }
+        }
+        .member {
+            min-width: 10rem;
         }
         .avatar {
             border-radius: 50%;
@@ -226,6 +229,15 @@
             font-size: .85rem;
             color: #8493b8;
         }
+        svg {
+            color: #c3c4c6;
+            margin-left: .5rem;
+            cursor: pointer;
+        }
+    }
+    .input-btn {
+        display: block;
+        margin: 1rem auto;
     }
 }
 
@@ -281,5 +293,35 @@
     }
     .des {
         font-size: 1.2rem;
+    }
+}
+
+.settings-detail {
+    .normal-btn {
+        border: none;
+        padding: .3rem 1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        margin: .4rem 1rem 0 0;
+    }
+}
+
+.mck-select {
+    padding: .3rem .5rem;
+    outline: none;
+    border-radius: .3rem;
+    font-size: .9rem;
+    font-weight: 300;
+    color: #3e4077;
+    border: solid 1px #a3a5b6;
+    option::-ms-expand{ display: none; }
+    option{
+        -moz-appearance:none; /* Firefox */
+        -webkit-appearance:none; /* Safari 和 Chrome */
+        appearance:none;
+    }
+    option:hover{
+        color:#fff;
+        background-color:#1E90FF;
     }
 }
