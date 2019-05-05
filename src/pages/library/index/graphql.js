@@ -13,7 +13,7 @@ function userPostQuery (args) {
       userPosts(
        userId: "${args.userId}",
        token: "${args.token}",
-       type: ${args.type},
+       type: 0,
        author: "${args.author}"
      ) {
        code,
@@ -56,7 +56,7 @@ function groupPostQuery (args) {
       groupPosts(
        userId: "${args.userId}",
        token: "${args.token}",
-       type: ${args.type},
+       type: 0,
        groupId: "${args.groupId}"
      ) {
        code,

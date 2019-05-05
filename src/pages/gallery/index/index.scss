@@ -4,6 +4,34 @@
     margin: 1rem 1rem 1rem 1rem;
     flex: 1;
 }
+
+.gallery-type-modal {
+    display: flex;
+    padding: .5rem 1.5rem 1rem;
+    .gallery-type {
+        text-align: center;
+        cursor: pointer;
+        border: 1px dashed #c2c9d9;
+        padding: 1rem;
+        border-radius: .5rem;
+        margin: 1rem;
+        color: #8493b8;
+        svg {
+            color: #c2c9d9;
+            font-size: 4rem;
+            margin: 1rem;
+            @extend .transition;
+        }
+        @extend .transition;
+        &:hover {
+            color: #3e4077;
+            svg {
+                color: #7f83b8;
+            }
+        }
+    }    
+}
+
 /*图片列表*/
 .component-img-list {
     font-size: 0;

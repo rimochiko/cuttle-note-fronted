@@ -50,12 +50,14 @@ export default class Store {
     
     // 登录
     @action logIn(user){
-      this.user = {
+      let res = {
         token: user.token,
         userId: user.userId,
+        nickname: user.nickname,
         avatar: user.avatar ? `http://localhost:8080/static/${user.avatar}` : ''
       }
-      window.localStorage.setItem('user', JSON.stringify(user));
+      this.user = res;
+      window.localStorage.setItem('user', JSON.stringify(res));
     }
     
     // 注销

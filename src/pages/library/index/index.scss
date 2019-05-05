@@ -25,11 +25,12 @@
         }        
     }
     .option {
-        a {
+        a,span {
             display: block;
             @extend .section;
             padding: .6rem;
             color: #7f83b8;
+            cursor: pointer;
         }
     }
 }

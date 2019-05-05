@@ -9,6 +9,8 @@ import {
 import Tree from '../../../components/tree';
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
+import Loading from '../../../components/loading';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
 
@@ -57,6 +59,7 @@ class Page extends Component {
       await this.getGroup();
       await this.fetchOwnerData(params);
       await this.fetchIdData(params);
+      this.refs.loading.toggle();
     }
 
     async getGroup () {
@@ -187,7 +190,7 @@ class Page extends Component {
           owner = {
             id: res.id,
             name: res.nickname,
-            avatar: res.avatar,
+            avatar: res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg'),
             type: params.obj
           }
         }
@@ -329,6 +332,7 @@ class Page extends Component {
            <div className="page">
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
+                    <Loading ref="loading"/>
                     <Modal title="文章信息" ref="info">
                       <ul>
                         <li>

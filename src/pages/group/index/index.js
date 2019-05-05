@@ -5,6 +5,7 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
 import Switch from '../../../components/switch'; 
+import Loading from '../../../components/loading';
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -144,6 +145,7 @@ class Page extends Component {
           tNameTip: '',
           searchText: '',
           searchList: [],
+          selectList: [],
           isAuth: 0 
         }
         this.getNewsList = this.getNewsList.bind(this);
@@ -209,7 +211,8 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          group.members = res || [];
+          console.log(res);
+          group.members = res.member || [];
         })
        
         this.setState({
@@ -222,14 +225,75 @@ class Page extends Component {
             members: group.members
           }
         })
+      }
+      this.refs.loading.toggle();
+    }
 
+    async fetchGroupData(id) {
+      let userStore = this.props.userStore;
+      let params = id;
+
+      if(userStore.groupList.length) {
+        let group;
+        if (!(id)) {
+          group =  {
+            name: userStore.groupList[0].nickname,
+            des: userStore.groupList[0].des,
+            id: userStore.groupList[0].id,
+            avatar: userStore.groupList[0].avatar || null
+          };
+        } else {
+          // 如果域名有团队
+          userStore.groupList.forEach((item) => {
+            if (item.id === id) {
+              group = item;
+            }
+          })
+          
+          // 如果group不存在，要请求group的信息
+          if (!group) {
+           await Qlquery.getGroupEasy({id})
+           .then(({data}) => {
+             let res = data.data.data;
+             if(res.id) {
+               group = {
+                 id: res.id,
+                 name: res.nickname,
+                 avatar: res.avatar ? `http://localhost:8080/static/group/${res.avatar}` : ''
+               }
+             }
+           })
+           .catch((err) => {
+             console.log(err);
+           })
+          }
+        }
+
+        // 获取团队成员
+        await Qlquery.getMembers({
+          groupId: group.id
+        })
+        .then(({data}) => {
+          let res = data.data.data;
+          group.members = res.member || [];
+        })
+       
+        this.setState({
+          group: {
+            name: group.name,
+            des: group.des,
+            id: group.id,
+            avatar: group.avatar || null,
+            members: group.members
+          }
+        })
       }
     }
     
     /**
      * 获取团队首页信息
      */
-    fetchGroupData () {
+    fetchMainData () {
       // 获取团队成员、团队数据、团队动态
     }
     
@@ -267,7 +331,6 @@ class Page extends Component {
 
    /**
     * 搜索用户
-    * @param {*} type 
     */
    async searchUser () {
      let user = this.props.userStore.user;
@@ -278,9 +341,13 @@ class Page extends Component {
      })
      .then(({data}) => {
        let res = data.data.data;
-       this.setState({
-         searchList: res
-       })
+       if(res.code === 1) {
+         console.log(res);
+        this.setState({
+          searchList: res.users
+        })         
+       }
+
      })
    }
 
@@ -329,8 +396,8 @@ class Page extends Component {
     if (this.state.isAuth === 0) {
       return (
         <ul className="ul-list-link">
-          <li><Link to={`/library/group/${this.state.group}`}><FontAwesomeIcon icon="book" />文库</Link></li>
-          <li><Link to={`/gallery/group/${this.state.group}`}><FontAwesomeIcon icon="image" />图库</Link></li>
+          <li><Link to={`/library/group/${this.state.group.id}`}><FontAwesomeIcon icon="book" />文库</Link></li>
+          <li><Link to={`/gallery/group/${this.state.group.id}`}><FontAwesomeIcon icon="image" />图库</Link></li>
           <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
           <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
         </ul>
@@ -338,8 +405,8 @@ class Page extends Component {
     } else {
       return (
         <ul className="ul-list-link">
-          <li><Link to={`/library/group/${this.state.group}`}><FontAwesomeIcon icon="book" />文库</Link></li>
-          <li><Link to={`/gallery/group/${this.state.group}`}><FontAwesomeIcon icon="image" />图库</Link></li>
+          <li><Link to={`/library/group/${this.state.group.id}`}><FontAwesomeIcon icon="book" />文库</Link></li>
+          <li><Link to={`/gallery/group/${this.state.group.id}`}><FontAwesomeIcon icon="image" />图库</Link></li>
           <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
         </ul> 
       )
@@ -365,7 +432,10 @@ class Page extends Component {
                   {
                     this.state.group.members&&this.state.group.members.map((item) => (
                       <li key={item.id}>
-                        <img src={item.avatar} alt={item.name}/></li>
+                        <img src={item.avatar ||  require('../../../assets/images/default.jpg')} 
+                             alt={item.name}
+                             title={item.name}/>
+                      </li>
                     ))
                   }
                   <li><span className="btn-add" onClick={this.toggleAddMem.bind(this)}>+</span></li>
@@ -456,7 +526,10 @@ class Page extends Component {
     // 绘制图表
     // myChart.setOption({});
   }
-
+  
+  /**
+   * 创建新团队
+   */
   toggleCreateGroup () {
     this.setState({
       tId: '',
@@ -489,15 +562,16 @@ class Page extends Component {
       )
      }
     `
-     axios({
-        url: '/graphql',
-        method: 'post',
-        headers:{
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
-     })
-     .then(({data})=> {
+    Qlquery.createGroup({
+      token: this.props.userStore.user.token,
+      userId: this.props.userStore.user.userId,
+      tId: this.state.tId,
+      tDes: this.state.tDes,
+      tName: this.state.tName,
+      tPublic: this.state.tPublic,
+      tAvatar: this.state.tAvatar
+    })
+    .then(({data})=> {
        let res = data.data.data;
        if (res === 1) {
          // 创建成功
@@ -509,17 +583,14 @@ class Page extends Component {
        }
      })
    }
-
+  
+   /**
+    * 检查团队名是否存在
+    */
    checkGroupId () {
-     const query = `
-     query {
-       data:
-       isGroupExist(
-         id: "${this.state.tId}"
-       )
-     }
-     `
-     axios.post('/graphql', {query})
+    Qlquery.checkGroupId({
+      id: this.state.tId
+    })
      .then(({data}) => {
        let res = data.data.data;
        if (res) {
@@ -536,11 +607,80 @@ class Page extends Component {
      })
    }
 
-    render () {
+   async componentWillUpdate(nextProps) {
+    let defaultId = this.state.groupList[0] && this.state.groupList[0].id,
+        prevMatch = this.props.match.params && this.props.match.params.id || defaultId,
+        nextMatch = nextProps.match.params && nextProps.match.params.id || defaultId
+
+    if (prevMatch === nextMatch) {
+      return;
+    }
+    this.refs.loading.toggle();
+    await this.fetchGroupData(nextMatch);
+    this.refs.loading.toggle();
+ }
+
+  /**
+    * 移除选择
+    * @param {*} id 
+    */
+  removeSelectItem(id) {
+    let list = this.state.selectList.slice(0), i, len;
+    for(i = 0, len = list.length; i < len; i++) {
+      if (list[i].id === id) {
+        break;
+      }
+    }
+    if (i < list.length) {
+      list.splice(i, 1);
+      this.setState({
+        selectList: list
+      })    
+    }
+  }
+  
+  /**
+   * 添加选中人
+   * @param {*} id 
+   * @param {*} nickname 
+   * @param {*} avatar 
+   */
+  addSelectItem(id, nickname, avatar) {
+    let list = this.state.selectList.slice(0);
+    list.push({
+      id: id,
+      nickname: nickname,
+      avatar: avatar || require('../../../assets/images/default.jpg')
+    });
+    this.setState({
+      selectList: list
+    });
+  }
+
+  /**
+   * 发送邀请
+   */
+  async sendInvite () {
+    Qlquery.sendInvite({
+      token: this.props.userStore.user.token,
+      userId: this.props.userStore.user.userId,
+      groupId: this.state.group.id,
+      users: this.state.selectList
+    })
+    .then(({data})=> {
+      let res = data.data.data;
+      if(res === 1) {
+        this.refs.addMem.toggle();
+      }
+    })
+  }
+
+  render () {
         return (
           <div className="page">
                 <Sidebar />
                 <div className="flex-row flex-1 overflow">
+                    <Loading ref="loading"/>
                     <Modal title="添加成员" ref="addMem">
                       <div className="add-mem">
                         <input type="text"
@@ -550,21 +690,47 @@ class Page extends Component {
                                  this.setState({
                                    searchText: e.target.value.trim()
                                  })
+                                 this.searchUser();
                                }}/>
                         <ul className="ul-add-mem">
                         {
-                          this.state.group.searchList&&this.state.group.searchList.map((item) => {
+                          this.state.searchList&&this.state.searchList.map((item) => {
                             return (
-                            <li key={item.id}>
-                              <img src={item.avatar} title={item.name}/>
-                              <p>{item.name}</p>
-                            </li>  
+                            <li key={item.id}
+                                onClick={
+                                  this.addSelectItem.bind(
+                                    this, 
+                                    item.id,
+                                    item.nickname,
+                                    item.avatar)}>
+                              <img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                                   alt={item.id}/>
+                              <p>{item.nickname}({item.id})</p>
+                            </li>
                             )
                           })
                         }
                         </ul>
+                        <p className="tip">已选择：</p>
+                        <ul className="select-list">
+                        {
+                          this.state.selectList&&this.state.selectList.map((item) => {
+                            return (
+                              <li key={item.id}>
+                                <p><img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                                        alt={item.id}/>{item.nickname}</p>
+                                <span onClick={this.removeSelectItem.bind(this, item.id)}>
+                                    <FontAwesomeIcon icon="times"/>
+                                </span>
+                              </li>                              
+                            )
+                          }) 
+                        }
+
+                        </ul>
                         <div className="btns">
-                          <button className="radius-btn input-btn">发送邀请</button>  
+                          <button className="radius-btn input-btn"
+                                  onClick={this.sendInvite.bind(this)}>发送邀请</button>  
                         </div>
                       </div>
                     </Modal>
@@ -579,50 +745,61 @@ class Page extends Component {
                               <th>权限</th>
                               <th></th>
                             </tr>
-                            <tr>
-                              <td className="member">
-                                <div className="flex-row flex-align">
-                                  <img src={require('../../../assets/images/avatar2.jpg')}
-                                      className="avatar"
-                                      alt=""/>
-                                  <div className="info">
-                                    <p className="text">测试</p>
-                                    <p className="des">test111</p>
-                                  </div>                              
-                                </div>
-                              </td>
-                              <td>
-                                <p>2019-03-11</p>
-                              </td>
-                              <td><p>管理员</p></td> 
-                              <td className="icon">
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <div className="flex-row flex-align">
-                                  <img src={require('../../../assets/images/avatar2.jpg')}
-                                      className="avatar"
-                                      alt=""/>
-                                  <div className="info">
-                                    <p className="text">测试</p>
-                                    <p className="des">test111</p>
-                                  </div>                              
-                                </div>
-                              </td>
-                              <td>
-                                <p>2019-03-11</p>
-                              </td>
-                              <td>
-                                <select className="mck-select">
-                                  <option>管理员</option>
-                                  <option>一般用户</option>
-                                </select>
-                              </td> 
-                              <td className="icon">
-                                <FontAwesomeIcon icon={["far", "trash-alt"]} />
-                              </td>
-                            </tr>
+                            {
+                              this.state.group.members && this.state.group.members.map((item) => {
+                                if (item.id === this.props.userStore.user.userId) {
+                                  return (
+                                  <tr key={item.id}>
+                                    <td className="member">
+                                      <div className="flex-row flex-align">
+                                        <img src={item.avatar || require('../../../assets/images/default.jpg')}
+                                            className="avatar"
+                                            alt={item.id}/>
+                                        <div className="info">
+                                          <p className="text">{item.nickname}</p>
+                                          <p className="des">{item.id}</p>
+                                        </div>                              
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <p>?</p>
+                                    </td>
+                                    <td><p>{item.role}</p></td> 
+                                    <td className="icon">
+                                    </td>
+                                  </tr>                                  
+                                  )
+                                } else {
+                                  return (
+                                    <tr key={item.id}> 
+                                      <td>
+                                      <div className="flex-row flex-align">
+                                        <img src={item.avatar || require('../../../assets/images/default.jpg')}
+                                            className="avatar"
+                                            alt={item.id}/>
+                                        <div className="info">
+                                          <p className="text">{item.nickname}</p>
+                                          <p className="des">{item.id}</p>
+                                        </div>                              
+                                      </div>
+                                      </td>
+                                      <td>
+                                        <p>2019-03-11</p>
+                                      </td>
+                                      <td>
+                                        <select className="mck-select">
+                                          <option>管理员</option>
+                                          <option>一般用户</option>
+                                        </select>
+                                      </td> 
+                                      <td className="icon">
+                                        <FontAwesomeIcon icon={["far", "trash-alt"]} />
+                                      </td>
+                                    </tr>
+                                  )
+                                }
+                              })
+                            }
                           </tbody>
                         </table>
                         <button className="input-btn radius-btn">确认修改</button>
