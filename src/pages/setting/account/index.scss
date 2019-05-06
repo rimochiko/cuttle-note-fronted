@@ -11,6 +11,12 @@
            justify-content: space-between;
            align-items: center;
        }
+       .radio-group {
+           margin: .8rem 0;
+           span {
+               margin-right: 1rem;
+           }
+       }
        .input-label {
            display: block;
            width: 100%;
@@ -47,7 +53,9 @@
            position: relative;
            width: 9rem;
            .file-input {
+               cursor: pointer;
                width: 100%;
+               height: 2rem;
                opacity: 0;
                position: absolute;
                cursor: pointer;
@@ -66,7 +74,12 @@
         width: 6rem;
         height: 6rem;
         margin-right: 2rem;
+        margin-bottom: 1rem;
     }
+}
+
+.margin-btn {
+    margin-right: 2rem;
 }
 
 .input-static-group {

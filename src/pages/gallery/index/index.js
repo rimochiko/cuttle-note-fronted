@@ -330,7 +330,8 @@ class Page extends Component {
                         <div className="switch">
                             <DropDown data={this.state.spaceList}>
                             <img src={this.state.object.avatar}
-                                 className="link-img"/>
+                                 className="link-img"
+                                 alt={this.state.object.name}/>
                                 {this.state.object.name}的空间
                                 <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                             </DropDown>                      
@@ -346,7 +347,9 @@ class Page extends Component {
                                   return (
                                   <li className="component-img-item">
                                     <Link to="/">
-                                      <img src={require("../../../assets/images/img.png")} className="component-img-cover"/>
+                                      <img src={require("../../../assets/images/img.png")} 
+                                           className="component-img-cover"
+                                           alt={item.title}/>
                                       <p className="component-img-text">
                                         {item.title}
                                       </p>

@@ -313,7 +313,8 @@ class Page extends Component {
       return (
         <div className="item-history" key={item.id}>
           <p className="info">{this.getHistoryIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
-          <p className="author"><img src={item.author.avatar}/><Link to="/">{item.author.name}</Link></p>
+          <p className="author">
+            <img src={item.author.avatar} alt=""/><Link to="/">{item.author.name}</Link></p>
           <p className="date">{item.date}</p>
           <p className="option">
             {this.getHistoryCollect(item.isCollected)}

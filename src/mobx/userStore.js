@@ -12,6 +12,8 @@ export default class Store {
         avatar: '',
         token: ''
       };
+      this.fans = [];
+      this.follows = [];
       this.groupList = [];
     }
 
@@ -69,6 +71,38 @@ export default class Store {
         token: ''
       };
       window.localStorage.setItem('user', null);
+    }
+    
+    // 获取用户粉丝和关注
+    @action async getRelations () {
+      if (this.user.token) {
+        const query = `
+        query {
+          fans:
+          userFans(userId: "${this.user.userId}") {
+            id,
+            nickname,
+            avatar
+          },
+          follow:
+          userFollow(userId: "${this.user.userId}") {
+            id,
+            nickname,
+            avatar
+          }
+        }
+        `;
+        await axios.post('/graphql', {query})
+        .then(({data}) => {
+          let fans = data.data.fans,
+              follows = data.data.follow;
+          this.fans = fans;
+          this.follows = follows;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
     }
 
 

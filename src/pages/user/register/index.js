@@ -242,7 +242,7 @@ class Page extends Component {
             <canvas id="pageBackground"></canvas>
             <div className="page-login-box">
               <div className="fixed-logo">
-                <a href="#"><img src={require('../../../assets/images/logo1.png')}/></a>
+                <a href="#"><img src={require('../../../assets/images/logo1.png')} alt="墨鱼笔记"/></a>
               </div>
               <div className="useropt">
                 <h1 className="title">注册</h1>

@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
 import axios from 'axios';
+import Qlquery from './graphql';
 
 @inject('userStore', 'postStore')
 @observer
@@ -47,17 +48,11 @@ class Section extends Component {
      * 喜欢文章
      */
     like () {
-        const query = `
-          mutation {
-            data:
-            postLike (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.like({
+            id: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId           
+        })
         .then(({data}) => {
             let res = data.data.data;
             console.log(res);
@@ -82,17 +77,11 @@ class Section extends Component {
      * 取消喜欢
      */
     cancelLike (){
-        const query = `
-          mutation {
-            data:
-            postUnlike (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.unlike({
+            id: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId 
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -395,7 +384,8 @@ class Section extends Component {
                         if (item.to) {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar || require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                                     alt={item.creatorName}/>
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link> 回复 <Link to="/">{item.receiverName}</Link>：
                                 {item.content}
@@ -407,7 +397,8 @@ class Section extends Component {
                         } else {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar || require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                                     alt={item.creatorName}/>
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link>：
                                 {item.content}

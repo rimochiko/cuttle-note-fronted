@@ -369,7 +369,7 @@ class Page extends Component {
     return (
     <div className="item-news" key={item.id}>
       <div className="avatar">                              
-        <img src={item.author.avatar}/>
+        <img src={item.author.avatar} alt={item.author.name}/>
       </div>
       <div className="detail">
         <div className="header">
@@ -423,7 +423,8 @@ class Page extends Component {
          <div className="group-box right flex-column">
             <div className="us-about">
               <div className="cover">
-                <img src={ this.state.group.avatar || require('../../../assets/images/default_g.jpg')}/>
+                <img src={ this.state.group.avatar || require('../../../assets/images/default_g.jpg')}
+                     alt={this.state.group.name}/>
               </div>
               <p className="title">{this.state.group.name}</p>
               <p className="des">{this.state.group.des || '暂无简介'}</p>
@@ -511,7 +512,9 @@ class Page extends Component {
       return (
         <div className="group-switch">
           <DropDown data={this.state.groupList}>
-              <img src={this.state.group.avatar || require('../../../assets/images/default_g.jpg')} className="link-img"/>
+              <img src={this.state.group.avatar || require('../../../assets/images/default_g.jpg')} 
+                   className="link-img"
+                   alt={this.state.group.name}/>
               {this.state.group.name}
               <FontAwesomeIcon icon="caret-down" className="link-svg"/>
           </DropDown>
@@ -878,7 +881,9 @@ class Page extends Component {
                           <div className="input-group">
                             <label className="input-label">小组头像</label>
                             <div className="two-side">
-                              <img src={this.state.tAvatar || require('../../../assets/images/default_g.jpg')} className="input-img"/>
+                              <img src={this.state.tAvatar || require('../../../assets/images/default_g.jpg')} 
+                                   className="input-img"
+                                   alt=""/>
                               <div className="input-file-box">
                                   <input className="file-input" 
                                          type="file"
@@ -975,7 +980,9 @@ class Page extends Component {
                             <div className="input-group">
                               <label className="input-label">小组头像</label>
                               <div className="two-side">
-                                <img src={require('../../../assets/images/default_g.jpg')} className="input-img"/>
+                                <img src={require('../../../assets/images/default_g.jpg')} 
+                                     className="input-img"
+                                     alt=""/>
                                 <div className="input-file-box">
                                   <input className="file-input" 
                                          type="file"

@@ -42,19 +42,24 @@ class Sidebar extends Component {
             nickname: '',
             userId: '',
             avatar: '',
-            des: ''
+            des: '',
+            follow: [],
+            fans: []
           }
         }
         this.toggleBar = this.toggleBar.bind(this);
     }
 
-    componentWillMount() {
+    async componentWillMount() {
+      await this.props.userStore.getRelations();
       let user = this.props.userStore.user;
       this.setState({
         user: {
           nickname: user.nickname,
           userId: user.userId,
-          avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg')
+          avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg'),
+          fans: user.fans,
+          follow: user.follows
         }
       })
     }
@@ -76,7 +81,9 @@ class Sidebar extends Component {
             <div className="public-sidebar">
               <div className="header">
                   <div className="logo" onClick={this.toggleBar}>
-                      <img src={this.state.user.avatar} className="header-avatar"/>
+                      <img src={this.state.user.avatar} 
+                           className="header-avatar"
+                           alt=""/>
                   </div>
                   <ul className="ul-nav">
                   {
@@ -120,18 +127,18 @@ class Sidebar extends Component {
                     <span><FontAwesomeIcon icon="times" onClick={this.toggleBar.bind(this)}/></span>
                   </div>
                   <div className="profile">
-                    <img src={this.state.user.avatar} className="avatar"/>
+                    <img src={this.state.user.avatar} className="avatar" alt={this.state.user.id}/>
                     <p className="name">{this.state.user.nickname}</p>
                     <p className="des">{this.state.user.des || '暂无个人简介'}</p>
                     <div className="list">
                       <span>我的关注</span>
                       <ul>
                         {
-                          profile.follow.map((item) => (
+                          this.state.user.follow.map((item) => (
                             <li key={item.id}>
                               <Link to='/'>
                                 <img src={item.avatar}
-                                    title={item.id}/>
+                                    alt={item.id}/>
                               </Link>
                             </li>
                           ))
@@ -144,11 +151,11 @@ class Sidebar extends Component {
                       <span>我的粉丝</span>
                       <ul>
                       {
-                          profile.fans.map((item) => (
+                          this.state.user.fans.map((item) => (
                             <li key={item.id}>
                               <Link to='/'>
                                 <img src={item.avatar}
-                                    title={item.id}/>
+                                    alt={item.id}/>
                               </Link>
                             </li>
                           ))

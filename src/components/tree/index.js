@@ -127,7 +127,7 @@ class Tree extends Component {
     generateLink (item, hasImg) {
         if (hasImg) {
             return (
-                <NavLink to={item.link}><img src={item.img} className="link-img"/>{item.name}</NavLink>
+                <NavLink to={item.link}><img src={item.img} className="link-img" alt=""/>{item.name}</NavLink>
             )
         } else {
             return (
