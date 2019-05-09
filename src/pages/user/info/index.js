@@ -11,6 +11,7 @@ import {Link, Switch,Route} from 'react-router-dom';
 import Qlquery from './graphql';
 
 import { inject, observer } from 'mobx-react';
+import Tooltip from '../../../components/tooltip';
 
 @inject('userStore', 'postStore')
 @observer
@@ -38,6 +39,7 @@ class Page extends Component {
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
       }
+      document.title = "我的消息 - 墨鱼笔记"
 
       // 获取数据
       let from = this.props.match.params && this.props.match.params.from;
@@ -181,9 +183,34 @@ class Page extends Component {
         }
       })
     }
+   
+    /**
+     * 接受团队邀请
+     */
+    acceptGroupInvite (infoId) {
+      let userStore = this.props.userStore;
 
-    acceptGroupInvite () {
-
+      Qlquery.acceptInvite({
+        userId: userStore.user.userId,
+        token: userStore.user.token,
+        infoId: infoId
+      })
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res === 1) {
+          this.setState({
+            tipText: '成功接受邀请'
+          })
+        } else {
+          this.setState({
+            tipText: '接受邀请失败:('
+          })
+        }
+        this.refs.tooltip.show();
+      })
+      .catch((err) => {
+        console.log(err)
+      })
     }
 
     /**
@@ -194,7 +221,7 @@ class Page extends Component {
       if (type === 22) {
         return (
           <div className="btn-group">
-            <button onClick={this.acceptGroupInvite.bind(this)}>接受邀请</button>
+            <button onClick={this.acceptGroupInvite.bind(this, id)}>接受邀请</button>
           </div> 
         );
       };
@@ -205,6 +232,7 @@ class Page extends Component {
         return (
           <div className="page overflow">
                 <Loading ref="loading"/>
+                <Tooltip ref="tooltip" text={this.state.tipText}/>
                 <Sidebar />
                 <div className="flex-column flex-1">
                     <Modal title="添加对话" ref="addBubble">
@@ -223,7 +251,7 @@ class Page extends Component {
                           this.state.members&&this.state.members.map((item) => {
                             return (
                             <li key={item.id}>
-                              <img src={item.avatar || require('../../../assets/images/default.jpg')} title={item.nickname}/>
+                              <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')} title={item.nickname}/>
                               <p>{item.nickname}({item.id})</p>
                             </li>  
                             )
@@ -257,7 +285,7 @@ class Page extends Component {
                                     <div className="info-avatar">
                                       {item.status === 1 ? <span className="buble"></span> : '' }
                                       <img 
-                                        src={item.from.avatar || require('../../../assets/images/default.jpg')}
+                                        src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
                                         alt={item.from.nickname}/>
                                     </div>
                                     <div className="info-detail">
@@ -287,7 +315,7 @@ class Page extends Component {
                                 return (
                                   <div className="chat-one-item" key={item.id}>
                                     <div className="item-avatar">
-                                    <img src={item.from.avatar || require('../../../assets/images/default.jpg')}
+                                    <img src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
                                          alt={item.from.nickname}/>
                                     </div>
                                     <div className="item-main">
@@ -303,7 +331,7 @@ class Page extends Component {
                                 return (
                                   <div className="chat-one-item mine" key={item.id}>
                                     <div className="item-avatar">
-                                    <img src={item.from.avatar || require('../../../assets/images/default.jpg')}
+                                    <img src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
                                          alt={item.from.nickname}/>
                                     </div>
                                     <div className="item-main">

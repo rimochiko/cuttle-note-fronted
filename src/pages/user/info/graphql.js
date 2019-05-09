@@ -4,7 +4,8 @@ export default {
     getInfoList,
     getUserInfo,
     searchUsers,
-    sendMessage
+    sendMessage,
+    acceptInvite
 }
 
 function getInfoList(args) {
@@ -105,5 +106,20 @@ function sendMessage (args) {
       }
     }
   }`;
+  return axios.post('/graphql', {query});
+}
+
+
+function acceptInvite (args) {
+  const query = `
+  mutation {
+    data:
+    groupJoin(
+      userId: "${args.userId}",
+      token: "${args.token}",
+      infoId: ${args.infoId}
+    )
+  }
+  `
   return axios.post('/graphql', {query});
 }

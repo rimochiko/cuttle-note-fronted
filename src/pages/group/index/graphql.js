@@ -117,16 +117,16 @@ function checkGroupId (args) {
 function sendInvite (args) {
   let ids = [];
   args.users.forEach(item => {
-    ids.push(item.id);
+    ids.push(`"${item.id}"`);
   });
 
   const query = `
-  query {
+  mutation {
     data:
     groupInviteUser (
       token: "${args.token}",
       userId: "${args.userId}",
-      objects: ${ids},
+      objects: [${ids}],
       groupId: "${args.groupId}"
     )
   }

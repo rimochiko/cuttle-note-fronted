@@ -36,25 +36,26 @@ export default class Store {
           let res = data.data.data;
           if (res === 1) {
             // 验证成功
-            let res = {
+            let obj = {
               token: user.token,
               userId: user.userId,
               nickname: user.nickname,
               avatar: user.avatar ? user.avatar: ''
             }
-            this.user = Object.assign(res, {
-              fans: this.user.fans,
-              follow: this.user.follow
-            });
+            this.logIn(obj);
             result = true;
           } else {
-            this.logOut(user);
+            this.logOut();
             result = false;
           }
         })
         .catch((err) => {
           console.log(err);
         })        
+      }
+      
+      if (result) {
+        await this.getRelations()
       }
       return result;
     }
@@ -76,6 +77,8 @@ export default class Store {
     
     // 登录
     @action logIn(user){
+      console.log("user");
+      console.log(user);
       let res = {
         token: user.token,
         userId: user.userId,

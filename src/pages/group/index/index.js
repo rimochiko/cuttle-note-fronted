@@ -6,6 +6,7 @@ import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
 import Switch from '../../../components/switch'; 
 import Loading from '../../../components/loading';
+import Tooltip from '../../../components/tooltip';
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -146,7 +147,8 @@ class Page extends Component {
           searchText: '',
           searchList: [],
           selectList: [],
-          isAuth: 0 
+          isAuth: 0,
+          tipText: '' 
         }
         this.getNewsList = this.getNewsList.bind(this);
     }
@@ -671,7 +673,17 @@ class Page extends Component {
     .then(({data})=> {
       let res = data.data.data;
       if(res === 1) {
+        this.setState({
+          tipText: '邀请信息已发送'
+        });
         this.refs.addMem.toggle();
+        this.refs.tooltip.show();
+      } else {
+        this.setState({
+          tipText: '邀请发送失败'
+        });
+        this.refs.addMem.toggle();
+        this.refs.tooltip.show();
       }
     })
   }
@@ -682,6 +694,7 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row flex-1 overflow">
                     <Loading ref="loading"/>
+                    <Tooltip text={this.state.tipText} ref="tooltip"/>
                     <Modal title="添加成员" ref="addMem">
                       <div className="add-mem">
                         <input type="text"
@@ -775,7 +788,7 @@ class Page extends Component {
                                     <tr key={item.id}> 
                                       <td>
                                       <div className="flex-row flex-align">
-                                        <img src={item.avatar || require('../../../assets/images/default.jpg')}
+                                        <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')}
                                             className="avatar"
                                             alt={item.id}/>
                                         <div className="info">

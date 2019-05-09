@@ -169,6 +169,7 @@ function getOnePost (args) {
 function addFollow (args) {
   const query = `
   mutation {
+    data:
     followUser(
       userId: "${args.userId}",
       token: "${args.token}",
@@ -176,12 +177,13 @@ function addFollow (args) {
     )
   }
   `;
-  return axios.post('graphql', {query});
+  return axios.post('/graphql', {query});
 }
 
 function cancelFollow (args) {
   const query = `
   mutation {
+    data:
     unfollowUser(
       userId: "${args.userId}",
       token: "${args.token}",
@@ -189,5 +191,5 @@ function cancelFollow (args) {
     )
   }
   `;
-  return axios.post('graphql', {query});
+  return axios.post('/graphql', {query});
 }

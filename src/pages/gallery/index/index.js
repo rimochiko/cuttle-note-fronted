@@ -340,6 +340,9 @@ class Page extends Component {
                               this.state.posts.map((item) => {
                                   return (
                                   <li className="component-img-item" key={item.id}>
+                                    <div className="tip-type">
+                                      草稿
+                                    </div>
                                     <Link to={`/gallery/${this.state.object.type === USER ? USER : GROUP}/${this.state.object.id}/${item.id}`}>
                                       <img src={require("../../../assets/images/img.png")} 
                                            className="component-img-cover"

@@ -27,18 +27,19 @@ class Sidebar extends Component {
         this.getFollow = this.getFollow.bind(this);
     }
 
-
     async componentWillReceiveProps () {
       if (this.props.userStore.user.userId) {
         await this.props.userStore.getRelations()
-        let user = this.props.userStore.user;
+        let userStore = this.props.userStore;
+        let user = userStore.user;
+
         this.setState({
           user: {
             nickname: user.nickname,
             userId: user.userId,
             avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg'),
-            fans: user.fans,
-            follow: user.follows
+            fans: userStore.fans,
+            follow: userStore.follows
           }
         })
       }
@@ -64,7 +65,7 @@ class Sidebar extends Component {
               this.state.user.follow.map((item) => (
                 <li key={item.id}>
                   <Link to='/'>
-                    <img src={item.avatar}
+                    <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../assets/images/default.jpg')}
                         alt={item.id}/>
                   </Link>
                 </li>
@@ -93,7 +94,7 @@ class Sidebar extends Component {
               this.state.user.fans.map((item) => (
                 <li key={item.id}>
                   <Link to='/'>
-                    <img src={item.avatar}
+                  <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` :require('../../assets/images/default.jpg')}
                         alt={item.id}/>
                   </Link>
                 </li>

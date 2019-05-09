@@ -41,6 +41,19 @@
         display: inline-block;
         width: 50%;
         box-sizing: border-box;
+        position: relative;
+        .tip-type {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 100;
+            font-size: .75rem;
+            background-color: #aa95e5;
+            color: #fff;
+            padding: .2rem;
+            border-radius: .2rem;
+            box-shadow: 0 10px 15px #eeeef8;
+        }
         .component-img-cover {
             max-width: 100%;
             margin-bottom: 1rem;

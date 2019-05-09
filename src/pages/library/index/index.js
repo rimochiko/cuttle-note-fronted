@@ -43,7 +43,8 @@ class Page extends Component {
             content: '',
             createDate: '',
             comments: []
-          }
+          },
+          isOpted: false
         }
         this.getOwnerInfo = this.getOwnerInfo.bind(this);
         this.getPostList = this.getPostList.bind(this);
@@ -187,11 +188,17 @@ class Page extends Component {
       await axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
+        let avatar;
+        if (params.obj === USER) {
+          avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
+        } else if (params.obj === GROUP) {
+          avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
+        }
         if(res.id) {
           owner = {
             id: res.id,
             name: res.nickname,
-            avatar: res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg'),
+            avatar: avatar,
             type: params.obj
           }
         }
@@ -327,6 +334,45 @@ class Page extends Component {
       return "确定要移入回收站？（15天内可恢复）";
     }
 
+    // 关注用户
+    async followUser () {
+      if (this.state.object && this.state.object.type === USER && this.state.object.id) {
+        await qlQuery.addFollow({
+          userId:this.props.userStore.user.userId,
+          followId: this.state.object.id,
+          token:this.props.userStore.user.token
+        })
+        .then(({data}) => {
+          if (data === 1) {
+            this.setState({
+              isOpted: true
+            })
+          }
+        })
+      }
+    }
+
+    // 取消用户
+    async unfollowUser () {
+      if (this.state.object && this.state.object.type === USER && this.state.object.id) {
+        await qlQuery.cancelFollow({
+          userId:this.props.userStore.user.userId,
+          followId: this.state.object.id,
+          token:this.props.userStore.user.token
+        })
+        .then(({data}) => {
+          if (data === 1) {
+            this.setState({
+              isOpted: false
+            })
+          }
+        })
+      }
+    }
+
+    /**
+     * 生成关注按钮
+     */
     generateOption () {
       // 判断是否有写入权
       console.log(this.state.isAuth);
@@ -337,11 +383,20 @@ class Page extends Component {
           </Link>
         )
       } else if(this.state.object.type === USER){
-        return (
-          <div>
-            <FontAwesomeIcon icon="plus"/>关注TA
-          </div>
-        )
+        if (this.state.isOpted) {
+          return (
+            <div onClick={this.unfollowUser.bind(this)}>
+              <FontAwesomeIcon icon="minus"/>取消关注
+            </div>
+          ) 
+        } else {
+          return (
+            <div onClick={this.followUser.bind(this)}>
+              <FontAwesomeIcon icon="plus"/>关注TA
+            </div>
+          )
+        }
+
       } else if(this.state.object.type === GROUP) {
         return (
           <div>

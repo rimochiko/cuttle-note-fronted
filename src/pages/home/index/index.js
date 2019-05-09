@@ -14,113 +14,9 @@ import 'echarts/lib/component/legend';
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 
-
-let historyList = [
-  {
-    id: 1,
-    title: '嗨，你真的懂this吗？',
-    link: '/',
-    author: {
-      name: '前端小姐姐',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'ssdfe'
-    },
-    date: '15分钟前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 2,
-    title: '一个Vue引发的性能问题',
-    link: '/',
-    author: {
-      name: 'heyKid',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'grgrh'
-    },
-    date: '34分钟前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 3,
-    title: '是否要做Code Review？与BAT资深架构...',
-    link: '/',
-    author: {
-      name: '小郑哥',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'rgrg'
-    },
-    date: '1天前',
-    isCollected: true,
-    type: 2
-  },
-  {
-    id: 4,
-    title: '《深入react技术栈》之样式处理',
-    link: '/',
-    author: {
-      name: '歌非',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'trrtr'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 5,
-    title: '9102了，你还不会移动端真机调试？',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 6,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 7,
-    title: '最让程序员自豪的事情是什么？',
-    link: '/',
-    author: {
-      name: '此人已失踪',
-      avatar: 'https://tvax1.sinaimg.cn/crop.0.0.996.996.50/006I03Dqly8fzprit6axsj30ro0ro0ua.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 8,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  }
-]
+import Qlquery from './graphql';
+import { Group } from 'echarts/lib/util/graphic';
+import Loading from '../../../components/loading';
 
 let newsList = [
   {
@@ -189,11 +85,19 @@ let newsList = [
   }
 ]
 
+const GROUP = "group",
+      USER = "user",
+      ARTICLE = "library",
+      CHART = "gallery";
+
 @inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
         super();
+        this.state = {
+          recentViews: []
+        }
         this.getHistoryList = this.getHistoryList.bind(this);
         this.getNewsList = this.getNewsList.bind(this);
     }
@@ -204,11 +108,42 @@ class Page extends Component {
         this.props.history.push('/login');
       }
       document.title="我的首页 - 墨鱼笔记";
+
+      await this.fetchData();
+      this.refs.loading.toggle();
+    }
+
+    async fetchData () {
+      // 获取最近浏览文章
+      let userStore = this.props.userStore;
+      Qlquery.getRecentViews({
+        token: userStore.user.token,
+        userId: userStore.user.userId
+      })
+      .then(({data}) => {
+        let recent = data.data.recent;
+        if(recent.code === 1){
+          this.generatePostLink(recent.posts);
+          this.setState({
+            recentViews: recent.posts
+          })          
+        }
+
+      })
+    }
+
+    generatePostLink (list) {
+      list && list.forEach((item) => {
+        let owner = item.group && item.group.id ? GROUP : USER,
+            type = item.type === 0 ? ARTICLE : CHART
+        item.link = `/${type}/${owner}/${item.id}`;
+      })
+
     }
 
     componentDidMount () {
       // console.log(this.props.userStore);
-
+       
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
        // 绘制图表
@@ -284,28 +219,15 @@ class Page extends Component {
      * */
     getHistoryIcon (type) {
       switch (type) {
-        case 1: return (
+        case 0: return (
           <FontAwesomeIcon icon="file-alt" />
         );break;
-        case 2: return (
+        case 1: return (
           <FontAwesomeIcon icon="file-image" />
         );
       }
     }
-    /**
-     *  获取收藏按钮
-     *  */
-    getHistoryCollect(isCollected) {
-      if (isCollected) {
-        return (
-          <span className="collect active"><FontAwesomeIcon icon="star"/></span>
-        );
-      } else {
-        return (
-          <span className="collect"><FontAwesomeIcon icon={["far","star"]}/></span>
-        );
-      }
-    }
+
     /** 
      * 获取历史阅读记录
      * */
@@ -314,10 +236,10 @@ class Page extends Component {
         <div className="item-history" key={item.id}>
           <p className="info">{this.getHistoryIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
           <p className="author">
-            <img src={item.author.avatar} alt=""/><Link to="/">{item.author.name}</Link></p>
+            <img src={`http://localhost:8080/static/user/${item.author.avatar}` || require('../../../assets/images/default.jpg')} alt=""/><Link to="/">{item.author.nickname}</Link></p>
           <p className="date">{item.date}</p>
           <p className="option">
-            {this.getHistoryCollect(item.isCollected)}
+              {item.group && item.group.id ? `${item.group.nickname}的空间` : `${item.author.nickname}的空间`}
           </p>
         </div>
       )
@@ -365,6 +287,7 @@ class Page extends Component {
             <div className="page">
                 <Sidebar />
                 <div className="main flex-column">
+                    <Loading ref="loading" />
                     <Header />
                     <div className="public-body flex-column">    
                       <div className="welcome flex-row">
@@ -410,7 +333,7 @@ class Page extends Component {
                             <div className="item-header">
                             </div>
                             {
-                              historyList.map((item, index) => {
+                              this.state.recentViews && this.state.recentViews.map((item, index) => {
                                 return this.getHistoryList(item);
                               })
                             }
