@@ -211,7 +211,6 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          console.log(res);
           group.members = res.member || [];
         })
        
@@ -342,7 +341,6 @@ class Page extends Component {
      .then(({data}) => {
        let res = data.data.data;
        if(res.code === 1) {
-         console.log(res);
         this.setState({
           searchList: res.users
         })         
@@ -433,7 +431,7 @@ class Page extends Component {
                   {
                     this.state.group.members&&this.state.group.members.map((item) => (
                       <li key={item.id}>
-                        <img src={item.avatar ||  require('../../../assets/images/default.jpg')} 
+                        <img src={`http://localhost:8080/static/user/${item.avatar}` ||  require('../../../assets/images/default.jpg')} 
                              alt={item.name}
                              title={item.name}/>
                       </li>
@@ -706,7 +704,7 @@ class Page extends Component {
                                     item.id,
                                     item.nickname,
                                     item.avatar)}>
-                              <img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                              <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} 
                                    alt={item.id}/>
                               <p>{item.nickname}({item.id})</p>
                             </li>
@@ -720,7 +718,7 @@ class Page extends Component {
                           this.state.selectList&&this.state.selectList.map((item) => {
                             return (
                               <li key={item.id}>
-                                <p><img src={item.avatar || require('../../../assets/images/default.jpg')} 
+                                <p><img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} 
                                         alt={item.id}/>{item.nickname}</p>
                                 <span onClick={this.removeSelectItem.bind(this, item.id)}>
                                     <FontAwesomeIcon icon="times"/>
@@ -755,7 +753,7 @@ class Page extends Component {
                                   <tr key={item.id}>
                                     <td className="member">
                                       <div className="flex-row flex-align">
-                                        <img src={item.avatar || require('../../../assets/images/default.jpg')}
+                                        <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')}
                                             className="avatar"
                                             alt={item.id}/>
                                         <div className="info">

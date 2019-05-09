@@ -7,6 +7,11 @@
     color: #FFF;
     background-color: rgba(0, 0, 0, .8);
     opacity: 0;
+    user-select: none;
+    border-radius: .3rem;
+    font-size: .9rem;
+    font-weight: 300;
+    box-shadow: 0 10px 15px #eee;
     transition: all .2s;
     z-index: -1;
     &.show {

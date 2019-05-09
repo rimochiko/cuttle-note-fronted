@@ -53,7 +53,7 @@ class App extends Component {
           <Route path="/library/:obj?/:owner?/:id?" component={LibraryPage} />
           <Route path="/article/edit" component={LibEditPage} />
           <Route path="/gallery/:obj?/:owner?/:id?" component={GalleryPage} />
-          <Route path="/photo/edit" component={GalleryEditPage} />
+          <Route path="/photo/edit/:type?" component={GalleryEditPage} />
           <Route path="/group/:id?" component={GroupPage} />
           <Route path="/setting" component={SettingPage} />  
           <Route path="/info/:from?" component={InfoPage} />

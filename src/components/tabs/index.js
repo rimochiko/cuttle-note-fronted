@@ -11,12 +11,10 @@ class Tabs extends Component {
             activeKey: null,
             tabHead: null
         }
-        console.log('init');
 
     }
 
     toggleActive (key) {
-        console.log(key);
 
     }
 

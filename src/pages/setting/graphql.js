@@ -13,8 +13,13 @@ function updateProfile (args) {
             token: "${args.token}",
             nickname: "${args.nickname}",
             des: "${args.des}",
-            avatar: "${args.avatar}"
-        )
+            avatar: "${args.avatar}",
+            location: "${args.location}",
+            sex: ${args.sex}
+        ) {
+          code
+          avatar
+        }
     }
   `;
   return axios({
@@ -30,6 +35,7 @@ function updateProfile (args) {
 function getProfile (args) {
     const query = `
       query {
+        data:
         userEasy(id: "${args.userId}") {
             avatar
             nickname

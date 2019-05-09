@@ -8,30 +8,38 @@ class App extends Component {
   constructor(){
     super();
     this.state = {     
-        roots: [{
+        data: {
+          roots: [{
             label: '中心主题',
-            children: [
-                {
-                    label: '分支主题 1',
-                }, 
-                {
-                    label: '分支主题 2',
-                }, 
-                {
-                    label: '分支主题 3',
-                }
-            ]
-        }]
+            children: []
+          }]
+        }
     }
   }
-  componentDidMount(){
-    console.log(this);
+
+  componentWillMount() {
+    this.setState({
+      data: this.props.chart
+    })
   }
+
+  componentDidMount(){
+    let graph = this.refs.mind.graph;
+    let that = this;
+    graph.on('beforechange', (e) => {
+      that.props.update(graph.save());
+      let baseImg = document.getElementById('canvas_1').toDataURL("image/png");
+      that.props.getBase64(baseImg);
+    })
+  }
+
+
   render() {
-    return (        
+    return (
       <GGEditor className="chart-edit-canvas">
         <MindToolbar />
         <Mind  className="edit-canvas"
+               ref="mind"
                style={{ width: 1360, height: 500 }} 
                data={this.state.data} />
       </GGEditor>

@@ -127,7 +127,6 @@ class Page extends Component {
      * 获取文章
      */
     async fetchIdData (params) {
-      console.log(params);
       if(params.id) {
         const query = qlQuery.getOnePost({
           userId: this.props.userStore.user.userId,
@@ -157,9 +156,6 @@ class Page extends Component {
      */
     async getOwnerInfo (params) {
       let owner = {};
-      console.log("params：")
-      console.log(params);
-
       await qlQuery.getOwnerInfo(params)
       .then(({data}) => {
         let res = data.data.data;
@@ -265,7 +261,6 @@ class Page extends Component {
     async componentWillUpdate(nextProps) {
       let prevMatch = this.props.match.params;
       let nextMatch = nextProps.match.params;
-      console.log(prevMatch);
       if (prevMatch === nextMatch) {
         return;
       }
@@ -274,7 +269,6 @@ class Page extends Component {
         obj: nextMatch.obj || USER,
         id: nextMatch.id
       }
-      console.log(params);
       if (params.obj !== prevMatch.obj) {
         await this.fetchOwnerData(params);
         await this.fetchIdData(params);
@@ -345,8 +339,8 @@ class Page extends Component {
                           {
                               this.state.posts.map((item) => {
                                   return (
-                                  <li className="component-img-item">
-                                    <Link to="/">
+                                  <li className="component-img-item" key={item.id}>
+                                    <Link to={`/gallery/${this.state.object.type === USER ? USER : GROUP}/${this.state.object.id}/${item.id}`}>
                                       <img src={require("../../../assets/images/img.png")} 
                                            className="component-img-cover"
                                            alt={item.title}/>

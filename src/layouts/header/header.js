@@ -7,14 +7,19 @@ import './header.scss';
 
 let dropMenudata = [{
     id: 1,
-    text: '新文档',
+    text: '创建新文字',
     link: '/article/edit',
-    icon: 'file-alt'
+    icon: 'pen'
 }, {
     id: 2,
-    text: '新画图',
-    link: '/photo/edit',
-    icon: 'file-image'
+    text: '创建思维图',
+    link: '/photo/edit/mind',
+    icon: 'brain'
+}, {
+    id: 3,
+    text: '创建流程图',
+    link: '/photo/edit/flow',
+    icon: 'project-diagram'
 }]
 
 class Header extends Component {

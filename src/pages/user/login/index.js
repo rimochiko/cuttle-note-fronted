@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
+import Tooltip from '../../../components/tooltip';
 
 @inject('userStore')
 @observer
@@ -17,7 +18,8 @@ class Page extends Component {
           passwordTip: '密码',
           isNameTipHide: false,
           isPassTipHide: false,
-          isDisabled: true
+          isDisabled: true,
+          tipText: ''
         }
         this.changeStatus = this.changeStatus.bind(this);
     }
@@ -125,7 +127,6 @@ class Page extends Component {
     .then(({data}) => {
       // 登录成功
       let res = data.data.data;
-      console.log(res);
       if (res.code === 1) {
         let user = {
           token: res.token,
@@ -151,6 +152,7 @@ class Page extends Component {
     render () {
         return (
           <div className="page-login">
+            <Tooltip text={this.state.tipText} />
             <canvas id="pageBackground"></canvas>
             <div className="page-login-box">
               <div className="fixed-logo">

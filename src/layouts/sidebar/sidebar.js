@@ -6,31 +6,6 @@ import './sidebar.scss';
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 
-let profile = {
-  fansCount: 32,
-  fans: [{
-    id: 'test1',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }, {
-    id: 'test2',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }, {
-    id: 'test3',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }],
-  followCount: 21,
-  follow: [{
-    id: 'test1',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }, {
-    id: 'test2',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }, {
-    id: 'test3',
-    avatar: require('../../assets/images/avatar1.jpg') 
-  }]
-}
-
 @inject('userStore')
 @observer
 class Sidebar extends Component {
@@ -41,27 +16,32 @@ class Sidebar extends Component {
           user: {
             nickname: '',
             userId: '',
-            avatar: '',
+            avatar: require('../../assets/images/default.jpg'),
             des: '',
             follow: [],
             fans: []
           }
         }
         this.toggleBar = this.toggleBar.bind(this);
+        this.getFans = this.getFans.bind(this);
+        this.getFollow = this.getFollow.bind(this);
     }
 
-    async componentWillMount() {
-      await this.props.userStore.getRelations();
-      let user = this.props.userStore.user;
-      this.setState({
-        user: {
-          nickname: user.nickname,
-          userId: user.userId,
-          avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg'),
-          fans: user.fans,
-          follow: user.follows
-        }
-      })
+
+    async componentWillReceiveProps () {
+      if (this.props.userStore.user.userId) {
+        await this.props.userStore.getRelations()
+        let user = this.props.userStore.user;
+        this.setState({
+          user: {
+            nickname: user.nickname,
+            userId: user.userId,
+            avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg'),
+            fans: user.fans,
+            follow: user.follows
+          }
+        })
+      }
     }
 
     toggleBar () {
@@ -74,6 +54,64 @@ class Sidebar extends Component {
     logOut () {
       this.props.userStore.logOut();
       this.props.history.push('/login');
+    }
+
+    getFollow () {
+      if (this.state.user.follow && this.state.user.follow.length) {
+        return (
+          <ul>
+            {
+              this.state.user.follow.map((item) => (
+                <li key={item.id}>
+                  <Link to='/'>
+                    <img src={item.avatar}
+                        alt={item.id}/>
+                  </Link>
+                </li>
+              ))
+            }
+            {
+              this.state.user.follow.length > 5 ?
+              <li>+{this.state.user.follow.length}</li> : ''
+            }
+          </ul>
+        )
+      } else {
+        return (
+          <div className="side-list-none">
+            无
+          </div>
+        )
+      }
+    }
+
+    getFans () {
+      if (this.state.user.fans && this.state.user.fans.length) {
+        return (
+          <ul>
+          {
+              this.state.user.fans.map((item) => (
+                <li key={item.id}>
+                  <Link to='/'>
+                    <img src={item.avatar}
+                        alt={item.id}/>
+                  </Link>
+                </li>
+              ))
+            }
+            {
+              this.state.user.fans.length > 5 ?
+              <li>+{this.state.user.fans.length}</li> : ''
+            }
+          </ul>
+        )
+      } else {
+        return (
+          <div className="side-list-none">
+          无
+          </div>
+        )
+      }
     }
 
     render () {
@@ -132,36 +170,16 @@ class Sidebar extends Component {
                     <p className="des">{this.state.user.des || '暂无个人简介'}</p>
                     <div className="list">
                       <span>我的关注</span>
-                      <ul>
-                        {
-                          this.state.user.follow.map((item) => (
-                            <li key={item.id}>
-                              <Link to='/'>
-                                <img src={item.avatar}
-                                    alt={item.id}/>
-                              </Link>
-                            </li>
-                          ))
-                        }
-                        <li>+{profile.followCount}</li>
-                      </ul>
+                      {
+                        this.getFollow()
+                      }
                     </div>
 
                     <div className="list">
                       <span>我的粉丝</span>
-                      <ul>
                       {
-                          this.state.user.fans.map((item) => (
-                            <li key={item.id}>
-                              <Link to='/'>
-                                <img src={item.avatar}
-                                    alt={item.id}/>
-                              </Link>
-                            </li>
-                          ))
-                        }
-                        <li>+{profile.fansCount}</li>
-                      </ul>
+                        this.getFans()
+                      }
                     </div>
                     
                   </div>

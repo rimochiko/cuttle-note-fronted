@@ -84,7 +84,9 @@
             color: #7f83b8;
             @extend .section;
             @extend .transition;
-
+            svg {
+                color: #c9c9f8;
+            }
         }
     }
 }

@@ -106,13 +106,11 @@ class Page extends Component {
         })
       } else {
         document.title = "创建新文章 - 墨鱼笔记";
-        console.log(this.props);
         let space =  {
           id: this.props.userStore.user.userId,
           name: this.props.userStore.user.nickname,
           type: "user"            
         }
-        console.log(space);
         this.setState({
           space: space,
           parentId: this.props.location.query && this.props.location.query.parentId || null
@@ -228,16 +226,23 @@ class Page extends Component {
      * 保存草稿
      */
     async saveDraft () {
-      if (!this.state.postId) {
-        const query = Qlquery.createPost({
-          token: this.props.userStore.user.token,
-            userId: this.props.userStore.user.userId,
-            title: this.state.title,
-            content: this.state.content,
-            isAuth: this.state.isAuth,
-            publish: 0,
-            parentId: this.state.parentId
-        });
+      let state = this.state;
+      let params = {
+        token: this.props.userStore.user.token,
+          userId: this.props.userStore.user.userId,
+          title: this.state.title,
+          content: this.state.content,
+          isAuth: this.state.isAuth,
+          publish: 0,
+          parentId: this.state.parentId
+      };
+      // 团队
+      if (state.space.type === GROUP) {
+        params.groupId = state.space.id;
+      }
+
+      if (!state.postId) {
+        const query = Qlquery.createPost(params);
 
         axios.post('/graphql', {query})
         .then(({data}) => {
@@ -254,16 +259,8 @@ class Page extends Component {
         })
       } else {
         // 修改post状态
-        const query = Qlquery.updatePost({
-            postId: this.state.postId,
-            token: this.props.userStore.user.token,
-            userId: this.props.userStore.user.userId,
-            title: this.state.title,
-            content: this.state.content,
-            isAuth: this.state.isAuth,
-            publish: 0,
-            parentId: this.state.parentId
-        });
+        params.postId = state.postId;
+        const query = Qlquery.updatePost(params);
 
         axios.post('/graphql', {query})
         .then(({data}) => {
@@ -284,23 +281,31 @@ class Page extends Component {
      * 发布文章
      */
     async publishPost () {
-      if (!this.state.postId) {
-        const query = Qlquery.createPost({
+      let state = this.state;
+      let params = {
           token: this.props.userStore.user.token,
-            userId: this.props.userStore.user.userId,
-            title: this.state.title,
-            content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
-            isAuth: this.state.isAuth,
-            publish: 1,
-            parentId: this.state.parentId
-        });
+          userId: this.props.userStore.user.userId,
+          title: this.state.title,
+          content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
+          isAuth: this.state.isAuth,
+          publish: 1,
+          parentId: this.state.parentId
+      };
 
+      // 团队
+      if (state.space.type === GROUP) {
+        params.groupId = state.space.id;
+      }
+
+      if (!this.state.postId) {
+        const query = Qlquery.createPost(params);
         axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
             // 跳转页面
-            this.props.history.push(`/library/user/${this.props.userStore.user.userId}/${res.postId}`)
+            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${this.space.id}/${res.postId}`
+            this.props.history.push(url)
           }
         })
         .catch((err) => {
@@ -308,21 +313,15 @@ class Page extends Component {
         })
       } else {
         // 修改post状态
-        const query = Qlquery.updatePost({
-            postId: this.state.postId,
-            token: this.props.userStore.user.token,
-            userId: this.props.userStore.user.userId,
-            title: this.state.title,
-            content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
-            isAuth: this.state.isAuth,
-            publish: 1
-        });
+        params.postId = this.state.postId;
+        const query = Qlquery.updatePost(params);
 
         axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
-            this.props.history.push(`/library/user/${this.props.userStore.user.userId}/${res.postId}`)
+            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${this.space.id}/${res.postId}`
+            this.props.history.push(url)
           }
         })
         .catch((err) => {

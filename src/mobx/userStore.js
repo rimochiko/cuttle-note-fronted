@@ -36,7 +36,16 @@ export default class Store {
           let res = data.data.data;
           if (res === 1) {
             // 验证成功
-            this.logIn(user);
+            let res = {
+              token: user.token,
+              userId: user.userId,
+              nickname: user.nickname,
+              avatar: user.avatar ? user.avatar: ''
+            }
+            this.user = Object.assign(res, {
+              fans: this.user.fans,
+              follow: this.user.follow
+            });
             result = true;
           } else {
             this.logOut(user);
@@ -50,13 +59,28 @@ export default class Store {
       return result;
     }
     
+    /**
+     * 更新昵称、头像
+     */
+    @action updateProfile(newUser) {
+      let user = JSON.parse(window.localStorage.getItem('user'));
+      if(newUser.nickname) {
+        user.nickname = newUser.nickname;
+      }
+      
+      if(newUser.avatar) {
+        user.avatar = newUser.avatar;
+      }
+      this.logIn(user);
+    }
+    
     // 登录
     @action logIn(user){
       let res = {
         token: user.token,
         userId: user.userId,
         nickname: user.nickname,
-        avatar: user.avatar ? `http://localhost:8080/static/${user.avatar}` : ''
+        avatar: user.avatar && user.avatar.search(/^http:\/\//) == -1 ? `http://localhost:8080/static/user/${user.avatar}` : user.avatar
       }
       this.user = res;
       window.localStorage.setItem('user', JSON.stringify(res));

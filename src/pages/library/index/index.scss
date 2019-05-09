@@ -25,12 +25,18 @@
         }        
     }
     .option {
-        a,span {
+        a,span,div {
             display: block;
             @extend .section;
             padding: .6rem;
+            font-size: .8rem;
             color: #7f83b8;
             cursor: pointer;
+        }
+        div {
+            svg {
+                margin-right: .4rem;
+            }
         }
     }
 }

@@ -52,7 +52,6 @@ class Tree extends Component {
 
         for(; i < length; i++) {
             if (data[i].id === parentId) {
-                console.log('find');
                 break;
             }
         }

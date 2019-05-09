@@ -1,9 +1,13 @@
+import axios from "axios";
+
 export default {
     userPostQuery,
     groupPostQuery,
     userDelPostQuery,
     groupDelPostQuery,
-    getOnePost
+    getOnePost,
+    addFollow,
+    cancelFollow
 }
 
 function userPostQuery (args) {
@@ -160,4 +164,30 @@ function getOnePost (args) {
     }
   }
   `
+}
+
+function addFollow (args) {
+  const query = `
+  mutation {
+    followUser(
+      userId: "${args.userId}",
+      token: "${args.token}",
+      followId: "${args.followId}"
+    )
+  }
+  `;
+  return axios.post('graphql', {query});
+}
+
+function cancelFollow (args) {
+  const query = `
+  mutation {
+    unfollowUser(
+      userId: "${args.userId}",
+      token: "${args.token}",
+      followId: "${args.followId}"
+    )
+  }
+  `;
+  return axios.post('graphql', {query});
 }

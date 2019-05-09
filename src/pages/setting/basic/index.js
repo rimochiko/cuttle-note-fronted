@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
+import Tooltip from '../../../components/tooltip';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Qlquery from '../graphql';
@@ -22,7 +23,8 @@ class Page extends Component {
           tDes: '',
           tSex: 0,
           tLocation: '',
-          tAvatar: ''
+          tAvatar: '',
+          tipText: ''
         }
     }
 
@@ -33,21 +35,29 @@ class Page extends Component {
       }
 
       await Qlquery.getProfile({
-        id: this.props.userStore.user.userId
+        userId: this.props.userStore.user.userId
       })
       .then(({data})=> {
-        let res = data.data.data;
-        this.setState({
-          nickname: res.nickname,
-          des: res.des,
-          sex: res.sex,
-          location: res.location,
-          avatar: res.avatar
-        })
+          let res = data.data.data;
+          this.setState({
+            nickname: res.nickname,
+            des: res.des,
+            sex: res.sex,
+            location: res.location,
+            avatar: res.avatar,
+            tNickname: res.nickname || '',
+            tDes: res.des || '',
+            tSex: res.sex,
+            tLocation: res.location || '',
+            tAvatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
+          })         
       })
-
       this.props.toggleLoading();
     }
+
+    /**
+     * 更新档案
+     */
     updateProfile () {
       Qlquery.updateProfile({
         token: this.props.userStore.user.token,
@@ -60,25 +70,35 @@ class Page extends Component {
       })
       .then(({data}) => {
         let res = data.data.data;
-        if (res === 1) {
+        if (res.code === 1) {
           // 修改成功
+          this.setState({
+            tipText: "资料修改成功，请刷新页面"
+          })
+          this.refs.tooltip.show()
+          this.props.userStore.updateProfile({
+            nickname: this.state.tNickname,
+            avatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
+          })
         }
       })
     }
 
     resetProfile () {
+      let state = this.state;
       this.setState({
-        tNickname: '',
-        tDes: '',
-        tSex: 0,
-        tLocation: '',
-        tAvatar: ''
+        tNickname: state.nickname,
+        tDes: state.des,
+        tSex: state.sex,
+        tLocation: state.location,
+        tAvatar: state.avatar
       })
     }
 
     render () {
         return (
           <div className="settings-detail">
+            <Tooltip ref="tooltip" text={this.state.tipText}/>
             <div className="flex-row">
                <div className="flex-1">
                     <div className="input-group">
@@ -86,7 +106,7 @@ class Page extends Component {
                       <input className="input-text" 
                             type="text" 
                             placeholder="请输入昵称"
-                            defaultValue={this.state.nickname}
+                            value={this.state.tNickname}
                             onChange={(e) => {
                               this.setState({
                                 tNickname: e.target.value
@@ -97,19 +117,25 @@ class Page extends Component {
 
                     <div className="input-group">
                       <label className="input-label">性别</label>
-                      <div className="radio-group" onChange={(e) => {
-                        this.setState({
-                          tSex: e.target.value
-                        })
-                      }}>
+                      <div className="radio-group">
                         <input type="radio"
                               value="0" 
                               name="sex" 
-                              defaultChecked={this.state.sex === 0}/><span>男</span>
+                              checked={this.state.tSex == 0}
+                              onChange={(e) => {
+                                this.setState({
+                                  tSex: 0
+                                })
+                              }}/><span>男</span>
                         <input type="radio" 
                               value="1" 
                               name="sex" 
-                              defaultChecked={this.state.sex === 1}/><span>女</span>
+                              checked={this.state.tSex == 1}
+                              onChange={(e) => {
+                                this.setState({
+                                  tSex: 1
+                                })
+                              }}/><span>女</span>
                       </div>
                       <span className="input-mark">必填项</span>
                     </div>
@@ -119,7 +145,7 @@ class Page extends Component {
                       <input className="input-text" 
                             type="text" 
                             placeholder="请输入所在地"
-                            defaultValue={this.state.location}
+                            value={this.state.tLocation}
                             onChange={(e)=>{
                               this.setState({
                                 tLocation: e.target.value
@@ -131,14 +157,13 @@ class Page extends Component {
                     <div className="input-group">
                       <label className="input-label">个人简介</label>
                       <textarea className="input-area" 
-                                type="text" 
                                 placeholder="快来介绍介绍自己吧，50字以内"
-                                defaultValue={this.state.des}
+                                value={this.state.tDes}
                                 onChange={(e)=>{
                                   this.setState({
                                     tDes: e.target.value
                                   })
-                                }}/>/>
+                                }}/>
                       <span className="input-mark">非必填项</span>
                     </div>
                 </div>  
@@ -146,7 +171,7 @@ class Page extends Component {
                 <div className="input-group">
                     <label className="input-label">头像</label>
                     <div className="two-side">
-                        <img src={this.state.tAvatar || this.state.avatar || require('../../../assets/images/avatar.jpg')} 
+                        <img src={this.state.tAvatar || require('../../../assets/images/default.jpg')} 
                             className="input-img"
                             alt=""/>
                         <div className="input-file-box">

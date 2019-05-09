@@ -41,7 +41,7 @@ function userPostQuery (args) {
     return `
     query {
       data:
-      userPosts(
+      userCharts(
        userId: "${args.userId}",
        token: "${args.token}",
        type: 1,
@@ -52,29 +52,7 @@ function userPostQuery (args) {
         id
         status
         title
-        author,
-        parentId,
-        children {
-          id
-          status
-          title
-          author,
-          parentId,
-          children {
-            id,
-            status,
-            title,
-            author,
-            parentId,
-            children {
-              id,
-              status,
-              title,
-              author
-              parentId
-            }
-          }
-        }
+        author
        }
      }
    }`;
@@ -84,7 +62,7 @@ function groupPostQuery (args) {
     return `
     query {
       data:
-      groupPosts(
+      groupCharts(
        userId: "${args.userId}",
        token: "${args.token}",
        type: 1,
@@ -95,29 +73,7 @@ function groupPostQuery (args) {
         id
         status
         title
-        author,
-        parentId,
-        children {
-          id
-          status
-          title
-          author,
-          parentId,
-          children {
-            id,
-            status,
-            title,
-            author,
-            parentId,
-            children {
-              id,
-              status,
-              title,
-              author
-              parentId
-            }
-          }
-        }
+        author
        }
      }
    }`;

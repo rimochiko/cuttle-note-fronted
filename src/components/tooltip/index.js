@@ -10,25 +10,20 @@ class Tooltip extends Component {
         super();
         this.state = {
             isShow: false,
-            timer: null,
-            time: 0
+            timer: null
         }
     }
 
     show () {
         this.setState({
+            isShow: true
+        });
+        this.setState({
             timer: setTimeout(() => {
                 this.setState({
-                    isShow: true,
-                    time: this.state.time + 1
+                    timer: null,
+                    isShow: false
                 })
-                if (this.state.time === 2) {
-                    this.setState({
-                        timer: null,
-                        time: 0,
-                        isShow: false
-                    })
-                }
             }, 1000)
         })
     }

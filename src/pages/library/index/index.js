@@ -47,6 +47,7 @@ class Page extends Component {
         }
         this.getOwnerInfo = this.getOwnerInfo.bind(this);
         this.getPostList = this.getPostList.bind(this);
+        this.generateOption = this.generateOption.bind(this);
     }
 
     async componentWillMount () {
@@ -74,7 +75,8 @@ class Page extends Component {
           id: item.id,
           avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
           text: item.nickname,
-          link: `/library/group/${item.id}`  
+          link: `/library/group/${item.id}`,
+          type: GROUP 
         }
       })
 
@@ -83,7 +85,8 @@ class Page extends Component {
           id: user.userId, 
           text: user.nickname,
           avatar: user.avatar || require('../../../assets/images/default.jpg'),
-          link: '/library/'
+          link: '/library/',
+          type: USER
         }].concat(groupList)
       })
     }
@@ -116,7 +119,7 @@ class Page extends Component {
 
       // 给isAuth赋值
       this.state.spaceList.forEach((item) => {
-        if (item.id === owner.id) {
+        if (item.id === owner.id && item.type === owner.type) {
           this.setState({
             isAuth: true
           })
@@ -160,8 +163,6 @@ class Page extends Component {
      */
     async getOwnerInfo (params) {
       let owner = {};
-      console.log("params：")
-      console.log(params);
       const query = params.obj === USER ? `
        query {
          data:
@@ -298,7 +299,6 @@ class Page extends Component {
         obj: nextMatch.obj || USER,
         id: nextMatch.id
       }
-      console.log(params);
       if (params.obj !== prevMatch.obj) {
         await this.fetchOwnerData(params);
         await this.fetchIdData(params);
@@ -327,6 +327,29 @@ class Page extends Component {
       return "确定要移入回收站？（15天内可恢复）";
     }
 
+    generateOption () {
+      // 判断是否有写入权
+      console.log(this.state.isAuth);
+      if (this.state.isAuth) {
+        return (
+          <Link to="/article/edit" title="创建新文章">
+            <FontAwesomeIcon icon="plus" />
+          </Link>
+        )
+      } else if(this.state.object.type === USER){
+        return (
+          <div>
+            <FontAwesomeIcon icon="plus"/>关注TA
+          </div>
+        )
+      } else if(this.state.object.type === GROUP) {
+        return (
+          <div>
+            <FontAwesomeIcon icon="plus"/>加入团队
+          </div>
+        )
+      }
+    }
     render () {
         return (
            <div className="page">
@@ -366,9 +389,9 @@ class Page extends Component {
                           </DropDown>                        
                         </div>
                         <div className="option">
-                          <Link to="/article/edit" title="创建新文章">
-                            <FontAwesomeIcon icon="plus" />
-                          </Link>
+                          {
+                            this.generateOption()
+                          }
                         </div>
                       </div>
                       <div className="tree">

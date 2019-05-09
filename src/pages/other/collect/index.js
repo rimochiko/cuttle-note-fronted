@@ -1,15 +1,12 @@
 import React, {Component} from 'react';
 import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
+import Loading from '../../../components/loading';
 import './index.scss';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
-import echarts from 'echarts/lib/echarts';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
 import { inject, observer } from 'mobx-react';
 import axios from 'axios';
 
@@ -30,14 +27,15 @@ class Page extends Component {
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
       }
-      this.getCollectData();
+      await this.getCollectData();
+      this.refs.loading.toggle();
     }
 
     /**
      * 获取收藏数据
      * @param {*} type 
      */
-    getCollectData () {
+    async getCollectData () {
       const query = `
       query {
         data:
@@ -63,10 +61,9 @@ class Page extends Component {
           }
         }
       }`;
-      axios.post('/graphql', {query})
+     await axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        console.log(data);
         if(res.code === 1) {
           this.setState({
             posts: res.posts
@@ -150,6 +147,7 @@ class Page extends Component {
             <div className="page">
                 <Sidebar />
                 <div className="main flex-column">
+                    <Loading ref="loading" />
                     <Header />
                     <div className="page-header">
                       <h1 className="normal-title">我的收藏</h1>
@@ -167,9 +165,9 @@ class Page extends Component {
                             </div>
                           </div>
                           <ul className="ul-page">
-                            <li><Link to="/">&lt;</Link></li>
+                            <li><Link to="/"><FontAwesomeIcon icon="angle-left"/></Link></li>
                             <li className="active"><Link to="/">1</Link></li>
-                            <li><Link to="/">&gt;</Link></li>
+                            <li><Link to="/"><FontAwesomeIcon icon="angle-right"/></Link></li>
                           </ul>
                    </div>
                    

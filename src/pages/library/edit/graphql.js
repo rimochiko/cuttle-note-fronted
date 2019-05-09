@@ -5,41 +5,82 @@ export default {
 }
 
 function createPost (args) {
-    if (args.parentId) {
-        return `
-        mutation {
-            data:
-            userTextPostSave (
-                token: "${args.token}",
-                userId: "${args.userId}",
-                title: "${args.title || '无标题'}",
-                content: "${args.content}",
-                isAuth: ${args.Auth ? args.Auth : 1},
-                publish: ${args.publish},
-                parentId: ${args.parentId}
-            ) {
-                code,
-                postId,
-                date
-            }
-        }`;        
+    if (args.groupId) {
+        if (args.parentId) {
+            return `
+            mutation {
+                data:
+                groupTextPostSave (
+                    token: "${args.token}",
+                    userId: "${args.userId}",
+                    title: "${args.title || '无标题'}",
+                    content: "${args.content}",
+                    isAuth: ${args.Auth ? args.Auth : 1},
+                    publish: ${args.publish},
+                    parentId: ${args.parentId},
+                    groupId: ${args.groupId}
+                ) {
+                    code,
+                    postId,
+                    date
+                }
+            }`;        
+        } else {
+            return `
+            mutation {
+                data:
+                groupTextPostSave (
+                    token: "${args.token}",
+                    userId: "${args.userId}",
+                    title: "${args.title || '无标题'}",
+                    content: "${args.content}",
+                    isAuth: ${args.Auth ? args.Auth : 1},
+                    publish: ${args.publish},
+                    groupId: ${args.groupId}
+                ) {
+                    code,
+                    postId,
+                    date
+                }
+            }`;         
+        }
     } else {
-        return `
-        mutation {
-            data:
-            userTextPostSave (
-                token: "${args.token}",
-                userId: "${args.userId}",
-                title: "${args.title || '无标题'}",
-                content: "${args.content}",
-                isAuth: ${args.Auth ? args.Auth : 1},
-                publish: ${args.publish}
-            ) {
-                code,
-                postId,
-                date
-            }
-        }`;         
+        if (args.parentId) {
+            return `
+            mutation {
+                data:
+                userTextPostSave (
+                    token: "${args.token}",
+                    userId: "${args.userId}",
+                    title: "${args.title || '无标题'}",
+                    content: "${args.content}",
+                    isAuth: ${args.Auth ? args.Auth : 1},
+                    publish: ${args.publish},
+                    parentId: ${args.parentId}
+                ) {
+                    code,
+                    postId,
+                    date
+                }
+            }`;        
+        } else {
+            return `
+            mutation {
+                data:
+                userTextPostSave (
+                    token: "${args.token}",
+                    userId: "${args.userId}",
+                    title: "${args.title || '无标题'}",
+                    content: "${args.content}",
+                    isAuth: ${args.Auth ? args.Auth : 1},
+                    publish: ${args.publish}
+                ) {
+                    code,
+                    postId,
+                    date
+                }
+            }`;         
+        }
     }
 
 }

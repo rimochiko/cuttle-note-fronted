@@ -60,14 +60,12 @@ class Section extends Component {
         axios.post('/graphql', {query})
         .then(({data}) => {
             let res = data.data.data;
-            console.log(res);
             if (res) {
                 // 喜欢成功
                 let post = Object.assign({},this.state.post, {
                     isLike: true,
                     likeNum: parseInt(this.state.post.likeNum) + 1
                 })
-                console.log(post);
                 this.setState({
                     post: post
                 });
@@ -128,7 +126,6 @@ class Section extends Component {
         axios.post('/graphql', {query})
         .then(({data}) => {
             let res = data.data.data;
-            console.log(res);
             if (res) {
                 // 收藏成功
                 let post = Object.assign({},this.state.post, {

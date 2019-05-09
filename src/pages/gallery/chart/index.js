@@ -4,7 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
 import axios from 'axios';
 import Qlquery from './graphql';
+import G6 from '@antv/g6';
+import GGEditor, { Mind, Flow } from 'gg-editor';
 
+const MIND = "mind",
+      FLOW = "flow"
 @inject('userStore', 'postStore')
 @observer
 class Section extends Component {
@@ -20,7 +24,8 @@ class Section extends Component {
                 likeNum: 0,
                 isLike: false,
                 isCollect: false,
-                comments: []
+                comments: [],
+                imgType: ''
             },
             comment: '',
             reply: {
@@ -37,10 +42,21 @@ class Section extends Component {
 
     componentWillUpdate (nextProps) {
         if (this.props.post && (nextProps.post !== this.props.post)) {
+            let content =  JSON.parse(unescape(nextProps.post.content));
+            let post = Object.assign({},nextProps.post, {
+                imgType: content && content.type,
+                content: content && content.chart
+            })
             this.setState({
-                post: nextProps.post,
+                post: post,
                 isAuth: nextProps.isAuth
             })
+        }
+    }
+
+    componentDidMount() {
+        if (this.refs.graph) {
+            this.refs.graph.graph.changeMode('readOnly');
         }
     }
 
@@ -55,14 +71,12 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            console.log(res);
             if (res) {
                 // 喜欢成功
                 let post = Object.assign({},this.state.post, {
                     isLike: true,
                     likeNum: parseInt(this.state.post.likeNum) + 1
                 })
-                console.log(post);
                 this.setState({
                     post: post
                 });
@@ -259,6 +273,38 @@ class Section extends Component {
         })
     }
 
+    generateGraph () {
+        switch(this.state.post.imgType) {
+            case MIND: 
+            return (
+                <GGEditor>
+                    <Mind  className="edit-canvas"
+                            ref="graph"
+                            style={{ width: 980, height: 500 }} 
+                            data={this.state.post.content || {
+                                roots: [{
+                                label: '中心主题',
+                                children: []
+                                }]
+                            }}/>
+                </GGEditor>
+            );
+            case FLOW:
+            return (
+                <GGEditor>
+                <Flow  className="edit-canvas"
+                        ref="graph"
+                        style={{ width: 980, height: 500 }} 
+                        data={this.state.post.content || {
+                            nodes: [],
+                            edges: []
+                          }
+                        }/>
+                </GGEditor>
+            );
+        }
+    }
+
     generateBtn () {
         if (this.state.isAuth) {
             return (
@@ -432,7 +478,18 @@ class Section extends Component {
                 </div>
                 </div>
                 <div className="body">
-                    <div className="content" dangerouslySetInnerHTML={{__html: this.state.post.content}}>
+                    <div className="content">
+                    <GGEditor>
+                    <Mind  className="edit-canvas"
+                            ref="graph"
+                            style={{ width: 980, height: 500 }} 
+                            data={this.state.post.content || {
+                                roots: [{
+                                label: '中心主题',
+                                children: []
+                                }]
+                            }}/>
+                    </GGEditor>
                     </div>
                     {
                         this.generateExtra()
