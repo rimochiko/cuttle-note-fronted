@@ -49,7 +49,8 @@ class Page extends Component {
         }
     }
 
-    async componentWillMount () {
+
+    async componentDidMount () {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
@@ -108,50 +109,45 @@ class Page extends Component {
         .catch((err) => {
           console.log(err);
         })
-        return;
-      }
-
-      // 如果不存在id
-      document.title = "新建图画 - 墨鱼笔记";
-      
-      let space =  query && query.group ? {
-          id: query.group.id,
-          name: query.group.name,
-          type: GROUP          
-      } : {
-          id: this.props.userStore.user.userId,
-          name: this.props.userStore.user.nickname,
-          type: USER          
-      }
+      } else {
+        // 如果不存在id
+        document.title = "新建图画 - 墨鱼笔记";
         
-      this.setState({
-        space: space
-      });
-    
-      if (!match.type || match.type === MIND) {
+        let space =  query && query.group ? {
+            id: query.group.id,
+            name: query.group.name,
+            type: GROUP          
+        } : {
+            id: this.props.userStore.user.userId,
+            name: this.props.userStore.user.nickname,
+            type: USER          
+        }
+          
         this.setState({
-          type: MIND,
-          chart: {
-            roots: [{
-              label: '中心主题',
-              children: []
-            }]
-          }
-        })
-      } else if (match.type === FLOW) {
-        this.setState({
-          type: FLOW,
-          chart: {
-            nodes: [],
-            edges: []
-          }    
-        })
+          space: space
+        });
+      
+        if (!match.type || match.type === MIND) {
+          this.setState({
+            type: MIND,
+            chart: {
+              roots: [{
+                label: '中心主题',
+                children: []
+              }]
+            }
+          })
+        } else if (match.type === FLOW) {
+          this.setState({
+            type: FLOW,
+            chart: {
+              nodes: [],
+              edges: []
+            }    
+          })
+        }        
       }
-
-    }
-
-    componentDidMount () {
-
+      this.refs.loading.toggle();
     }
     
     /**
@@ -274,6 +270,7 @@ class Page extends Component {
           <div className="flex-row overflow">
             <Sidebar />
             <div className="flex-column edit-chart-page">
+                <Loading ref="loading" />
                 <div className="chart-edit-header">
                   <input type="text" 
                          placeholder="标题" 

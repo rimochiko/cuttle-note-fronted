@@ -153,83 +153,6 @@ class Page extends Component {
         this.getNewsList = this.getNewsList.bind(this);
     }
 
-    async componentWillMount() {
-      // 判断是否有登录
-      if (await this.props.userStore.isLogin() === false) {
-        this.props.history.push('/login');
-      }
-      document.title="团队 - 墨鱼笔记";
-      let userStore = this.props.userStore;
-      let params = this.props.match.params;
-      await userStore.getGroup();
-
-      if(userStore.groupList.length) {
-        let group;
-        if (!(params && params.id)) {
-          group =  {
-            name: userStore.groupList[0].nickname,
-            des: userStore.groupList[0].des,
-            id: userStore.groupList[0].id,
-            avatar: userStore.groupList[0].avatar || null
-          };
-        } else {
-          // 如果域名有团队
-          userStore.groupList.forEach((item) => {
-            if (item.id === params.id) {
-              group = item;
-            }
-          })
-          
-          // 如果group不存在，要请求group的信息
-          if (!group) {
-           await Qlquery.getGroupEasy(params)
-           .then(({data}) => {
-             let res = data.data.data;
-             if(res.id) {
-               group = {
-                 id: res.id,
-                 name: res.nickname,
-                 avatar: `http://localhost:8080/static/group/${res.avatar}`
-               }
-             }
-           })
-           .catch((err) => {
-             console.log(err);
-           })
-          }
-        }
-
-        let groupList = userStore.groupList.map((item) => {
-          return {
-            id: item.id,
-            text: item.nickname,
-            avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
-            link: `/group/${item.id}`
-          }
-        })
-        // 获取团队成员
-        await Qlquery.getMembers({
-          groupId: group.id
-        })
-        .then(({data}) => {
-          let res = data.data.data;
-          group.members = res.member || [];
-        })
-       
-        this.setState({
-          groupList: groupList,
-          group: {
-            name: group.name,
-            des: group.des,
-            id: group.id,
-            avatar: group.avatar || null,
-            members: group.members
-          }
-        })
-      }
-      this.refs.loading.toggle();
-    }
-
     async fetchGroupData(id) {
       let userStore = this.props.userStore;
       let params = id;
@@ -523,11 +446,85 @@ class Page extends Component {
     }
   }
   
-  componentDidMount () {
+  async componentDidMount () {
+     // 判断是否有登录
+     if (await this.props.userStore.isLogin() === false) {
+      this.props.history.push('/login');
+    }
+    document.title="团队 - 墨鱼笔记";
+    let userStore = this.props.userStore;
+    let params = this.props.match.params;
+    await userStore.getGroup();
+
+    if(userStore.groupList.length) {
+      let group;
+      if (!(params && params.id)) {
+        group =  {
+          name: userStore.groupList[0].nickname,
+          des: userStore.groupList[0].des,
+          id: userStore.groupList[0].id,
+          avatar: userStore.groupList[0].avatar || null
+        };
+      } else {
+        // 如果域名有团队
+        userStore.groupList.forEach((item) => {
+          if (item.id === params.id) {
+            group = item;
+          }
+        })
+        
+        // 如果group不存在，要请求group的信息
+        if (!group) {
+         await Qlquery.getGroupEasy(params)
+         .then(({data}) => {
+           let res = data.data.data;
+           if(res.id) {
+             group = {
+               id: res.id,
+               name: res.nickname,
+               avatar: `http://localhost:8080/static/group/${res.avatar}`
+             }
+           }
+         })
+         .catch((err) => {
+           console.log(err);
+         })
+        }
+      }
+
+      let groupList = userStore.groupList.map((item) => {
+        return {
+          id: item.id,
+          text: item.nickname,
+          avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
+          link: `/group/${item.id}`
+        }
+      })
+      // 获取团队成员
+      await Qlquery.getMembers({
+        groupId: group.id
+      })
+      .then(({data}) => {
+        let res = data.data.data;
+        group.members = res.member || [];
+      })
+     
+      this.setState({
+        groupList: groupList,
+        group: {
+          name: group.name,
+          des: group.des,
+          id: group.id,
+          avatar: group.avatar || null,
+          members: group.members
+        }
+      })
+    }
     // 基于准备好的dom，初始化echarts实例
     //var myChart = echarts.init(document.getElementById('statist-graph'));
     // 绘制图表
     // myChart.setOption({});
+    this.refs.loading.toggle();
   }
   
   /**

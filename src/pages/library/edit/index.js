@@ -43,11 +43,7 @@ class Page extends Component {
         }
     }
 
-    async componentWillReceiveProps () {
-
-    }
-
-    async componentWillMount () {
+    async componentDidMount () {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
@@ -116,9 +112,6 @@ class Page extends Component {
           parentId: this.props.location.query && this.props.location.query.parentId || null
         });
       }
-    }
-
-    componentDidMount () {
       this.refs.editBox.innerHTML = this.state.post && this.state.post.content || '';
     }
 
@@ -304,7 +297,7 @@ class Page extends Component {
           let res = data.data.data;
           if (res.code === 1) {
             // 跳转页面
-            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${this.space.id}/${res.postId}`
+            let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
             this.props.history.push(url)
           }
         })
@@ -320,7 +313,7 @@ class Page extends Component {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
-            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${this.space.id}/${res.postId}`
+            let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
             this.props.history.push(url)
           }
         })

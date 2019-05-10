@@ -51,7 +51,7 @@ class Page extends Component {
         this.generateOption = this.generateOption.bind(this);
     }
 
-    async componentWillMount () {
+    async componentDidMount () {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');

@@ -28,7 +28,7 @@ class Page extends Component {
         }
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
       // 请求用户资料
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');

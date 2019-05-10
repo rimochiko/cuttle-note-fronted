@@ -22,7 +22,7 @@ class Page extends Component {
         this.getCollectList = this.getCollectList.bind(this);
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');

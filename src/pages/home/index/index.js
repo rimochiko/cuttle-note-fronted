@@ -18,72 +18,16 @@ import Qlquery from './graphql';
 import { Group } from 'echarts/lib/util/graphic';
 import Loading from '../../../components/loading';
 
-let newsList = [
-  {
-    id: 3,
-    title: '是否要做Code Review？与BAT资深架构...',
-    link: '/',
-    author: {
-      name: '小郑哥',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'rgrg'
-    },
-    date: '1天前',
-    type: 2
-  },
-  {
-    id: 4,
-    title: '《深入react技术栈》之样式处理',
-    link: '/',
-    author: {
-      name: '歌非',
-      avatar: 'https://tvax3.sinaimg.cn/crop.0.0.996.996.50/dcedbca1ly8fv8o71kltwj20ro0rot9s.jpg',
-      id: 'trrtr'
-    },
-    date: '1天前',
-    des: 'css模块化的方案:CSS Module CSS Module样式默认局部,要使用全局样式就加入:...《深入React技术栈》笔记 一、初入React世界 1.2 JSX语法 class 属性修改为...',
-    type: 1
-  },
-  {
-    id: 6,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 7,
-    title: '最让程序员自豪的事情是什么？',
-    link: '/',
-    author: {
-      name: '此人已失踪',
-      avatar: 'https://tvax1.sinaimg.cn/crop.0.0.996.996.50/006I03Dqly8fzprit6axsj30ro0ro0ua.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 8,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: 'https://tva2.sinaimg.cn/crop.48.45.483.483.50/005IMl41jw8evygvu692ij30g40o6402.jpg',
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  }
-]
+const FILE_LIKE = 2,
+      FILE_COLLECT = 3,
+      FILE_CREATE = 5,
+      FILE_COMMENT = 8;
+
+// 团队动作相关
+const GROUP_JOIN = 25;
+
+// 个人操作相关
+const USER_FOLLOW = 44;
 
 const GROUP = "group",
       USER = "user",
@@ -96,39 +40,28 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
-          recentViews: []
+          recentViews: [],
+          news: []
         }
         this.getHistoryList = this.getHistoryList.bind(this);
         this.getNewsList = this.getNewsList.bind(this);
     }
 
-    async componentWillMount () {
-      // 判断是否有登录
-      if (await this.props.userStore.isLogin() === false) {
-        this.props.history.push('/login');
-      }
-      document.title="我的首页 - 墨鱼笔记";
-
-      await this.fetchData();
-      this.refs.loading.toggle();
-    }
-
     async fetchData () {
       // 获取最近浏览文章
       let userStore = this.props.userStore;
-      Qlquery.getRecentViews({
+      Qlquery.getHomeData({
         token: userStore.user.token,
         userId: userStore.user.userId
       })
       .then(({data}) => {
-        let recent = data.data.recent;
-        if(recent.code === 1){
-          this.generatePostLink(recent.posts);
-          this.setState({
-            recentViews: recent.posts
-          })          
-        }
-
+        let recent = data.data.recent,
+            news = data.data.news;
+            this.generatePostLink(recent.posts);
+        this.setState({
+          recentViews: recent.code === 1 ? recent.posts : [],
+          news: news.code === 1 ? news.options: []
+        })         
       })
     }
 
@@ -141,9 +74,14 @@ class Page extends Component {
 
     }
 
-    componentDidMount () {
-      // console.log(this.props.userStore);
-       
+    async componentDidMount () {
+      if (await this.props.userStore.isLogin() === false) {
+        this.props.history.push('/login');
+      }
+      document.title="我的首页 - 墨鱼笔记";
+
+      await this.fetchData();
+      this.refs.loading.toggle();
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
        // 绘制图表
@@ -247,10 +185,10 @@ class Page extends Component {
 
     getNewsIcon (type) {
       switch(type) {
-        case 1: return (
+        case 0: return (
           <span className="icon pen"><FontAwesomeIcon icon="pen" /></span>
         );break;
-        case 2: return (
+        case 1: return (
           <span className="icon camera"><FontAwesomeIcon icon="camera" /></span>
         )
       }
@@ -260,26 +198,34 @@ class Page extends Component {
      * 获取动态列表
      *  */
     getNewsList (item) {
-      return (
-      <div className="item-news" key={item.id}>
-        <div className="avatar">                              
-          <img src={item.author.avatar}/>
-        </div>
-        <div className="detail">
-          <div className="header">
-            <p className="date">{item.date}</p>
-            <p className="author"><Link to='/' className="link">{item.author.name}</Link></p>
-            <p className="type">
-              {this.getNewsIcon(item.type)}
-              创建了一篇新的文章<Link to={item.link}>{item.title}</Link>   
-            </p>
-          </div>
-          <div className="body">
-            {item.des}
-          </div>
-        </div>
-      </div>
-      );
+      // 根据动态种类
+      switch(item.type) {
+        case FILE_CREATE:
+          return (
+            <div className="item-news" key={item.id}>
+              <div className="avatar">                              
+                <img src={item.user.avatar ? `http://localhost:8080/static/user/${item.user.avatar}` : require('../../../assets/images/default.jpg')} 
+                     alt={item.user.id}/>
+              </div>
+              <div className="detail">
+                <div className="header">
+                  <p className="date">{item.date}</p>
+                  <p className="author"><Link to='/' className="link">{item.user.nickname}</Link></p>
+                  <p className="type">
+                    {this.getNewsIcon(item.post.type)}
+                    {item.post.type === 0 ? "创建了一篇新文章 " : "创建了一张新图画 "}
+                    <Link to={item.post.type === 0 ? `/library/${item.post.link}`:`/gallery/${item.post.link}`}>{item.post.title}</Link>   
+                  </p>
+                </div>
+                <div className="body">
+                  {item.post.type === 0 ? item.post.content : "" } 
+                </div>
+              </div>
+            </div>
+          );
+        break;
+      }
+
     }
 
     render () {
@@ -346,7 +292,7 @@ class Page extends Component {
                             <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
                           </div>
                           {
-                            newsList.map((item, index) => {
+                            this.state.news && this.state.news.map((item, index) => {
                               return this.getNewsList(item);
                             })
                           }

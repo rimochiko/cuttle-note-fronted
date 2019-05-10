@@ -1,10 +1,10 @@
 import axios from "axios";
 
 export default {
-    getRecentViews
+    getHomeData
 }
 
-function getRecentViews (args) {
+function getHomeData (args) {
     const query = `
     query {
         recent:
@@ -29,8 +29,32 @@ function getRecentViews (args) {
             type,
             date
           }
+        },
+        news:
+        followUserNews(
+          token: "${args.token}",
+          userId: "${args.userId}"
+        ) {
+          code
+          options {
+            id
+            user {
+              id
+              nickname
+              avatar
+            }
+            post {
+              id,
+              type
+              title
+              link
+            }
+            date
+            type
+          }
         }
     }
     `
     return axios.post('/graphql', {query});
 }
+
