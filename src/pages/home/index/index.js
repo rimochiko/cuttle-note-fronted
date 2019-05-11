@@ -11,7 +11,6 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 
-import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 
 import Qlquery from './graphql';
@@ -50,18 +49,18 @@ class Page extends Component {
     async fetchData () {
       // 获取最近浏览文章
       let userStore = this.props.userStore;
-      Qlquery.getHomeData({
+      await Qlquery.getHomeData({
         token: userStore.user.token,
         userId: userStore.user.userId
       })
       .then(({data}) => {
-        let recent = data.data.recent,
-            news = data.data.news;
-            this.generatePostLink(recent.posts);
-        this.setState({
-          recentViews: recent.code === 1 ? recent.posts : [],
-          news: news.code === 1 ? news.options: []
-        })         
+          let recent = data.data.recent,
+              news = data.data.news;
+              this.generatePostLink(recent.posts);
+          this.setState({
+            recentViews: recent && recent.code === 1 ? recent.posts : [],
+            news: news && news.code === 1 ? news.options: []
+          })             
       })
     }
 
@@ -77,6 +76,7 @@ class Page extends Component {
     async componentDidMount () {
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       document.title="我的首页 - 墨鱼笔记";
 
@@ -97,11 +97,6 @@ class Page extends Component {
       },
       legend: {
           data:['浏览量','人气量','记录次数']
-      },
-      toolbox: {
-          feature: {
-              saveAsImage: {}
-          }
       },
       grid: {
           left: '3%',
@@ -159,10 +154,11 @@ class Page extends Component {
       switch (type) {
         case 0: return (
           <FontAwesomeIcon icon="file-alt" />
-        );break;
+        );
         case 1: return (
           <FontAwesomeIcon icon="file-image" />
         );
+        default: return '';
       }
     }
 
@@ -187,10 +183,11 @@ class Page extends Component {
       switch(type) {
         case 0: return (
           <span className="icon pen"><FontAwesomeIcon icon="pen" /></span>
-        );break;
+        );
         case 1: return (
           <span className="icon camera"><FontAwesomeIcon icon="camera" /></span>
-        )
+        );
+        default: return '';
       }
     }
 
@@ -223,9 +220,9 @@ class Page extends Component {
               </div>
             </div>
           );
-        break;
+        default: return '';
       }
-
+      
     }
 
     render () {

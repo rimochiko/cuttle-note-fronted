@@ -38,6 +38,7 @@ class Page extends Component {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       document.title = "我的消息 - 墨鱼笔记"
 

@@ -47,6 +47,7 @@ class Page extends Component {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       console.log(this.props);
 
@@ -109,10 +110,10 @@ class Page extends Component {
         }
         this.setState({
           space: space,
-          parentId: this.props.location.query && this.props.location.query.parentId || null
+          parentId: (this.props.location.query && this.props.location.query.parentId) || null
         });
       }
-      this.refs.editBox.innerHTML = this.state.post && this.state.post.content || '';
+      this.refs.editBox.innerHTML = (this.state.post && this.state.post.content) || '';
     }
 
     /**
@@ -157,6 +158,7 @@ class Page extends Component {
         case "undo": 
           document.execCommand('Undo');
         break;
+        default:;
 			}
     }
 
@@ -171,7 +173,7 @@ class Page extends Component {
 
 
     textStyleCommand (e, command) {
-      var command = {
+      var obj = {
         bold: function (text) {
           return `**${text}**`
         },

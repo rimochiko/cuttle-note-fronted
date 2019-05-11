@@ -34,7 +34,14 @@ class Header extends Component {
                 </div>
                 <div className="right-header flex-row">
                     <div className="search-box icon-right">
-                        <input type="text" className="input-search" placeholder="用户/群组/文档"/>
+                        <input type="text"
+                               className="input-search" 
+                               placeholder="用户/群组/文档"
+                               onKeyDown={(e) => {
+                                 if(e.keyCode === 13) {
+                                     this.history.push('/search/article')
+                                 }
+                               }}/>
                         <FontAwesomeIcon icon="search" className="header-icon"/>
                     </div>
                     <DropDown data={dropMenudata}>

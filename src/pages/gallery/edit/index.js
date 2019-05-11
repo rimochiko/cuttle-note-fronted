@@ -54,6 +54,7 @@ class Page extends Component {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       // 判断路由，初始化数据
       let match = this.props.match.params;

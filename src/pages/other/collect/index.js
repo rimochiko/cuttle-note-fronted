@@ -26,6 +26,7 @@ class Page extends Component {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       await this.getCollectData();
       this.refs.loading.toggle();
@@ -113,10 +114,11 @@ class Page extends Component {
       switch (type) {
         case 0: return (
           <FontAwesomeIcon icon="file-alt" />
-        );break;
+        );
         case 1: return (
           <FontAwesomeIcon icon="file-image" />
         );
+        default: return ''; 
       }
     }
 
@@ -132,7 +134,9 @@ class Page extends Component {
               {item.title}
               </Link>
           </p>
-          <p className="author"><img src={`http://localhost:8080/static/user/${item.author.avatar}` || require('../../../assets/images/default.jpg')}/><Link to="/">{item.author.nickname}</Link></p>
+          <p className="author">
+             <img alt={item.author.nickname}
+                  src={`http://localhost:8080/static/user/${item.author.avatar}` || require('../../../assets/images/default.jpg')}/><Link to="/">{item.author.nickname}</Link></p>
           <p className="from"><Link to="/">{item.author.nickname}的空间</Link></p>
           <p className="option">
             <span className="collect active" onClick={this.cancelCollect.bind(this, item.id, index)}><FontAwesomeIcon icon="star"/></span>

@@ -8,7 +8,10 @@ export default {
   inviteUser,
   createGroup,
   checkGroupId,
-  sendInvite
+  sendInvite,
+  getHomeData,
+  deleteUser,
+  changeUserRole
 }
 
 function getGroupEasy (args) {
@@ -132,4 +135,69 @@ function sendInvite (args) {
   }
   `;
   return axios.post('/graphql', {query})  
+}
+
+function getHomeData (args) {
+  const query = `
+  query {
+    news:
+    groupNews(
+      token: "${args.token}",
+      userId: "${args.userId}",
+      groupId: "${args.groupId}"
+    ) {
+      code
+      options {
+        id
+        user {
+          id
+          nickname
+          avatar
+        }
+        post {
+          id,
+          type
+          title
+          link
+        }
+        date
+        type
+      }
+    }
+  }
+  `;
+  return axios.post('/graphql', {query});
+}
+
+function deleteUser (args) {
+  const query = `
+  mutation {
+    data:
+    groupExit(
+      token: "${args.token}",
+      userId: "${args.userId}",
+      groupId: "${args.groupId}",
+      objectId: "${args.objectId}"
+    )
+  }
+  `;
+  return axios.post('/graphql', {query});
+
+}
+
+function changeUserRole (args) {
+  const query = `
+  mutation {
+    data:
+    groupExit(
+      token: "${args.token}",
+      userId: "${args.userId}",
+      groupId: "${args.groupId}",
+      objectId: "${args.objectId}",
+      isAdmin: ${args.isAdmin}
+    )
+  }
+  `;
+  return axios.post('/graphql', {query});
+
 }

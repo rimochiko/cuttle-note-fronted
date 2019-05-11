@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
-import axios from 'axios';
+import Qlquery from './graphql';
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Section extends Component {
     constructor () {
@@ -47,17 +47,11 @@ class Section extends Component {
      * 喜欢文章
      */
     like () {
-        const query = `
-          mutation {
-            data:
-            postLike (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.like({
+            id: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId           
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -80,17 +74,11 @@ class Section extends Component {
      * 取消喜欢
      */
     cancelLike (){
-        const query = `
-          mutation {
-            data:
-            postUnlike (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.unlike({
+            id: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId 
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -113,17 +101,11 @@ class Section extends Component {
      * 收藏文章
      *  */
     collect () {
-        const query = `
-          mutation {
-            data:
-            postCollect (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.collect({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -145,17 +127,11 @@ class Section extends Component {
      * 取消收藏文章
      *  */
     cancelCollect () {
-        const query = `
-          mutation {
-            data:
-            postUncollect (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.unCollect({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -198,55 +174,13 @@ class Section extends Component {
      * 评论文章
      */
     comment () {
-        const query = this.state.reply.id ? `
-          mutation {
-            data:
-            postComment (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}",
-                replyId: ${this.state.reply.id || ''},
-                content: "${this.state.comment}",
-            ) {
-                code
-                comments {
-                    id
-                    creatorId
-                    creatorName
-                    receiverId
-                    receiverName
-                    avatar
-                    content
-                    date
-                    parentId
-                }
-            }
-          }
-        `: `
-        mutation {
-          data:
-          postComment (
-              postId: ${this.state.post.id},
-              token: "${this.props.userStore.user.token}",
-              userId: "${this.props.userStore.user.userId}",
-              content: "${this.state.comment}",
-          ) {
-              code
-              comments {
-                  id
-                  creatorId
-                  creatorName
-                  receiverId
-                  receiverName
-                  avatar
-                  content
-                  date
-                  parentId
-              }
-          }
-        }
-      `;
-        axios.post('/graphql', {query})
+        Qlquery.comment({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            replyId: this.state.reply.id || '',
+            content: this.state.comment,
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res.code === 1) {

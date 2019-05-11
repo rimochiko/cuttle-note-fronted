@@ -12,6 +12,7 @@ export default class Store {
         avatar: '',
         token: ''
       };
+      this.infoNum = 0;
       this.fans = [];
       this.follows = [];
       this.groupList = [];
@@ -51,11 +52,9 @@ export default class Store {
         })
         .catch((err) => {
           console.log(err);
-        })        
-      }
-      
-      if (result) {
+        }) 
         await this.getRelations()
+        await this.getUnreadNum()
       }
       return result;
     }
@@ -125,6 +124,26 @@ export default class Store {
               follows = data.data.follow;
           this.fans = fans;
           this.follows = follows;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
+    }
+
+    // 获取用户未读消息数据
+    @action async getUnreadNum () {
+      if (this.user.token) {
+        const query = `
+          query {
+            data:
+            getUnreadCount (userId: "${this.user.userId}",token: "${this.user.token}")
+          }
+        `;
+        await axios.post('/graphql', {query})
+        .then(({data}) => {
+          let res = data.data.data;
+          this.infoNum = res || 0;
         })
         .catch((err) => {
           console.log(err);

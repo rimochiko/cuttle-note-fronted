@@ -32,6 +32,7 @@ class Page extends Component {
       // 请求用户资料
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
 
       await Qlquery.getProfile({

@@ -25,6 +25,7 @@ class Page extends Component {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
         this.props.history.push('/login');
+        return;
       }
       await this.getTrashData();
       this.refs.loading.toggle();

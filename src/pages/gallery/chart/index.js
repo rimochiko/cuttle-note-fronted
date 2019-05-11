@@ -2,14 +2,12 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
-import axios from 'axios';
 import Qlquery from './graphql';
-import G6 from '@antv/g6';
 import GGEditor, { Mind, Flow } from 'gg-editor';
 
 const MIND = "mind",
       FLOW = "flow"
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Section extends Component {
     constructor () {
@@ -40,7 +38,7 @@ class Section extends Component {
         this.generateExtra = this.generateExtra.bind(this);
     }
 
-    componentWillUpdate (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.props.post && (nextProps.post !== this.props.post)) {
             let content =  JSON.parse(unescape(nextProps.post.content));
             let post = Object.assign({},nextProps.post, {
@@ -118,17 +116,11 @@ class Section extends Component {
      * 收藏文章
      *  */
     collect () {
-        const query = `
-          mutation {
-            data:
-            postCollect (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.collect({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId
+        })
         .then(({data}) => {
             let res = data.data.data;
             console.log(res);
@@ -151,17 +143,11 @@ class Section extends Component {
      * 取消收藏文章
      *  */
     cancelCollect () {
-        const query = `
-          mutation {
-            data:
-            postUncollect (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}"
-            )
-          }
-        `
-        axios.post('/graphql', {query})
+        Qlquery.unCollect({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res) {
@@ -204,55 +190,13 @@ class Section extends Component {
      * 评论文章
      */
     comment () {
-        const query = this.state.reply.id ? `
-          mutation {
-            data:
-            postComment (
-                postId: ${this.state.post.id},
-                token: "${this.props.userStore.user.token}",
-                userId: "${this.props.userStore.user.userId}",
-                replyId: ${this.state.reply.id || ''},
-                content: "${this.state.comment}",
-            ) {
-                code
-                comments {
-                    id
-                    creatorId
-                    creatorName
-                    receiverId
-                    receiverName
-                    avatar
-                    content
-                    date
-                    parentId
-                }
-            }
-          }
-        `: `
-        mutation {
-          data:
-          postComment (
-              postId: ${this.state.post.id},
-              token: "${this.props.userStore.user.token}",
-              userId: "${this.props.userStore.user.userId}",
-              content: "${this.state.comment}",
-          ) {
-              code
-              comments {
-                  id
-                  creatorId
-                  creatorName
-                  receiverId
-                  receiverName
-                  avatar
-                  content
-                  date
-                  parentId
-              }
-          }
-        }
-      `;
-        axios.post('/graphql', {query})
+        Qlquery.comment({
+            postId: this.state.post.id,
+            token: this.props.userStore.user.token,
+            userId: this.props.userStore.user.userId,
+            replyId: this.state.reply.id || '',
+            content: this.state.comment,
+        })
         .then(({data}) => {
             let res = data.data.data;
             if (res.code === 1) {

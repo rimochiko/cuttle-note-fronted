@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 import Tooltip from '../../../components/tooltip';
+import Tool from '../tool';
+import Qlquery from '../graphql';
 
 @inject('userStore')
 @observer
@@ -18,46 +19,23 @@ class Page extends Component {
           passwordTip: '密码',
           isNameTipHide: false,
           isPassTipHide: false,
-          isDisabled: true,
-          tipText: ''
+          isLoging: false,
+          tipText: '',
+          loginText: '登录'
         }
         this.changeStatus = this.changeStatus.bind(this);
     }
 
-    async componentWillMount () {
+    async componentDidMount() {
       // 判断是否已经登录
       if(await this.props.userStore.isLogin() === true) {
-        this.props.history.push('/'); 
+        this.props.history.push('/');
+        return;
       }
       document.title = "登录 - 墨鱼笔记";
+      Tool.drawBackground();
     }
 
-    componentDidMount() {
-      this.drawBackground();
-    }
-
-    drawBackground () {
-      let cvs = document.getElementById('pageBackground'),
-          width = window.innerWidth,
-          height = window.innerHeight,
-          circleNum = 15;
-      cvs.width = width;
-      cvs.height = height;
-      
-      let ctx = cvs.getContext('2d');
-
-      for (let i = 0; i < circleNum; i++){
-        let x = Math.random()*width,
-            y = Math.random()*height,
-            r = Math.random()*80 + 10;
-        ctx.beginPath();
-        ctx.arc(x,y,r,0,2*Math.PI,true);
-        ctx.fillStyle="rgba(255, 255, 255, .1)";
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-    
     /**
      * 监听输入
      */
@@ -86,8 +64,7 @@ class Page extends Component {
       if (type === 'name' && !this.state.name) {
         this.setState({
           isNameTipHide: false,
-          nameTip: '请填写用户名',
-          isDisabled: true
+          nameTip: '请填写用户名'
         })
         return;
       }
@@ -95,35 +72,36 @@ class Page extends Component {
       if (type === 'password' && !this.state.password) {
         this.setState({
           isPassTipHide: false,
-          passwordTip: '请填写密码',
-          isDisabled: true
+          passwordTip: '请填写密码'
         })
         return;    
       }
-      this.setState({
-        isDisabled: false
-      })
+    }
+
+    /**
+     * 判断登录按钮可用
+     */
+    judgeButtonStatus () {
+      let state = this.state;
+      if ((state.isNameTipHide && state.isPassTipHide) || state.isLoging) {
+        return false;
+      }
+      return true;
     }
 
       /**
    * 用户登录
    */
-  loginUser() {
-    const query = `
-    mutation {
-      data:
-      userLogin(
-       userId: "${this.state.name}",
-       password: "${this.state.password}") {
-         code,
-         token,
-         userId,
-         avatar,
-         nickname
-       }
-     }`;
-      
-    axios.post('/graphql', {query})
+  async loginUser() {
+    this.setState({
+      isLoging: true,
+      loginText: '...'
+    });
+
+    await Qlquery.login({
+      name: this.state.name,
+      password: this.state.password
+    })
     .then(({data}) => {
       // 登录成功
       let res = data.data.data;
@@ -138,25 +116,30 @@ class Page extends Component {
         this.props.history.push('/');
       } else {
         this.setState({
-          isPassTipHide: false,
-          passwordTip: '密码填写错误',
-          isDisabled: true
+          tipText: "密码或用户名错误",
+          isLoging: false,
+          loginText: '登录'
         })
+        this.refs.tooltip.show();
       }
     })
     .catch((err) => {
       console.log(err);
+      this.setState({
+        tipText: "服务器出现故障:("
+      })
+      this.refs.tooltip.show()
     })
   }
 
     render () {
         return (
           <div className="page-login">
-            <Tooltip text={this.state.tipText} />
+            <Tooltip text={this.state.tipText} ref="tooltip"/>
             <canvas id="pageBackground"></canvas>
             <div className="page-login-box">
               <div className="fixed-logo">
-                <a href="#"><img src={require('../../../assets/images/logo1.png')} alt="墨鱼笔记"/></a>
+                <img src={require('../../../assets/images/logo1.png')} alt="墨鱼笔记"/>
               </div>
               <div className="useropt">
                 <h1 className="title">登录</h1>
@@ -164,7 +147,10 @@ class Page extends Component {
                 <div className="form-useropt">
                     <div className="icon-input">
                       <FontAwesomeIcon icon="user" />
-                      <span className="tip" style={{opacity: this.state.isNameTipHide ? 0:1}}>{this.state.nameTip}</span>
+                      <span className="tip" 
+                            style={{opacity: this.state.isNameTipHide ? 0:1}}>
+                            {this.state.nameTip}
+                      </span>
                       <input style={{color: this.state.isNameTipHide ? '#666':'#fff'}}
                              type="text" 
                              value={this.state.name} 
@@ -174,7 +160,10 @@ class Page extends Component {
                     </div>
                     <div className="icon-input">
                       <FontAwesomeIcon icon="key" />
-                      <span className="tip" style={{opacity: this.state.isPassTipHide ? 0:1}}>{this.state.passwordTip}</span>
+                      <span className="tip" 
+                            style={{opacity: this.state.isPassTipHide ? 0:1}}>
+                            {this.state.passwordTip}
+                      </span>
                       <input style={{color: this.state.isPassTipHide ? '#666':'#fff'}} 
                              type="password" 
                              value={this.state.password} 
@@ -191,8 +180,8 @@ class Page extends Component {
                     </div>
                     <button 
                            className="form-btn" 
-                           disabled={this.state.isDisabled}
-                           onClick={this.loginUser.bind(this)}>登录</button>
+                           disabled={this.judgeButtonStatus()}
+                           onClick={this.loginUser.bind(this)}>{this.state.loginText}</button>
                     <p className="form-subtext">还没有账号? <Link to="/register">注册</Link></p>
                 </div>
               </div>

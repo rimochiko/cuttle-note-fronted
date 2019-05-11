@@ -4,6 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
+import Tooltip from '../../../components/tooltip';
+import Tool from '../tool';
+import Qlquery from '../graphql';
 
 @inject('userStore')
 @observer
@@ -20,43 +23,20 @@ class Page extends Component {
       isNameTipHide: false,
       isPassTipHide: false,
       isMailTipHide: false,
-      isDisabled: true
+      isSending: false,
+      tipText: ''
     }
     this.changeStatus = this.changeStatus.bind(this);
   }
 
-  async componentWillMount () {
+  async componentDidMount () {
     // 判断是否已经登录
     if(await this.props.userStore.isLogin() === true) {
-      this.props.history.push('/'); 
+      this.props.history.push('/');
+      return;
     }
     document.title = "注册 - 墨鱼笔记";
-  }
-
-  componentDidMount() {
-    this.drawBackground();
-  }
-
-  drawBackground () {
-    let cvs = document.getElementById('pageBackground'),
-        width = window.innerWidth,
-        height = window.innerHeight,
-        circleNum = 15;
-    cvs.width = width;
-    cvs.height = height;
-    
-    let ctx = cvs.getContext('2d');
-
-    for (let i = 0; i < circleNum; i++){
-      let x = Math.random()*width,
-          y = Math.random()*height,
-          r = Math.random()*80 + 10;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,2*Math.PI,true);
-      ctx.fillStyle="rgba(255, 255, 255, .1)";
-      ctx.fill();
-      ctx.closePath();
-    }
+    Tool.drawBackground();
   }
 
   /**
@@ -87,35 +67,30 @@ class Page extends Component {
   /**
    * 判断用户输入正误
    */
-  judgeInput (type) {
+  async judgeInput (type) {
     if (type === 'name') {
       if (!this.state.name) {
         this.setState({
           isNameTipHide: false,
-          nameTip: '请填写用户名',
-          isDisabled: true
+          nameTip: '请填写用户名'
         })
         return;        
       } else if (!(/^\w{6,14}$/.test(this.state.name))) {
         this.setState({
           isNameTipHide: false,
-          nameTip: '用户名应由6-14位数字字母组成',
-          isDisabled: true
+          nameTip: '用户名应由6-14位数字字母组成'
         })
         return;
       }
       // 验证用户名是否存在
-      const query = `query {
-            isExist:
-            isUserNone(userId: "${this.state.name}")}`;
-
-      axios.post('/graphql', {query})
+      await Qlquery.checkName({
+        name: this.state.name
+      })
       .then(({data}) => {
         if(data.data.isExist === 1) {
           this.setState({
               isNameTipHide: false,
-              nameTip: '用户名已经存在',
-              isDisabled: true
+              nameTip: '用户名已经存在'
           })
         } else {
           this.setState({
@@ -126,22 +101,19 @@ class Page extends Component {
       .catch((err) => {
         console.log(err);
       })
-      
     }
 
     if (type === 'password') {
       if (!this.state.password) {
         this.setState({
           isPassTipHide: false,
-          passwordTip: '请填写密码',
-          isDisabled: true
+          passwordTip: '请填写密码'
         })
         return;            
       } else  if (!(/^\S{6,16}$/.test(this.state.password))) {
         this.setState({
           isPassTipHide: false,
-          passwordTip: '密码应由6-16位非空字符组成',
-          isDisabled: true
+          passwordTip: '密码应由6-16位非空字符组成'
         })
         return;
       }
@@ -155,26 +127,22 @@ class Page extends Component {
       if (!this.state.mail) {
         this.setState({
           isMailTipHide: false,
-          mailTip: '请填写邮箱',
-          isDisabled: true
+          mailTip: '请填写邮箱'
         })
         return;           
       } else if (!reg.test(this.state.mail)){
         this.setState({
           isMailTipHide: false,
-          mailTip: '邮箱格式错误',
-          isDisabled: true        
+          mailTip: '邮箱格式错误'
         })
         return;
       }
+
       // 验证邮箱是否存在
-      const query = `query {
-        isExist:
-        isMailNone(mail: "${this.state.mail}")}`;
-        
-      axios.post('/graphql', {query})
+      await Qlquery.checkMail({
+        mail: this.state.mail
+      })
       .then(({data}) => {
-        //console.log(data);
         if(data.data.isExist === 1) {
           this.setState({
             isMailTipHide: false,
@@ -194,32 +162,34 @@ class Page extends Component {
     }
   }
 
+    /**
+     * 判断按钮可用
+     */
+    judgeButtonStatus () {
+      let state = this.state;
+      if ((state.isNameTipHide && state.isPassTipHide && state.isMailTipHide) || state.isSending) {
+        return false;
+      }
+      return true;
+    }
+
   /**
    * 用户注册
    */
-  regUser() {
-    const { dispatch } = this.props
-    const query = `
-      mutation {
-        data:
-        userSave(
-          userId: "${this.state.name}",
-          password: "${this.state.password}",
-          mail: "${this.state.mail}"
-        ) {
-          token,
-          userId,
-          avatar,
-          nickname,
-          code
-        }
-      }`;
-      
-    axios.post('/graphql', {query})
+  async regUser() {
+    this.setState({
+      isSending: true
+    });
+
+    let state = this.state;
+    await Qlquery.register({
+      name: state.name,
+      password: state.password,
+      mail: state.mail
+    })
     .then(({data}) => {
       // 注册成功
       let res = data.data.data;
-      console.log(res);
       if (res.code === 1) {
         let user = {
           token: res.token,
@@ -229,16 +199,26 @@ class Page extends Component {
         }
         this.props.userStore.logIn(user);
         this.props.history.push('/');
+      } else { 
+        this.setState({
+          tipText: "注册失败:("
+        })
+        this.refs.tooltip.show()
       }
     })
     .catch((err) => {
       console.log(err);
+      this.setState({
+        tipText: "服务器出现故障:("
+      })
+      this.refs.tooltip.show()
     })
   }
 
     render () {
         return (
           <div className="page-login">
+            <Tooltip ref="tooltip" text={this.state.tipText} />
             <canvas id="pageBackground"></canvas>
             <div className="page-login-box">
               <div className="fixed-logo">
@@ -280,7 +260,7 @@ class Page extends Component {
                     </div>
                     <button 
                            className="form-btn"
-                           disabled={this.state.isDisabled}
+                           disabled={this.judgeButtonStatus()}
                            onClick={this.regUser.bind(this)}>注册</button>
                     <p className="form-subtext">已有账号? <Link to="/login">登录</Link></p>
                 </div>

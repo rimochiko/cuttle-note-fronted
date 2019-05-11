@@ -249,8 +249,13 @@
             font-size: .9rem;
             vertical-align: middle;
             &.icon {
+                display: flex;
+                align-items: center;
                 font-size: 1rem;
                 color: #7f83b8;
+                svg {
+                    margin-right: 1rem;
+                }
             }
         }
         .member {
@@ -276,8 +281,7 @@
         }
     }
     .input-btn {
-        display: block;
-        margin: 1rem auto;
+        padding: .5rem 1rem;
     }
 }
 

@@ -9,8 +9,7 @@ export default {
 }
 
 
-const USER = "user",
-      GROUP = "group";
+const USER = "user"
 
 function getOwnerInfo (params) {
     const query = params.obj === USER ? `

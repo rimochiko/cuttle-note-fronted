@@ -21,106 +21,18 @@ import Qlquery from './graphql';
 
 import axios from 'axios';
 import { inject, observer } from 'mobx-react';
-let newsList = [
-  {
-    id: 3,
-    title: '是否要做Code Review？与BAT资深架构...',
-    link: '/',
-    author: {
-      name: '小郑哥',
-      avatar: require('../../../assets/images/avatar3.jpg'),
-      id: 'rgrg'
-    },
-    date: '1天前',
-    type: 2
-  },
-  {
-    id: 4,
-    title: '《深入react技术栈》之样式处理',
-    link: '/',
-    author: {
-      name: '歌非',
-      avatar: require('../../../assets/images/avatar6.jpg'),
-      id: 'trrtr'
-    },
-    date: '1天前',
-    des: 'css模块化的方案:CSS Module CSS Module样式默认局部,要使用全局样式就加入:...《深入React技术栈》笔记 一、初入React世界 1.2 JSX语法 class 属性修改为...',
-    type: 1
-  },
-  {
-    id: 6,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: require('../../../assets/images/avatar4.jpg'),
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 2
-  },
-  {
-    id: 7,
-    title: '最让程序员自豪的事情是什么？',
-    link: '/',
-    author: {
-      name: '此人已失踪',
-      avatar: require('../../../assets/images/avatar5.jpg'),
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  },
-  {
-    id: 8,
-    title: '搜索和在线阅读 Github 代码的插件推荐',
-    link: '/',
-    author: {
-      name: 'sedes',
-      avatar: require('../../../assets/images/avatar6.jpg'),
-      id: 'sedes'
-    },
-    date: '1天前',
-    isCollected: false,
-    type: 1
-  }
-]
 
-let groupList = [{
-  id: '1232',
-  name: '野原家',
-  count: 3,
-  avatar: require('../../../assets/images/avatar5.jpg'),
-  news: []
-}, {
-  id: '1233',
-  name: '向日葵班',
-  count: 14,
-  avatar: require('../../../assets/images/avatar6.jpg'),
-  news: []
-}];
+const FILE_LIKE = 2,
+      FILE_COLLECT = 3,
+      FILE_CREATE = 5,
+      FILE_COMMENT = 8;
 
-let groupMember = [{
-  id: 'hdbdm', 
-  name: '无脸男',
-  avatar: require('../../../assets/images/avatar2.jpg')
-}, {
-  id: 'hdbd3m',
-  name: '大神', 
-  avatar: require('../../../assets/images/avatar4.jpg')
-},
-{
-  id: 'hdb2dm', 
-  name: '山东省',
-  avatar: require('../../../assets/images/avatar3.jpg')
-},
-{
-  id: 'hdb4dm', 
-  name: '圣斗士',
-  avatar: require('../../../assets/images/avatar.jpg')
-}]
+// 团队动作相关
+const GROUP_JOIN = 25;
+
+// 个人操作相关
+const USER_FOLLOW = 44;
+
 
 @inject('userStore')
 @observer
@@ -148,6 +60,7 @@ class Page extends Component {
           searchList: [],
           selectList: [],
           isAuth: 0,
+          news: [],
           tipText: '' 
         }
         this.getNewsList = this.getNewsList.bind(this);
@@ -200,6 +113,19 @@ class Page extends Component {
         .then(({data}) => {
           let res = data.data.data;
           group.members = res.member || [];
+        })
+
+        // 获取团队成员
+        await Qlquery.getHomeData({
+          groupId: group.id,
+          token: this.props.userStore.user.token,
+          userId: this.props.userStore.user.userId
+        })
+        .then(({data}) => {
+          let news = data.data.news;
+          this.setState({
+            news: news.options
+          })
         })
        
         this.setState({
@@ -276,40 +202,49 @@ class Page extends Component {
 
   getNewsIcon (type) {
     switch(type) {
-      case 1: return (
+      case 0: return (
         <span className="icon pen"><FontAwesomeIcon icon="pen" /></span>
-      );break;
-      case 2: return (
+      );
+      case 1: return (
         <span className="icon camera"><FontAwesomeIcon icon="camera" /></span>
       )
+      default: return '';
     }
   }
 
-  /**
-   * 获取动态列表
-   *  */
-  getNewsList (item) {
-    return (
-    <div className="item-news" key={item.id}>
-      <div className="avatar">                              
-        <img src={item.author.avatar} alt={item.author.name}/>
-      </div>
-      <div className="detail">
-        <div className="header">
-          <p className="date">{item.date}</p>
-          <p className="author"><Link to='/' className="link">{item.author.name}</Link></p>
-          <p className="type">
-            {this.getNewsIcon(item.type)}
-            创建了一篇新的文章<Link to={item.link}>{item.title}</Link>   
-          </p>
-        </div>
-        <div className="body">
-          {item.des}
-        </div>
-      </div>
-    </div>
-    );
-  }
+    /**
+     * 获取动态列表
+     *  */
+    getNewsList (item) {
+      // 根据动态种类
+      switch(item.type) {
+        case FILE_CREATE:
+          return (
+            <div className="item-news" key={item.id}>
+              <div className="avatar">                              
+                <img src={item.user.avatar ? `http://localhost:8080/static/user/${item.user.avatar}` : require('../../../assets/images/default.jpg')} 
+                     alt={item.user.id}/>
+              </div>
+              <div className="detail">
+                <div className="header">
+                  <p className="date">{item.date}</p>
+                  <p className="author"><Link to='/' className="link">{item.user.nickname}</Link></p>
+                  <p className="type">
+                    {this.getNewsIcon(item.post.type)}
+                    {item.post.type === 0 ? "创建了一篇新文章 " : "创建了一张新图画 "}
+                    <Link to={item.post.type === 0 ? `/library/${item.post.link}`:`/gallery/${item.post.link}`}>{item.post.title}</Link>   
+                  </p>
+                </div>
+                <div className="body">
+                  {item.post.type === 0 ? item.post.content : "" } 
+                </div>
+              </div>
+            </div>
+          );
+        default: return '';
+      }
+
+    }
 
   /**
    * 生成团队操作按钮
@@ -409,7 +344,7 @@ class Page extends Component {
                 <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
               </div>
               {
-                newsList.map((item, index) => {
+                this.state.news&&this.state.news.map((item, index) => {
                   return this.getNewsList(item);
                 })
               }
@@ -450,6 +385,7 @@ class Page extends Component {
      // 判断是否有登录
      if (await this.props.userStore.isLogin() === false) {
       this.props.history.push('/login');
+      return;
     }
     document.title="团队 - 墨鱼笔记";
     let userStore = this.props.userStore;
@@ -508,7 +444,20 @@ class Page extends Component {
         let res = data.data.data;
         group.members = res.member || [];
       })
-     
+
+      // 获取团队成员
+      await Qlquery.getHomeData({
+        groupId: group.id,
+        token: this.props.userStore.user.token,
+        userId: this.props.userStore.user.userId
+      })
+      .then(({data}) => {
+        let news = data.data.news;
+        this.setState({
+          news: news.options
+        })
+      })
+           
       this.setState({
         groupList: groupList,
         group: {
@@ -609,8 +558,8 @@ class Page extends Component {
 
    async componentWillUpdate(nextProps) {
     let defaultId = this.state.groupList[0] && this.state.groupList[0].id,
-        prevMatch = this.props.match.params && this.props.match.params.id || defaultId,
-        nextMatch = nextProps.match.params && nextProps.match.params.id || defaultId
+        prevMatch = (this.props.match.params && this.props.match.params.id) || defaultId,
+        nextMatch = (nextProps.match.params && nextProps.match.params.id) || defaultId
 
     if (prevMatch === nextMatch) {
       return;
@@ -683,6 +632,77 @@ class Page extends Component {
         this.refs.tooltip.show();
       }
     })
+  }
+
+  async cancelAdmin (userId) {
+    await Qlquery.changeUserRole({
+      token: this.props.userStore.user.token,
+      userId: this.props.userStore.user.userId,
+      groupId: this.state.group.id,
+      objectId: userId,
+      isAdmin: false
+    })
+    .then(({data}) => {
+      let res = data.data.data;
+      if(res === 1) {
+        this.setState({
+          tipText: '取消管理成功'
+        });
+        this.refs.tooltip.show();
+      }
+    })
+
+  }
+  
+  async setAdmin (userId) {
+    await Qlquery.changeUserRole({
+      token: this.props.userStore.user.token,
+      userId: this.props.userStore.user.userId,
+      groupId: this.state.group.id,
+      objectId: userId,
+      isAdmin: true
+    })
+    .then(({data}) => {
+      let res = data.data.data;
+      if(res === 1) {
+        this.setState({
+          tipText: '设置管理成功'
+        });
+        this.refs.tooltip.show();
+      }
+    })
+  }
+
+  async deleteUser (userId) {
+    await Qlquery.deleteUser({
+      token: this.props.userStore.user.token,
+      userId: this.props.userStore.user.userId,
+      groupId: this.state.group.id,
+      objectId: userId
+    })
+    .then(({data}) => {
+      let res = data.data.data;
+      if(res === 1) {
+        this.setState({
+          tipText: '移除成员成功'
+        });
+        this.refs.tooltip.show();
+      }
+    })
+  }
+
+  generateMemberRoleBtn (roleId, userId) {
+    if (roleId === 4) {
+      return (
+        <button className="radius-btn input-btn" 
+                onClick={this.cancelAdmin.bind(this, userId)}>取消管理员</button>
+      )
+    } else if(roleId === 5) {
+      return (
+        <button className="radius-btn input-btn"
+                onClick={this.setAdmin.bind(this, userId)}>设置管理员</button>
+      )
+    }
   }
 
   render () {
@@ -775,7 +795,9 @@ class Page extends Component {
                                     <td>
                                       <p>?</p>
                                     </td>
-                                    <td><p>{item.role}</p></td> 
+                                    <td>
+                                      <p>{item.role === 4? "管理员" : "普通成员"}</p>
+                                    </td> 
                                     <td className="icon">
                                     </td>
                                   </tr>                                  
@@ -795,16 +817,15 @@ class Page extends Component {
                                       </div>
                                       </td>
                                       <td>
-                                        <p>2019-03-11</p>
+                                        <p>?</p>
                                       </td>
                                       <td>
-                                        <select className="mck-select">
-                                          <option>管理员</option>
-                                          <option>一般用户</option>
-                                        </select>
+                                        <p>{item.role === 4? "管理员" : "普通成员"}</p>
                                       </td> 
                                       <td className="icon">
-                                        <FontAwesomeIcon icon={["far", "trash-alt"]} />
+                                        <FontAwesomeIcon icon={["far", "trash-alt"]}
+                                                         onClick={this.deleteUser.bind(this, item.id)}/>
+                                        {this.generateMemberRoleBtn(item.role, item.id)}
                                       </td>
                                     </tr>
                                   )
@@ -813,7 +834,6 @@ class Page extends Component {
                             }
                           </tbody>
                         </table>
-                        <button className="input-btn radius-btn">确认修改</button>
                       </div>
                     </Modal>
 
