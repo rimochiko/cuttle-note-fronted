@@ -32,7 +32,8 @@ class Page extends Component {
             id: '',
             nickname: '',
             avatar: '',
-            type: USER
+            type: USER,
+            isFollow: false
           },
           isAuth: false,
           spaceList: [],
@@ -111,7 +112,7 @@ class Page extends Component {
         }
       } else {
         // 发送请求获取
-        owner = await this.getOwnerInfo(params);
+        owner = await this.getOwnerInfo(params, userStore.user.userId);
         owner.type = params.obj
       }
       // 如果URL的指定不在可访问的空间内
@@ -163,32 +164,12 @@ class Page extends Component {
     /**
      * 获取当前主人的信息
      */
-    async getOwnerInfo (params) {
+    async getOwnerInfo (params, userId) {
       let owner = {};
-      const query = params.obj === USER ? `
-       query {
-         data:
-         userEasy(
-           id:"${params.owner}"
-         ) {
-          avatar
-          id
-          nickname
-        }
-       }`:
-       `query {
-         data:
-         groupEasy(
-           id:"${params.owner}"
-         ) {
-           id
-           avatar
-           nickname
-         }
-       }`;
-      await axios.post('/graphql', {query})
+      qlQuery.getOwnerInfo(params, userId)
       .then(({data}) => {
         let res = data.data.data;
+        let isFollow = data.data.isFollow;
         let avatar;
         if (params.obj === USER) {
           avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
@@ -200,7 +181,8 @@ class Page extends Component {
             id: res.id,
             name: res.nickname,
             avatar: avatar,
-            type: params.obj
+            type: params.obj,
+            isFollow: isFollow
           }
         }
       })
@@ -384,7 +366,7 @@ class Page extends Component {
           </Link>
         )
       } else if(this.state.object.type === USER){
-        if (this.state.isOpted) {
+        if (this.state.object.isFollow) {
           return (
             <div onClick={this.unfollowUser.bind(this)}>
               <FontAwesomeIcon icon="minus"/>取消关注

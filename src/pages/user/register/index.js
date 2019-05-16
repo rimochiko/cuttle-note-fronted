@@ -167,7 +167,7 @@ class Page extends Component {
      */
     judgeButtonStatus () {
       let state = this.state;
-      if ((state.isNameTipHide && state.isPassTipHide && state.isMailTipHide) || state.isSending) {
+      if (state.isSending || (state.isNameTipHide && state.isPassTipHide && state.isMailTipHide)) {
         return false;
       }
       return true;

@@ -32,7 +32,19 @@ const GROUP_JOIN = 25;
 
 // 个人操作相关
 const USER_FOLLOW = 44;
-
+const defaultStatistic = {
+  likeNum: 0,
+  textNum: 0,
+  viewNum: 0,
+  imgNum: 0,
+  chart: [{"name":"记录次数",
+  "type":"line",
+  "smooth":true,
+  "stack":"总量",
+  "areaStyle":{"color":"#d3d3e7"},
+  "lineStyle":{"color":"#d3d3e7"},
+  "data":[0,0,0,0,0,0,0]}]  
+}
 
 @inject('userStore')
 @observer
@@ -40,7 +52,7 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
-          statistics: '',
+          statistics: defaultStatistic,
           groupList: [],
           group: {
             name: '',
@@ -56,7 +68,8 @@ class Page extends Component {
           tPublic: false,
           tIdTip: '',
           tNameTip: '',
-          searchText: '',
+          tDesTip: '',
+          tAvatarTip: '',
           searchList: [],
           selectList: [],
           isAuth: 0,
@@ -64,6 +77,7 @@ class Page extends Component {
           tipText: '' 
         }
         this.getNewsList = this.getNewsList.bind(this);
+        this.judgeSubmitForm = this.judgeSubmitForm.bind(this);
     }
 
     async fetchGroupData(id) {
@@ -115,16 +129,18 @@ class Page extends Component {
           group.members = res.member || [];
         })
 
-        // 获取团队成员
+        // 获取主页成员
         await Qlquery.getHomeData({
           groupId: group.id,
           token: this.props.userStore.user.token,
           userId: this.props.userStore.user.userId
         })
         .then(({data}) => {
-          let news = data.data.news;
+          let news = data.data.news,
+              statistics = data.data.statistics;
           this.setState({
-            news: news.options
+            news: news.options,
+            statistics: statistics
           })
         })
        
@@ -139,14 +155,6 @@ class Page extends Component {
         })
       }
     }
-    
-    /**
-     * 获取团队首页信息
-     */
-    fetchMainData () {
-      // 获取团队成员、团队数据、团队动态
-    }
-    
     
     /** 
      * 添加成员面板
@@ -182,12 +190,18 @@ class Page extends Component {
    /**
     * 搜索用户
     */
-   async searchUser () {
+   async searchUser (text) {
      let user = this.props.userStore.user;
+     if(text === '') {
+       this.setState({
+         searchList: []
+       })
+     };
+
      await Qlquery.searchUsers({
        token: user.token,
        userId: user.userId,
-       search: this.state.searchText
+       search: text
      })
      .then(({data}) => {
        let res = data.data.data;
@@ -196,7 +210,9 @@ class Page extends Component {
           searchList: res.users
         })         
        }
-
+     })
+     .catch((err) => {
+       console.log(err);
      })
    }
 
@@ -310,7 +326,7 @@ class Page extends Component {
             </div> `  
         </div>
 
-        <div className="flex-column group-main">
+        <div className="flex-column group-main flex-1">
           <div className="group-statistics">
                 <div className="section-title">
                   <h1 className="text">数据统计</h1>
@@ -319,20 +335,20 @@ class Page extends Component {
                 <div className="flex-row">
                   <div className="group-statist-detail">
                     <div className="item-statist">
-                      <p className="data">123</p>
+                      <p className="data">{this.state.statistics.textNum}</p>
                       <p className="name">文章</p>
                     </div>
                     <div className="item-statist">
-                      <p className="data">26</p>
-                      <p className="name">文章</p>
+                      <p className="data">{this.state.statistics.imgNum}</p>
+                      <p className="name">图画</p>
                     </div>
                     <div className="item-statist">
-                      <p className="data">17</p>
-                      <p className="name">评论</p>
+                      <p className="data">{this.state.statistics.likeNum}</p>
+                      <p className="name">点赞量</p>
                     </div>
                     <div className="item-statist">
-                      <p className="data">1454</p>
-                      <p className="name">浏览</p>
+                      <p className="data">{this.state.statistics.viewNum}</p>
+                      <p className="name">浏览量</p>
                     </div>
                   </div>
                   <div className="statist-graph" id="statist-graph"></div>
@@ -469,10 +485,40 @@ class Page extends Component {
         }
       })
     }
-    // 基于准备好的dom，初始化echarts实例
-    //var myChart = echarts.init(document.getElementById('statist-graph'));
+    let  myChart = echarts.init(document.getElementById('statist-graph'));
     // 绘制图表
-    // myChart.setOption({});
+    myChart.setOption({
+      tooltip : {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'cross',
+            label: {
+                backgroundColor: '#6a7985'
+            }
+        }
+    },
+    legend: {
+        data:['浏览量','人气量','记录次数']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+        backgroundColor: '#f7f7fb'
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['周一','周二','周三','周四','周五','周六','周日']
+        }
+    ],
+    yAxis : [{
+            type : 'value'
+    }],
+    series :(this.state.statistic && this.state.statistic.chart) || defaultStatistic.chart
+     });
     this.refs.loading.toggle();
   }
   
@@ -528,8 +574,18 @@ class Page extends Component {
          this.toggleCreateGroup();
          this.props.history.push(`/group/${id}`)
        } else {
-
+         this.setState({
+           tipText: '创建团队失败:('
+         });
+         this.refs.tooltip.show()
        }
+     })
+     .catch((err) => {
+       console.log(err);
+       this.setState({
+        tipText: '创建团队失败:('
+      });
+      this.refs.tooltip.show()
      })
    }
   
@@ -553,6 +609,9 @@ class Page extends Component {
            tIdTip: ''
          })
        }
+     })
+     .catch((err) => {
+       console.log(err)
      })
    }
 
@@ -632,6 +691,13 @@ class Page extends Component {
         this.refs.tooltip.show();
       }
     })
+    .catch((err) => {
+      console.log(err);
+      this.setState({
+        tipText: '邀请发送失败'
+      });
+      this.refs.tooltip.show();
+    })
   }
 
   async cancelAdmin (userId) {
@@ -648,10 +714,19 @@ class Page extends Component {
         this.setState({
           tipText: '取消管理成功'
         });
-        this.refs.tooltip.show();
+      } else {
+        this.setState({
+          tipText: '取消管理失败'
+        });
       }
+      this.refs.tooltip.show();
     })
-
+    .catch((err) => {
+      console.log(err);
+      this.setState({
+        tipText: '取消管理失败'
+      });      
+    })
   }
   
   async setAdmin (userId) {
@@ -686,8 +761,20 @@ class Page extends Component {
         this.setState({
           tipText: '移除成员成功'
         });
-        this.refs.tooltip.show();
+      } else {
+        this.setState({
+          tipText: '移除成员失败'
+        });
       }
+      this.refs.tooltip.show();
+    })
+    .catch((err) => {
+      this.setState({
+        tipText: '移除成员失败'
+      });
+      this.refs.tooltip.show();     
+        this.refs.tooltip.show();
+      this.refs.tooltip.show();     
     })
   }
 
@@ -705,6 +792,75 @@ class Page extends Component {
     }
   }
 
+  generateGroupAuth (roleId) {
+    if(roleId === 5) {
+      return "普通成员"
+    }
+    if(roleId === 6) {
+      return "组长"
+    }
+    if(roleId === 4) {
+      return "副组长"
+    }
+  }
+
+  judgeSubmitForm (type) {
+    if (type === 0) {
+        // 如果是创建团队
+        if (!this.state.tId || !this.state.tName) {
+          return false;
+        }
+        if (this.state.tIdTip || 
+            this.state.tNameTip || 
+            this.state.tDesTip || 
+            this.state.tAvatarTip) {
+            return false;
+        }
+        return true;
+    } else {
+        // 如果是更新团队
+        if (!this.state.tName) {
+          return false;
+        }
+        if (this.state.tIdTip || 
+            this.state.tNameTip || 
+            this.state.tDesTip || 
+            this.state.tAvatarTip) {
+            return false;
+        }
+        return true;   
+    }
+    return false;
+  }
+
+  judgeTempAvatar (e) {
+    if (!e.target.files) {
+      return;
+    }
+    let file = e.target.files[0],
+    reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      let tag="base64,",
+          base64 = e.target.result,
+          baseStr = base64.substring(base64.indexOf(tag) + tag.length);
+      let eqTagIndex=baseStr.indexOf("=");
+          baseStr=eqTagIndex!=-1?baseStr.substring(0,eqTagIndex):baseStr;
+      let strLen=baseStr.length;
+      let fileSize=(strLen-(strLen/8)*2)/1024;
+      if(fileSize >= 64) {
+        this.setState({
+          tAvatarTip: '图片大小不能超过64kb'
+        })
+        return;
+      }
+      this.setState({
+        tAvatar: e.target.result,
+        tAvatarTip: ''
+      })
+    }
+  }
+
   render () {
         return (
           <div className="page">
@@ -718,10 +874,10 @@ class Page extends Component {
                                placeholder="搜索ID" 
                                className="input"
                                onChange={(e) => {
-                                 this.setState({
-                                   searchText: e.target.value.trim()
-                                 })
-                                 this.searchUser();
+                                 let text = e.target.value.trim();
+                                 if (text) {
+                                  this.searchUser(text);                                   
+                                 }
                                }}/>
                         <ul className="ul-add-mem">
                         {
@@ -772,7 +928,6 @@ class Page extends Component {
                           <tbody>
                             <tr>
                               <th>成员</th>
-                              <th>加入日期</th>
                               <th>权限</th>
                               <th></th>
                             </tr>
@@ -793,10 +948,7 @@ class Page extends Component {
                                       </div>
                                     </td>
                                     <td>
-                                      <p>?</p>
-                                    </td>
-                                    <td>
-                                      <p>{item.role === 4? "管理员" : "普通成员"}</p>
+                                      <p>{this.generateGroupAuth(item.role)}</p>
                                     </td> 
                                     <td className="icon">
                                     </td>
@@ -817,10 +969,7 @@ class Page extends Component {
                                       </div>
                                       </td>
                                       <td>
-                                        <p>?</p>
-                                      </td>
-                                      <td>
-                                        <p>{item.role === 4? "管理员" : "普通成员"}</p>
+                                        <p>{this.generateGroupAuth(item.role)}</p>
                                       </td> 
                                       <td className="icon">
                                         <FontAwesomeIcon icon={["far", "trash-alt"]}
@@ -843,16 +992,34 @@ class Page extends Component {
                           <div className="flex-column input-side">
                             <div className="input-group">
                               <label className="input-label" 
-                                     >小组域名</label>
+                                     >小组ID</label>
                               <input className="input-text"
                                      type="text" 
                                      placeholder="请输入域名"
+                                     value={this.state.tId}
                                      onChange={(e) => {
                                        this.setState({
                                          tId: e.target.value
                                        })
                                      }}
-                                     onBlur={this.checkGroupId.bind(this)}/>
+                                     onBlur={()=> {
+                                       if(!this.state.tId) {
+                                         this.setState({
+                                           tIdTip: '团队ID不能为空'
+                                         })
+                                         return;
+                                       }
+                                       if(!this.state.Id.match(/^(\w|_){1,10}$/)) {
+                                         this.setState({
+                                           tIdTip: '团队ID只能包含字母数字和下划线'
+                                         })
+                                         return;
+                                       }
+                                      this.checkGroupId.bind(this)
+                                      this.setState({
+                                        tIdTip: ''
+                                      })
+                                     }}/>
                               <span className="input-mark">{this.state.tIdTip || "必填项"}</span>
                             </div>
 
@@ -861,17 +1028,27 @@ class Page extends Component {
                               <input className="input-text" 
                                      type="text" 
                                      placeholder="请输入昵称"
+                                     value={this.state.tName}
                                      onChange={(e) => {
                                       this.setState({
                                         tName: e.target.value
                                       })
                                     }}
                                     onBlur={()=>{
+                                      if (!this.state.tName) {
+                                        this.setState({
+                                          tNameTip: '团队名称不能为空'
+                                        })
+                                        return;
+                                      }
                                       if (this.state.tName && this.state.tName.length > 12) {
                                         this.setState({
                                           tNameTip: '团队名称超过了12个字符'
                                         })
                                       }
+                                      this.setState({
+                                        tNameTip: ''
+                                      })
                                     }}/>
                               <span className="input-mark">{this.state.tNameTip || "必填项，12个字符以内"}</span>
                             </div>
@@ -881,12 +1058,22 @@ class Page extends Component {
                               <textarea className="input-area" 
                                         type="text" 
                                         placeholder="介绍一下你的小组吧！50字以内"
+                                        value={this.state.tDes}
                                         onChange={(e) => {
                                           this.setState({
                                             tDes: e.target.value
+                                          })}}
+                                        onBlur={()=>{
+                                          if (this.state.tDes && this.state.tName.length > 50) {
+                                            this.setState({
+                                              tDesTip: '团队简介超过了50个字符'
+                                            })
+                                          }
+                                          this.setState({
+                                            tDesTip: ''
                                           })
                                         }}/>
-                              <span className="input-mark">非必填项</span>
+                              <span className="input-mark">{this.state.tDesTip || "非必填项"}</span>
                             </div>
 
                             <div className="input-group mini-group">
@@ -895,11 +1082,11 @@ class Page extends Component {
                                 <span className="input-mark">私密小组的图文库只有成员能浏览</span>
                               </div>
                               <Switch 
-                                isChecked="this.state.temp.public"
+                                isChecked={this.state.tPublic}
                                 toggle={() => {
                                   this.setState({
                                     temp: {
-                                      public: !this.state.temp.public
+                                      public: !this.state.tPublic
                                     }
                                   })
                                 }}/>
@@ -916,26 +1103,18 @@ class Page extends Component {
                                   <input className="file-input" 
                                          type="file"
                                          accept="image/jpeg,image/x-png"
-                                         onChange={(e) => {
-                                          let file = e.target.files[0],
-                                              reader = new FileReader();
-                                          reader.readAsDataURL(file);
-                                          reader.onload = (e) => {
-                                            this.setState({
-                                              tAvatar: e.target.result
-                                            })
-                                          } 
-                                         }}/>
+                                         onChange={this.judgeTempAvatar.bind(this)}/>
                                   <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                               </div>
                             </div>
-                           <span className="input-mark">非必填项</span>
+                           <span className="input-mark">{this.state.tAvatarTip || "非必填项"}</span>
                           </div>
                         </div>
 
                         <div className="input-group">
                           <button className="input-btn radius-btn"
-                                  onClick={this.createGroup.bind(this)}>确认</button>
+                                  onClick={this.createGroup.bind(this)}
+                                  disabled={!this.judgeSubmitForm(0)}>确认</button>
                         </div>
                       </div>
                     </Modal>
@@ -955,19 +1134,29 @@ class Page extends Component {
                               <input className="input-text" 
                                      type="text" 
                                      placeholder="请输入昵称"
-                                     onChange={(e) => {
-                                      this.setState({
-                                        tName: e.target.value
-                                      })
-                                    }}
-                                    onBlur={()=>{
-                                      if (this.state.tName && this.state.tName.length > 12) {
+                                     value={this.state.tName}
+                                      onChange={(e) => {
                                         this.setState({
-                                          tNameTip: '团队名称超过了12个字符'
+                                          tName: e.target.value
                                         })
-                                      }
-                                    }}/>
-                              <span className="input-mark">必填项</span>
+                                      }}
+                                      onBlur={()=>{
+                                        if (!this.state.tName) {
+                                          this.setState({
+                                            tNameTip: '团队名称不能为空'
+                                          })
+                                          return;
+                                        }
+                                        if (this.state.tName && this.state.tName.length > 12) {
+                                          this.setState({
+                                            tNameTip: '团队名称超过了12个字符'
+                                          })
+                                        }
+                                        this.setState({
+                                          tNameTip: ''
+                                        })
+                                      }}/>
+                              <span className="input-mark">{this.state.tNameTip || "必填项，12个字符以内"}</span>
                             </div>
 
                             <div className="input-group">
@@ -975,12 +1164,22 @@ class Page extends Component {
                               <textarea className="input-area" 
                                         type="text" 
                                         placeholder="介绍一下你的小组吧！50字以内"
+                                        value={this.state.tDes}
                                         onChange={(e) => {
                                           this.setState({
                                             tDes: e.target.value
+                                          })}}
+                                        onBlur={()=>{
+                                          if (this.state.tDes && this.state.tName.length > 50) {
+                                            this.setState({
+                                              tDesTip: '团队简介超过了50个字符'
+                                            })
+                                          }
+                                          this.setState({
+                                            tDesTip: ''
                                           })
                                         }}/>
-                              <span className="input-mark">非必填项</span>
+                              <span className="input-mark">{this.state.tDesTip || "非必填项"}</span>
                             </div>
 
                             <div className="input-group mini-group">
@@ -989,18 +1188,19 @@ class Page extends Component {
                                 <span className="input-mark">私密小组的图文库只有成员能浏览</span>
                               </div>
                               <Switch 
-                                isChecked="this.state.temp.public"
+                                isChecked={this.state.tPublic}
                                 toggle={() => {
                                   this.setState({
                                     temp: {
-                                      public: !this.state.temp.public
+                                      public: !this.state.tPublic
                                     }
                                   })
                                 }}/>
                             </div> 
 
                             <div className="input-group">
-                              <button className="input-btn radius-btn">确认</button>
+                              <button className="input-btn radius-btn"
+                                      disabled={!this.judgeSubmitForm(1)}>确认</button>
                             </div>
                           </div>
                          
@@ -1015,20 +1215,12 @@ class Page extends Component {
                                   <input className="file-input" 
                                          type="file"
                                          accept="image/jpeg,image/x-png"
-                                         onChange={(e) => {
-                                          let file = e.target.files[0],
-                                              reader = new FileReader();
-                                          reader.readAsDataURL(file);
-                                          reader.onload = (e) => {
-                                            this.setState({
-                                              tAvatar: e.target.result
-                                            })
-                                          } 
-                                         }}/>
+                                         onChange={this.judgeTempAvatar.bind(this)}
+                                         />
                                   <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                                 </div>
                               </div>
-                              <span className="input-mark">非必填项</span>
+                              <span className="input-mark">{this.state.tAvatarTip || "非必填项"}</span>
                             </div>
                             
                             <div className="input-group">

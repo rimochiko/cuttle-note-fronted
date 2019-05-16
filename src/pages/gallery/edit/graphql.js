@@ -17,11 +17,11 @@ function createChart (args) {
         userImagePostSave (
             token: "${args.token}",
             userId: "${args.userId}",
-            title: "${args.title}",
+            title: "${args.title || "无标题"}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
-            imgbase: "${args.imgBase || ''}"
+            imgbase: "${args.imgbase || ''}"
         ) {
             code
             postId
@@ -33,11 +33,11 @@ function createChart (args) {
         groupImagePostSave (
             token: "${args.token}",
             userId: "${args.userId}",
-            title: "${args.title}",
+            title: "${args.title || "无标题"}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
-            imgbase: "${args.imgBase || ''}"
+            imgbase: "${args.imgbase || ''}"
             groupId: ${args.groupId}
         ) {
             code
@@ -46,14 +46,16 @@ function createChart (args) {
         }
     }`;
 
-    return axios({
+   return axios({
         url: '/graphql',
         method: 'post',
         headers:{
           'Content-Type': 'application/x-www-form-urlencoded'
         },
+        maxContentLength: Infinity,
         data: encodeURIComponent("query")+"="+encodeURIComponent(query)
-     })}
+     })
+    }
 
 
 function updateChart (args) {
@@ -68,7 +70,7 @@ function updateChart (args) {
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
-            imgbase: "${args.imgBase || ''}"
+            imgbase: "${args.imgbase || ''}"
         ) {
             code
             postId
@@ -85,7 +87,7 @@ function updateChart (args) {
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
-            imgbase: "${args.imgBase || ''}"
+            imgbase: "${args.imgbase || ''}"
             groupId: "${args.groupId}"
         ) {
             code
@@ -137,5 +139,5 @@ function getOnePost (args) {
       }
     }
     `
-    return axios.post('graphql', {query})
+    return axios.post('/graphql', {query})
   }

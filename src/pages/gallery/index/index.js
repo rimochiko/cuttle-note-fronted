@@ -31,7 +31,8 @@ class Page extends Component {
                 id: '',
                 name: '',
                 avatar: '',
-                type: ''
+                type: '',
+                isFollow: false
             },
             post: {
                 author: '',
@@ -39,7 +40,8 @@ class Page extends Component {
                 createDate: '',
                 comments: []
             },
-            spaceList: []
+            spaceList: [],
+            isAuth: false
         }
     }
     
@@ -101,10 +103,8 @@ class Page extends Component {
         }
       } else {
         // 发送请求获取
-        owner = await this.getOwnerInfo(params);
+        owner = await this.getOwnerInfo(params, userStore.user.userId);
         owner.type = params.obj
-        console.log("owner:");
-        console.log(owner);
       }
       // 如果URL的指定不在可访问的空间内
       this.setState({
@@ -155,17 +155,19 @@ class Page extends Component {
     /**
      * 获取当前主人的信息
      */
-    async getOwnerInfo (params) {
+    async getOwnerInfo (params,userId) {
       let owner = {};
-      await qlQuery.getOwnerInfo(params)
+      await qlQuery.getOwnerInfo(params,userId)
       .then(({data}) => {
         let res = data.data.data;
+        let isFollow = data.data.isFollow;
         if(res.id) {
           owner = {
             id: res.id,
             name: res.nickname,
             avatar: res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg'),
-            type: params.obj
+            type: params.obj,
+            isFollow: isFollow
           }
         }
       })
@@ -302,6 +304,88 @@ class Page extends Component {
       this.refs.create.toggle();
     }
 
+    generateLabel (status) {
+      if (status === 0) {
+        return (
+            <div className="tip-type">
+              草稿
+            </div>
+        )
+      }
+    }
+
+      // 关注用户
+      async followUser () {
+        if (this.state.object && this.state.object.type === USER && this.state.object.id) {
+          await qlQuery.addFollow({
+            userId:this.props.userStore.user.userId,
+            followId: this.state.object.id,
+            token:this.props.userStore.user.token
+          })
+          .then(({data}) => {
+            if (data === 1) {
+              this.setState({
+                isOpted: true
+              })
+            }
+          })
+        }
+      }
+  
+      // 取消用户
+      async unfollowUser () {
+        if (this.state.object && this.state.object.type === USER && this.state.object.id) {
+          await qlQuery.cancelFollow({
+            userId:this.props.userStore.user.userId,
+            followId: this.state.object.id,
+            token:this.props.userStore.user.token
+          })
+          .then(({data}) => {
+            if (data === 1) {
+              this.setState({
+                isOpted: false
+              })
+            }
+          })
+        }
+      }
+      
+    /**
+     * 生成关注按钮
+     */
+    generateOption () {
+      // 判断是否有写入权
+      console.log(this.state.isAuth);
+      if (this.state.isAuth) {
+        return (
+          <Link to="/article/edit" title="创建新文章">
+            <FontAwesomeIcon icon="plus" />
+          </Link>
+        )
+      } else if(this.state.object.type === USER){
+        if (this.state.object.isFollow) {
+          return (
+            <div onClick={this.unfollowUser.bind(this)}>
+              <FontAwesomeIcon icon="minus"/>取消关注
+            </div>
+          ) 
+        } else {
+          return (
+            <div onClick={this.followUser.bind(this)}>
+              <FontAwesomeIcon icon="plus"/>关注TA
+            </div>
+          )
+        }
+
+      } else if(this.state.object.type === GROUP) {
+        return (
+          <div>
+            <FontAwesomeIcon icon="plus"/>加入团队
+          </div>
+        )
+      }
+    }
+
     render () {
         return (
             <div className="page">
@@ -332,7 +416,7 @@ class Page extends Component {
                             </DropDown>                      
                         </div>
                         <div className="option">
-                            <span onClick={this.toggleCreate.bind(this)}><FontAwesomeIcon icon="plus" /></span>
+                            {this.generateOption()}
                         </div>
                       </div>                        
                       <div className="imglist">
@@ -340,19 +424,17 @@ class Page extends Component {
                           {
                               this.state.posts.map((item) => {
                                   return (
-                                  <li className="component-img-item" key={item.id}>
-                                    <div className="tip-type">
-                                      草稿
-                                    </div>
+                                    <li className="component-img-item" key={item.id}>
+                                    {this.generateLabel(item.status)}
                                     <Link to={`/gallery/${this.state.object.type === USER ? USER : GROUP}/${this.state.object.id}/${item.id}`}>
-                                      <img src={require("../../../assets/images/img.png")} 
-                                           className="component-img-cover"
-                                           alt={item.title}/>
+                                      <img src={`http://localhost:8080/static/chart/${item.url}.png`} 
+                                            className="component-img-cover"
+                                            alt={item.title}/>
                                       <p className="component-img-text">
                                         {item.title}
                                       </p>
                                     </Link>
-                                   </li>    
+                                    </li> 
                                   )
                               })
                           }
@@ -370,7 +452,7 @@ class Page extends Component {
                             removePost={this.showRemovePost.bind(this)}
                             infoPost={this.showInfoPost.bind(this)}
                             post={this.state.post}
-                            isAuth={false}
+                            isAuth={this.state.isAuth}
                           />)} 
                         />
                       </Switch>

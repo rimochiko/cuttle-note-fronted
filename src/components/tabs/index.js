@@ -15,7 +15,10 @@ class Tabs extends Component {
     }
 
     toggleActive (key) {
-
+        console.log(key);
+        this.setState({
+            activeKey: key
+        })
     }
 
     render () {
@@ -46,8 +49,14 @@ class Tabs extends Component {
               </ul>
               {
                   children.map((item) => {
-                      if (item.key === this.props.defaultActiveKey) {
-                          return (item);
+                      if (this.state.activeKey === null) {
+                          if (item.key === this.props.defaultActiveKey) {
+                              return item;
+                          }
+                      } else {
+                          if (item.key === this.state.activeKey) {
+                              return item;
+                          }
                       }
                   })
               }

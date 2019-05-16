@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom'
+import { Link,withRouter } from 'react-router-dom'
 import DropDown from '../../components/dropdown';
 import Badge from '../../components/badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './header.scss';
+import { inject, observer } from 'mobx-react';
+
 
 let dropMenudata = [{
     id: 1,
@@ -22,12 +24,29 @@ let dropMenudata = [{
     icon: 'project-diagram'
 }]
 
+@inject('userStore')
+@observer
 class Header extends Component {
     constructor () {
         super();
+        this.generateInfo = this.generateInfo.bind(this)
+    }
+
+    generateInfo () {
+        let infoNum = this.props.userStore.infoNum;
+        if (infoNum > 0) {
+            return (
+                <Badge><FontAwesomeIcon icon="bell" className="header-icon icon-right"/></Badge>
+            )
+        } else {
+            return (
+                <FontAwesomeIcon icon="bell" className="header-icon icon-right"/>
+            )
+        }
     }
 
     render () {
+        console.log(this.props);
         return (
             <div className="public-header">
                 <div className="left-header">
@@ -39,7 +58,7 @@ class Header extends Component {
                                placeholder="用户/群组/文档"
                                onKeyDown={(e) => {
                                  if(e.keyCode === 13) {
-                                     this.history.push('/search/article')
+                                     this.props.history.push('/search/article')
                                  }
                                }}/>
                         <FontAwesomeIcon icon="search" className="header-icon"/>
@@ -47,11 +66,15 @@ class Header extends Component {
                     <DropDown data={dropMenudata}>
                         <FontAwesomeIcon icon="plus" className="header-icon icon-right"/>
                     </DropDown>
-                    <Link to="/info"><Badge><FontAwesomeIcon icon="bell" className="header-icon icon-right"/></Badge></Link>
+                    <Link to="/info">
+                    {
+                        this.generateInfo()
+                    }
+                    </Link>
                 </div>
             </div>
         );
     }
 }
 
-export default Header;
+export default withRouter(Header);

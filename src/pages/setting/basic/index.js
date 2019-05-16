@@ -20,10 +20,14 @@ class Page extends Component {
           location: '',
           avatar: '',
           tNickname: '',
+          tNicknameTip: '',
           tDes: '',
+          tDesTip: '',
           tSex: 0,
           tLocation: '',
+          tLocationTip: '',
           tAvatar: '',
+          tAvatarTip: '',
           tipText: ''
         }
     }
@@ -52,6 +56,9 @@ class Page extends Component {
             tLocation: res.location || '',
             tAvatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
           })         
+      })
+      .catch((err) => {
+        this.props.userStore.logOut();
       })
       this.props.toggleLoading();
     }
@@ -96,6 +103,34 @@ class Page extends Component {
       })
     }
 
+    judgeTempAvatar (e) {
+      if (!e.target.files) {
+        return;
+      }
+      let file = e.target.files[0],
+      reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        let tag="base64,",
+            base64 = e.target.result,
+            baseStr = base64.substring(base64.indexOf(tag) + tag.length);
+        let eqTagIndex=baseStr.indexOf("=");
+            baseStr=eqTagIndex!=-1?baseStr.substring(0,eqTagIndex):baseStr;
+        let strLen=baseStr.length;
+        let fileSize=(strLen-(strLen/8)*2)/1024;
+        if(fileSize >= 64) {
+          this.setState({
+            tAvatarTip: '图片大小不能超过64kb'
+          })
+          return;
+        }
+        this.setState({
+          tAvatar: e.target.result,
+          tAvatarTip: ''
+        })
+      }
+    }
+
     render () {
         return (
           <div className="settings-detail">
@@ -112,8 +147,19 @@ class Page extends Component {
                               this.setState({
                                 tNickname: e.target.value
                               })
+                            }}
+                            onBlur={() => {
+                              if (!this.state.tNickname) {
+                                this.setState({
+                                  tNicknameTip: '昵称不能为空'
+                                })
+                                return;
+                              }
+                              this.setState({
+                                tNicknameTip: ''
+                              })
                             }}/>
-                      <span className="input-mark">必填项</span>
+                      <span className="input-mark">{this.state.tNicknameTip || "必填项"}</span>
                     </div>
 
                     <div className="input-group">
@@ -152,7 +198,7 @@ class Page extends Component {
                                 tLocation: e.target.value
                               })
                             }}/>
-                      <span className="input-mark">非必填项</span>
+                      <span className="input-mark">{this.state.tLocation || "非必填项"}</span>
                     </div>
 
                     <div className="input-group">
@@ -165,7 +211,7 @@ class Page extends Component {
                                     tDes: e.target.value
                                   })
                                 }}/>
-                      <span className="input-mark">非必填项</span>
+                      <span className="input-mark">{this.state.tDesTip || "非必填项"}</span>
                     </div>
                 </div>  
 
@@ -179,20 +225,11 @@ class Page extends Component {
                             <input className="file-input" 
                                   type="file"
                                   accept="image/jpeg,image/x-png"
-                                  onChange={(e) => {
-                                      let file = e.target.files[0],
-                                          reader = new FileReader();
-                                      reader.readAsDataURL(file);
-                                      reader.onload = (e) => {
-                                        this.setState({
-                                          tAvatar: e.target.result
-                                        })
-                                      } 
-                                  }}/>
+                                  onChange={this.judgeTempAvatar.bind(this)}/>
                             <button className="input-btn file-btn radius-btn"><FontAwesomeIcon icon="upload"/>上传头像</button>
                         </div>
                     </div>
-                    <span className="input-mark">非必填项</span>
+                    <span className="input-mark">{this.state.tAvatarTip || "非必填项"}</span>
                   </div>                          
             </div>
           

@@ -83,7 +83,7 @@ class Page extends Component {
      */
     judgeButtonStatus () {
       let state = this.state;
-      if ((state.isNameTipHide && state.isPassTipHide) || state.isLoging) {
+      if (state.isLoging || (state.isNameTipHide && state.isPassTipHide)) {
         return false;
       }
       return true;
@@ -94,8 +94,7 @@ class Page extends Component {
    */
   async loginUser() {
     this.setState({
-      isLoging: true,
-      loginText: '...'
+      isLoging: true
     });
 
     await Qlquery.login({

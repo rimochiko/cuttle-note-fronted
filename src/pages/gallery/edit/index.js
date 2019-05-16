@@ -96,16 +96,16 @@ class Page extends Component {
             this.setState({
               title: res.post.title,
               isAuth: res.post.isAuth,
-              type: res.content && res.content.type,
-              chart: res.content && res.content.chart,
+              type: res.post.content && JSON.parse(res.post.content).type,
+              chart: res.post.content && JSON.parse(res.post.content).chart,
               lastSaveTime: res.post.recentTime,
               lastSaveUser: res.post.recentUser,
-              postId: res.post.id,
               space: space
             })
           } else {
             console.log("请求文章失败")
           }
+          console.log(this.state);
         })
         .catch((err) => {
           console.log(err);
@@ -215,7 +215,7 @@ class Page extends Component {
         }),
         isAuth: state.isAuth,
         publish: 1,
-        imgbase: ''
+        imgbase: state.imgBase
       };
       // 加入团队信息
       if (state.space.type === GROUP) {
@@ -227,7 +227,7 @@ class Page extends Component {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
-            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${this.space.id}/${res.postId}`
+            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
             this.props.history.push(url);
           }
         })
@@ -237,10 +237,8 @@ class Page extends Component {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
-            this.setState({
-              lastSaveTime: res.date,
-              postId: res.postId
-            });
+            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+            this.props.history.push(url);
           }
         })
       }

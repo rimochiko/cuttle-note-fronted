@@ -26,9 +26,9 @@ class App extends Component {
   componentDidMount(){
     let graph = this.refs.mind.graph;
     let that = this;
-    graph.on('beforechange', (e) => {
+    graph.on('afterchange', (e) => {
       that.props.update(graph.save());
-      let baseImg = document.getElementById('canvas_1').toDataURL("image/png");
+      let baseImg = graph._cfg._canvas._cfg.el.toDataURL("image/png");
       that.props.getBase64(baseImg);
     })
   }

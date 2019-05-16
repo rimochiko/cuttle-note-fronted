@@ -74,7 +74,7 @@ class Section extends Component {
      * 取消喜欢
      */
     cancelLike (){
-        Qlquery.unlike({
+        Qlquery.unLike({
             id: this.state.post.id,
             token: this.props.userStore.user.token,
             userId: this.props.userStore.user.userId 
@@ -162,13 +162,6 @@ class Section extends Component {
             })
         }
     }
-
-    inputComment (e) {
-        let value = e.target.value;
-        this.setState({
-            comment: value
-        })
-    }
     
     /**
      * 评论文章
@@ -179,7 +172,7 @@ class Section extends Component {
             token: this.props.userStore.user.token,
             userId: this.props.userStore.user.userId,
             replyId: this.state.reply.id || '',
-            content: this.state.comment,
+            comment: this.state.comment,
         })
         .then(({data}) => {
             let res = data.data.data;
@@ -205,9 +198,6 @@ class Section extends Component {
         if (this.state.isAuth) {
             return (
                 <p>
-                    <span title="文章信息" onClick={this.props.infoPost}>
-                        <FontAwesomeIcon icon="info-circle"/>
-                    </span>
                     <Link title="编辑" to={{pathname:'/article/edit', 
                                            query: {postId: this.state.post.id,
                                                    parentId: this.state.post.parent}}}>
@@ -310,7 +300,13 @@ class Section extends Component {
                 <div className="input-comment-box">
                      {this.generateReply()}
                     <textarea className="input-textarea" 
-                              onChange={this.inputComment.bind(this)}
+                              onChange={(e)=>{
+                                let value = e.target.value;
+                                this.setState({
+                                    comment: value
+                                })
+                                console.log(this.state.comment)
+                              }}
                               defaultValue={this.state.comment}>
                     </textarea>
                     <div className="input-btn-box">
@@ -323,10 +319,10 @@ class Section extends Component {
                     <ul className="ul-comment-single">
                     {
                         this.state.post&&this.state.post.comments.map((item) => {
-                        if (item.to) {
+                        if (item.receiverId) {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar || require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} />
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link> 回复 <Link to="/">{item.receiverName}</Link>：
                                 {item.content}
@@ -338,7 +334,7 @@ class Section extends Component {
                         } else {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar || require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} />
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link>：
                                 {item.content}

@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../../components/modal';
 import Tabs from '../../../components/tabs';
 import Switch from '../../../components/switch';
+import Loading from '../../../components/loading';
+import Tooltip from '../../../components/tooltip';
 import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import Qlquery from './graphql';
@@ -39,8 +41,15 @@ class Page extends Component {
           draftTime: null,
           blurTime: null,
           blur: 0,
-          markdown: ''
+          markdown: '',
+          linkName: '',
+          linkHref: '',
+          imgAlt: '',
+          imgSrc: '',
+          tipText: '',
+          selectText: ''
         }
+        this.generateLink = this.generateLink.bind(this);
     }
 
     async componentDidMount () {
@@ -49,14 +58,15 @@ class Page extends Component {
         this.props.history.push('/login');
         return;
       }
-      console.log(this.props);
 
       if (this.props.location.query && this.props.location.query.postId) {
+        
         document.title = "编辑文章 - 墨鱼笔记";
         this.setState({
           postId: this.props.location.query.postId,
           parentId: this.props.location.query.parentId
         })
+
 
         // 如果有postId，说明是编辑文档，要先获取文档内容
         const query = Qlquery.getOnePost({
@@ -90,7 +100,6 @@ class Page extends Component {
               content: res.post.content,
               lastSaveTime: res.post.recentTime,
               lastSaveUser: res.post.recentUser,
-              postId: res.post.id,
               parentId: res.post.parent,
               space: space
             })
@@ -114,6 +123,33 @@ class Page extends Component {
         });
       }
       this.refs.editBox.innerHTML = (this.state.post && this.state.post.content) || '';
+      this.refs.loading.toggle();
+    }
+
+    getSelection () {
+      let res = ''
+      if (window.getSelection) {
+        //获取Selection对象
+        let se = window.getSelection()
+        //获取起始位置，这个是字符的序号位置，而不是坐标
+        let start = se.anchorOffset;
+        //获取结束位置
+        let  end = se.focusOffset;
+        //获取起始的dom元素
+        if (!se.anchorNode || !se.focusNode) {
+          return res;
+        }
+        let startEl = se.anchorNode.parentElement;
+        //获取结束的dom元素
+        let endEl = se.focusNode.parentElement;
+        //获取起始dom元素的文本内容
+        let startText = startEl.innerText;
+        if (startEl == endEl) {
+          res = startText.substring(start, end);
+        }
+        return res;
+      }
+      return res;
     }
 
     /**
@@ -132,10 +168,8 @@ class Page extends Component {
           document.execCommand('italic',false,null);
           break;
         case "link": 
-          this.refs.addLink.toggle();
-          let url="";
-          if(url) 
-            document.execCommand("createlink",false,url);
+          if(this.state.linkHref) 
+            document.execCommand("createlink",false,this.state.linkHref);
           break;
         case "listul": 
           document.execCommand("insertUnorderedList", false);
@@ -150,7 +184,9 @@ class Page extends Component {
           document.execCommand('formatBlock', false, '<blockquote>');
           break; 
         case "image": 
-          this.refs.addImage.toggle();
+          if (this.state.imgSrc) {
+            document.execCommand("insertImage", false, this.state.imgSrc);
+          }
         break;
         case "code": 
           document.execCommand('formatBlock', false, '<pre>');
@@ -276,6 +312,7 @@ class Page extends Component {
      * 发布文章
      */
     async publishPost () {
+      console.log(this.state);
       let state = this.state;
       let params = {
           token: this.props.userStore.user.token,
@@ -291,8 +328,9 @@ class Page extends Component {
       if (state.space.type === GROUP) {
         params.groupId = state.space.id;
       }
+      console.log(this.state.postId);
 
-      if (!this.state.postId) {
+      /*if (!this.state.postId) {
         const query = Qlquery.createPost(params);
         axios.post('/graphql', {query})
         .then(({data}) => {
@@ -315,14 +353,14 @@ class Page extends Component {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
-            let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+            let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${this.state.postId}`
             this.props.history.push(url)
           }
         })
         .catch((err) => {
           console.log(err);
         })
-      }      
+      }*/      
     }
 
     /**
@@ -363,12 +401,6 @@ class Page extends Component {
         })        
     }
 
-    changTitle (e) {
-      this.setState({
-        title: e.target.value
-      })
-    }
-
     toggleMarkdown () {
       this.refs.markdown.toggle();
     }
@@ -377,218 +409,313 @@ class Page extends Component {
       this.refs.setting.toggle();
     }
 
+    // 插入链接
+    toggleLinkModal () {
+      let txt = this.getSelection();
+      this.setState({
+        selectText: txt && txt.trim()
+      });
+      this.refs.addLink.toggle();
+    }
+    insertSelectLink () {
+      if (this.state.linkHref.search(/(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/) < 0) {
+        this.setState({
+          tipText: '网址格式错误'
+        })
+        this.refs.tooltip.show()
+        return;
+      }
+      this.addTextStyle.bind(this, 'link');
+      this.refs.addLink.toggle();
+    }
+    insertDirectLink () {
+      if (this.state.linkHref.search(/(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/) < 0) {
+        this.setState({
+          tipText: '网址格式错误'
+        })
+        this.refs.tooltip.show()
+        return;
+      }
+      let link = `<a href="${this.state.linkHref}" target="_blank">${this.state.linkName || this.state.linkHref}</a>`;
+      this.refs.editBox.innerHTML = this.refs.editBox.innerHTML + link;
+      this.refs.addLink.toggle();
+    }
+
+    componentWillUnmount () {
+      this.setState({
+        draftTime: null,
+        blurTime: null
+      })
+    }
+
+    generateLink () {
+      if (this.state.selectText && this.state.selectText.length > 0) {
+        return (
+          <div className="edit-link-body">
+            <div className="input-group">
+              <label>链接地址</label>
+              <input type="text" onChange={
+                (e) => {
+                  this.setState({
+                    linkName: e.target.value
+                  })
+                }
+              }/>
+            </div>
+            <div className="input-group">
+              <button className="radius-btn input-btn" 
+                      onClick={this.insertSelectLink.bind(this)}>确定</button>
+            </div>
+          </div>
+        )
+      } else {
+        return (
+          <div className="edit-link-body">
+            <div className="input-group">
+              <label>链接名称</label>
+              <input type="text" placeholder="默认为链接地址" onChange={
+                (e) => {
+                  this.setState({
+                    linkName: e.target.value
+                  })
+                }
+              }/>
+            </div>
+            <div className="input-group">
+              <label>链接地址</label>
+              <input type="text" placeholder="http://" onChange={
+                (e) => {
+                  this.setState({
+                    linkHref: e.target.value
+                  })
+                }
+              }/>
+            </div>
+            <div className="input-group">
+              <button className="radius-btn input-btn" 
+                      onClick={this.insertDirectLink.bind(this)}>确定</button>
+            </div>
+          </div>
+        )
+      }
+    }
+
     render () {
         return (
           <div className="page">
           <Sidebar />
             <div className="flex-row overflow flex-1">
-            <Modal title="转为Markdown" ref="markdown">
-              <div className="markdown-show">
-               {this.state.markdown}
-              </div>
-            </Modal>
-            <Modal title="添加链接" ref="addLink">
-              <div className="edit-link-body">
-                <div className="input-group">
-                  <label>名称</label>
-                  <input type="text" />
+              <Loading ref="loading" />
+              <Tooltip text={this.state.tipText} ref="tooltip"/>
+              <Modal title="转为Markdown" ref="markdown">
+                <div className="markdown-show">
+                {this.state.markdown}
                 </div>
-                <div className="input-group">
-                  <label>链接</label>
-                  <input type="text" />
-                </div>
-                <div className="input-group">
-                  <button className="radius-btn input-btn">确定</button>
-                </div>
-              </div>   
-            </Modal>
+              </Modal>
+              <Modal title="添加链接" ref="addLink">
+                {
+                  this.generateLink()
+                }   
+              </Modal>
 
-            <Modal title="高级设置" ref="setting">
-                <div className="edit-menu">
-                  <div className="edit-setting-column">
-                    <span className="btn-text">父级文档</span>
-                        <input type="text" placeholder="搜索ID" className="input"/>
-                        <ul className="ul-add-mem">
-                          <li>测试测试</li>
-                        </ul>
-                    <span className="des">影响权限设置</span>
+              <Modal title="高级设置" ref="setting">
+                  <div className="edit-menu">
+                    <div className="edit-setting-column">
+                      <span className="btn-text">父级文档</span>
+                          <input type="text" placeholder="搜索ID" className="input"/>
+                          <ul className="ul-add-mem">
+                            <li>测试测试</li>
+                          </ul>
+                      <span className="des">影响权限设置</span>
+                    </div>
+
+                    <div className="edit-setting flex-row">
+                      <div className="flex-column edit-left">
+                        <span className="text">是否私密</span>
+                        <span className="des">私密文章无关系者无权查看</span>
+                      </div>
+                      <Switch />                  
+                    </div>
                   </div>
+              </Modal>
 
-                  <div className="edit-setting flex-row">
-                    <div className="flex-column edit-left">
-                      <span className="text">是否私密</span>
-                      <span className="des">私密文章无关系者无权查看</span>
-                    </div>
-                    <Switch />                  
-                  </div>
-                </div>
-            </Modal>
+              <Modal title="添加图片" ref="addImage">
+                <div className="edit-link-body">
+                  <Tabs defaultActiveKey="1">
+                    <TabPane tab="本地上传" key="1">
+                      <div className="input-group">
+                        <label>选择图片</label>
+                        <input type="file" />
+                      </div>
+                      <div className="input-group">
+                        <label>图片描述</label>
+                        <input type="text" onChange={(e) => {
+                          this.setState({
+                            imgName: e.target.value
+                          })
+                        }}/>
+                      </div>
+                      <div className="input-group">
+                        <button className="radius-btn input-btn">上传</button>
+                      </div>
+                    </TabPane>
+                    <TabPane tab="网络获取" key="2">
+                      <div className="input-group">
+                        <label>图片地址</label>
+                        <input type="text" onChange={(e) => {
+                          this.setState({
+                            imgSrc: e.target.value
+                          })
+                        }}/>
+                      </div>
+                      <div className="input-group">
+                        <label>图片描述</label>
+                        <input type="text" />
+                      </div>
+                      <div className="input-group">
+                        <button className="radius-btn input-btn">确定</button>
+                      </div>
+                    </TabPane>
+                  </Tabs>
+                </div>   
+              </Modal>
 
-            <Modal title="添加图片" ref="addImage">
-              <div className="edit-link-body">
-                <Tabs defaultActiveKey="1">
-                  <TabPane tab="本地上传" key="1">
-                    <div className="input-group">
-                      <label>选择图片</label>
-                      <input type="file" />
-                    </div>
-                    <div className="input-group">
-                      <label>图片描述</label>
-                      <input type="text" />
-                    </div>
-                    <div className="input-group">
-                      <button className="radius-btn input-btn">上传</button>
-                    </div>
-                  </TabPane>
-                  <TabPane tab="网络获取" key="2">
-                    <div className="input-group">
-                      <label>图片地址</label>
-                      <input type="text" />
-                    </div>
-                    <div className="input-group">
-                      <label>图片描述</label>
-                      <input type="text" />
-                    </div>
-                    <div className="input-group">
-                      <button className="radius-btn input-btn">确定</button>
-                    </div>
-                  </TabPane>
-                </Tabs>
-              </div>   
-            </Modal>
-
-            <div className="edit-page flex-1">
-              <div className="edit-header">
-                <input type="text"
-                       placeholder="输入文章标题" 
-                       className="title" 
-                       defaultValue={this.state.title}
-                       onChange={this.changTitle.bind(this)}/>
-                <div className="edit-tool">
-                  <ul className="ul-tool">
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="粗体"
-                        onClick={this.addTextStyle.bind(this, 'bold')}
-                        >
-                        <FontAwesomeIcon icon="bold"/>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="斜体"
-                        onClick={this.addTextStyle.bind(this, 'italic')}>
-                        <FontAwesomeIcon icon="italic"/>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="无序列表"
-                        onClick={this.addTextStyle.bind(this, 'listul')}>
-                        <FontAwesomeIcon icon="list-ul"/>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="有序列表"
-                        onClick={this.addTextStyle.bind(this, 'listol')}>
-                        <FontAwesomeIcon icon="list-ol"/>
-                      </button>
-                    </li>
-                    <li>
-                      <div
-                        className="single-tool heading" 
-                        >
-                        <FontAwesomeIcon title="标题" icon="heading"/>
-                        <div className="heading-menu">
-                          <button onClick={this.addTextStyle.bind(this, 'title', 1)}><h1>一级标题</h1></button>
-                          <button onClick={this.addTextStyle.bind(this, 'title', 2)}><h2>二级标题</h2></button>
-                          <button onClick={this.addTextStyle.bind(this, 'title', 3)}><h3>三级标题</h3></button>
-                          <button onClick={this.addTextStyle.bind(this, 'title', 4)}><h4>四级标题</h4></button>
+              <div className="edit-page flex-1">
+                <div className="edit-header">
+                  <input type="text"
+                        placeholder="输入文章标题" 
+                        className="title" 
+                        defaultValue={this.state.title}
+                        onChange={(e) => {
+                          this.setState({
+                            title: e.target.value
+                          })
+                        }}/>
+                  <div className="edit-tool">
+                    <ul className="ul-tool">
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="粗体"
+                          onClick={this.addTextStyle.bind(this, 'bold')}
+                          >
+                          <FontAwesomeIcon icon="bold"/>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="斜体"
+                          onClick={this.addTextStyle.bind(this, 'italic')}>
+                          <FontAwesomeIcon icon="italic"/>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="无序列表"
+                          onClick={this.addTextStyle.bind(this, 'listul')}>
+                          <FontAwesomeIcon icon="list-ul"/>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="有序列表"
+                          onClick={this.addTextStyle.bind(this, 'listol')}>
+                          <FontAwesomeIcon icon="list-ol"/>
+                        </button>
+                      </li>
+                      <li>
+                        <div
+                          className="single-tool heading" 
+                          >
+                          <FontAwesomeIcon title="标题" icon="heading"/>
+                          <div className="heading-menu">
+                            <button onClick={this.addTextStyle.bind(this, 'title', 1)}><h1>一级标题</h1></button>
+                            <button onClick={this.addTextStyle.bind(this, 'title', 2)}><h2>二级标题</h2></button>
+                            <button onClick={this.addTextStyle.bind(this, 'title', 3)}><h3>三级标题</h3></button>
+                            <button onClick={this.addTextStyle.bind(this, 'title', 4)}><h4>四级标题</h4></button>
+                          </div>
                         </div>
-                      </div>
 
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="链接"
-                        onClick={this.addTextStyle.bind(this, 'link')}>
-                        <FontAwesomeIcon icon="link"/>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="引用"
-                        onClick={this.addTextStyle.bind(this, 'quote')}>
-                        <FontAwesomeIcon icon="quote-left"/>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="single-tool" 
-                        title="代码"
-                        onClick={this.addTextStyle.bind(this, 'code')}>
-                        <FontAwesomeIcon icon="code"/>
-                      </button>
-                    </li>
-                    <li>
-                      <div
-                        className="single-tool" 
-                        title="图片"
-                        onClick={this.addTextStyle.bind(this, 'image')}>
-                        <FontAwesomeIcon icon="image"/>
-                      </div>
-                    </li>
-                    <li>
-                      <div
-                        className="single-tool" 
-                        title="撤销"
-                        onClick={this.addTextStyle.bind(this, 'undo')}>
-                        <FontAwesomeIcon icon="undo"/>
-                      </div>
-                    </li>
-                  </ul>
-                  <ul className="ul-tool">
-                    <li>
-                      <div className="single-tool" 
-                           title="Markdown语法"
-                           onClick={this.toggleMarkdown.bind(this)}>
-                           <FontAwesomeIcon icon={['fab','markdown']}/>
-                           
-                      </div>
-                    </li>
-                  </ul>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="链接"
+                          onClick={this.toggleLinkModal.bind(this)}>
+                          <FontAwesomeIcon icon="link"/>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="引用"
+                          onClick={this.addTextStyle.bind(this, 'quote')}>
+                          <FontAwesomeIcon icon="quote-left"/>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="single-tool" 
+                          title="代码"
+                          onClick={this.addTextStyle.bind(this, 'code')}>
+                          <FontAwesomeIcon icon="code"/>
+                        </button>
+                      </li>
+                      <li>
+                        <div
+                          className="single-tool" 
+                          title="图片"
+                          onClick={this.addTextStyle.bind(this, 'image')}>
+                          <FontAwesomeIcon icon="image"/>
+                        </div>
+                      </li>
+                      <li>
+                        <div
+                          className="single-tool" 
+                          title="撤销"
+                          onClick={this.addTextStyle.bind(this, 'undo')}>
+                          <FontAwesomeIcon icon="undo"/>
+                        </div>
+                      </li>
+                    </ul>
+                    <ul className="ul-tool">
+                      <li>
+                        <div className="single-tool" 
+                            title="Markdown语法"
+                            onClick={this.toggleMarkdown.bind(this)}>
+                            <FontAwesomeIcon icon={['fab','markdown']}/>
+                            
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="edit-body"
+                    contentEditable ref="editBox"
+                    onBlur={this.editGetBlur.bind(this)}
+                    onFocus={this.editGetFocus.bind(this)}
+                    dangerouslySetInnerHTML={{
+                      __html: this.state.content
+                    }}
+                    >
+                  
+                </div>
+                <div className="edit-footer">
+                  <p>
+                    <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
+                    {this.state.space.name}
+                    </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}</p>
+                  <div className="btns-box">
+                    <button className="radius-btn sub-btn" onClick={this.saveDraft.bind(this)}>保存到草稿箱</button>
+                    <button className="radius-btn input-btn" onClick={this.publishPost.bind(this)}>发布</button>
+                  </div>
                 </div>
               </div>
-              <div className="edit-body"
-                   contentEditable ref="editBox"
-                   onBlur={this.editGetBlur.bind(this)}
-                   onFocus={this.editGetFocus.bind(this)}
-                   dangerouslySetInnerHTML={{
-                     __html: this.state.content
-                   }}
-                   >
-                
+                  
               </div>
-              <div className="edit-footer">
-                <p>
-                  <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
-                  {this.state.space.name}
-                  </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}</p>
-                <div className="btns-box">
-                  <button className="radius-btn sub-btn" onClick={this.saveDraft.bind(this)}>保存到草稿箱</button>
-                  <button className="radius-btn input-btn" onClick={this.publishPost.bind(this)}>发布</button>
-                </div>
-              </div>
-            </div>
-                
-            </div>
           </div>
         );
     }

@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {Link, NavLink, withRouter} from 'react-router-dom';
 import config from './config';
 import './sidebar.scss';
-import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 
 @inject('userStore')
@@ -27,9 +26,11 @@ class Sidebar extends Component {
         this.getFollow = this.getFollow.bind(this);
     }
 
-    async componentWillReceiveProps () {
+    componentDidMount () {
+    }
+
+    componentWillReceiveProps () {
       if (this.props.userStore.user.userId) {
-        await this.props.userStore.getRelations()
         let userStore = this.props.userStore;
         let user = userStore.user;
 

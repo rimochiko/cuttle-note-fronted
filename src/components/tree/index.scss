@@ -12,8 +12,12 @@ $mainColor: #632df8;
         justify-content: space-between;
         align-items: center;
         .btn-main {
+            flex: 1;
             display: flex;
             align-items: center;
+            a {
+                flex: 1;
+            }
         }
         a {
            display: flex;

@@ -7,8 +7,11 @@ export default {
     groupDelPostQuery,
     getOnePost,
     addFollow,
-    cancelFollow
+    cancelFollow,
+    getOwnerInfo
 }
+
+const USER = "user";
 
 function userPostQuery (args) {
     return `
@@ -192,4 +195,35 @@ function cancelFollow (args) {
   }
   `;
   return axios.post('/graphql', {query});
+}
+
+function getOwnerInfo (params, userId) {
+  const query = params.obj === USER ? `
+       query {
+         isFollow:
+         isFollowed(
+          userId:"${userId}",
+          token: "",
+          followId: "${params.owner}"
+         )
+         data:
+         userEasy(
+           id:"${params.owner}"
+         ) {
+          avatar
+          id
+          nickname
+        }
+       }`:
+       `query {
+         data:
+         groupEasy(
+           id:"${params.owner}"
+         ) {
+           id
+           avatar
+           nickname
+         }
+       }`;
+      return axios.post('/graphql', {query})
 }

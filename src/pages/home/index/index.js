@@ -33,6 +33,20 @@ const GROUP = "group",
       ARTICLE = "library",
       CHART = "gallery";
 
+const defaultStatistic = {
+            likeNum: 0,
+            textNum: 0,
+            viewNum: 0,
+            imgNum: 0,
+            chart: [{"name":"记录次数",
+            "type":"line",
+            "smooth":true,
+            "stack":"总量",
+            "areaStyle":{"color":"#d3d3e7"},
+            "lineStyle":{"color":"#d3d3e7"},
+            "data":[0,0,0,0,0,0,0]}]  
+}
+
 @inject('userStore')
 @observer
 class Page extends Component {
@@ -40,7 +54,8 @@ class Page extends Component {
         super();
         this.state = {
           recentViews: [],
-          news: []
+          news: [],
+          statistic:defaultStatistic
         }
         this.getHistoryList = this.getHistoryList.bind(this);
         this.getNewsList = this.getNewsList.bind(this);
@@ -55,11 +70,13 @@ class Page extends Component {
       })
       .then(({data}) => {
           let recent = data.data.recent,
-              news = data.data.news;
-              this.generatePostLink(recent.posts);
+              news = data.data.news,
+              statistic = data.data.statistic;
+              this.generatePostLink(recent && recent.posts);
           this.setState({
             recentViews: recent && recent.code === 1 ? recent.posts : [],
-            news: news && news.code === 1 ? news.options: []
+            news: news && news.code === 1 ? news.options: [],
+            statistic: statistic || defaultStatistic
           })             
       })
     }
@@ -67,8 +84,9 @@ class Page extends Component {
     generatePostLink (list) {
       list && list.forEach((item) => {
         let owner = item.group && item.group.id ? GROUP : USER,
-            type = item.type === 0 ? ARTICLE : CHART
-        item.link = `/${type}/${owner}/${item.id}`;
+            type = item.type === 0 ? ARTICLE : CHART,
+            author = item.group && item.group.id ? item.group.id : item.author.id;
+        item.link = `/${type}/${owner}/${author}/${item.id}`;
       })
 
     }
@@ -112,38 +130,10 @@ class Page extends Component {
               data : ['周一','周二','周三','周四','周五','周六','周日']
           }
       ],
-      yAxis : [
-          {
+      yAxis : [{
               type : 'value'
-          }
-      ],
-      series : [{
-              name:'记录次数',
-              type:'line',
-              smooth: true,
-              stack: '总量',
-              areaStyle: {color:'#d3d3e7'},
-              lineStyle: {color:'#d3d3e7'},
-              data:[5, 2, 0, 6, 2, 3, 6]
-          },
-          {
-              name:'浏览量',
-              type:'line',
-              stack: '总量',
-              smooth: true,
-              areaStyle: {color: '#ff8ba7'},
-              lineStyle: {color:'#ff8ba7'},
-              data:[120, 132, 101, 134, 90, 230, 210]
-          },
-          {
-              name:'人气量',
-              type:'line',
-              smooth: true,
-              stack: '总量',
-              areaStyle: {color: '#4c71f9'},
-              lineStyle: {color: '#4c71f9'},
-              data:[54, 18, 61, 34, 90, 30, 10]
-          }]
+      }],
+      series : (this.state.statistic && this.state.statistic.chart) || defaultStatistic.chart
        });
     }
 
@@ -249,20 +239,20 @@ class Page extends Component {
                             </div>
                             <div className="panel">
                               <div className="item-statist">
-                                <p className="data">123</p>
+                                <p className="data">{this.state.statistic.textNum}</p>
                                 <p className="name">文章</p>
                               </div>
                               <div className="item-statist">
-                                <p className="data">26</p>
-                                <p className="name">文章</p>
+                                <p className="data">{this.state.statistic.imgNum}</p>
+                                <p className="name">图画</p>
                               </div>
                               <div className="item-statist">
-                                <p className="data">17</p>
-                                <p className="name">评论</p>
+                                <p className="data">{this.state.statistic.viewNum}</p>
+                                <p className="name">浏览量</p>
                               </div>
                               <div className="item-statist">
-                                <p className="data">1454</p>
-                                <p className="name">浏览</p>
+                                <p className="data">{this.state.statistic.likeNum}</p>
+                                <p className="name">点赞量</p>
                               </div>
                             </div>
                             <div className="statist-graph" id="statist-graph"></div>

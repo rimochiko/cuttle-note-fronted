@@ -11,9 +11,15 @@ export default {
 
 const USER = "user"
 
-function getOwnerInfo (params) {
+function getOwnerInfo (params, userId) {
     const query = params.obj === USER ? `
     query {
+      isFollow:
+      isFollowed(
+       userId:"${userId}",
+       token: "",
+       followId: "${params.owner}"
+      )
       data:
       userEasy(
         id:"${params.owner}"
@@ -36,6 +42,34 @@ function getOwnerInfo (params) {
    return axios.post('/graphql', {query});
 }
 
+function addFollow (args) {
+  const query = `
+  mutation {
+    data:
+    followUser(
+      userId: "${args.userId}",
+      token: "${args.token}",
+      followId: "${args.followId}"
+    )
+  }
+  `;
+  return axios.post('/graphql', {query});
+}
+
+function cancelFollow (args) {
+  const query = `
+  mutation {
+    data:
+    unfollowUser(
+      userId: "${args.userId}",
+      token: "${args.token}",
+      followId: "${args.followId}"
+    )
+  }
+  `;
+  return axios.post('/graphql', {query});
+}
+
 function userPostQuery (args) {
     return `
     query {
@@ -51,7 +85,8 @@ function userPostQuery (args) {
         id
         status
         title
-        author
+        author,
+        url
        }
      }
    }`;
@@ -72,7 +107,8 @@ function groupPostQuery (args) {
         id
         status
         title
-        author
+        author,
+        url
        }
      }
    }`;

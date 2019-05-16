@@ -164,6 +164,17 @@ function getHomeData (args) {
         type
       }
     }
+    statistic:
+    getGroupStatistic(
+      token: "${args.token}",
+      userId: "${args.userId}"
+    ){
+      textNum 
+      imgNum 
+      viewNum 
+      likeNum
+      charts 
+    }
   }
   `;
   return axios.post('/graphql', {query});

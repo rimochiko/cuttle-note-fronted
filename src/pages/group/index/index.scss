@@ -285,6 +285,14 @@
     }
 }
 
+.settings-detail {
+    .input-btn:disabled {
+        opacity: .8;
+        cursor: not-allowed;
+    }    
+}
+
+
 .group-main {
     margin: 2rem 3rem 2rem 0;
 }

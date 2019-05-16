@@ -53,6 +53,17 @@ function getHomeData (args) {
             type
           }
         }
+        statistic:
+          getUserStatistic(
+            token: "${args.token}",
+            userId: "${args.userId}"
+          ){
+          textNum 
+          imgNum 
+          viewNum 
+          likeNum
+          charts 
+          }
     }
     `
     return axios.post('/graphql', {query});

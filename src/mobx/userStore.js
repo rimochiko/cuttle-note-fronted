@@ -76,8 +76,6 @@ export default class Store {
     
     // 登录
     @action logIn(user){
-      console.log("user");
-      console.log(user);
       let res = {
         token: user.token,
         userId: user.userId,
