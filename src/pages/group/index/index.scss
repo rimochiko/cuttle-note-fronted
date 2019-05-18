@@ -249,11 +249,11 @@
             font-size: .9rem;
             vertical-align: middle;
             &.icon {
-                display: flex;
-                align-items: center;
+                vertical-align: middle;
                 font-size: 1rem;
                 color: #7f83b8;
                 svg {
+                    display: inline-block;
                     margin-right: 1rem;
                 }
             }

@@ -10,7 +10,7 @@ export default {
   checkGroupId,
   sendInvite,
   getHomeData,
-  deleteUser,
+  exitGroup,
   changeUserRole
 }
 
@@ -167,12 +167,14 @@ function getHomeData (args) {
     statistic:
     getGroupStatistic(
       token: "${args.token}",
-      userId: "${args.userId}"
+      userId: "${args.userId}",
+      groupId: "${args.groupId}"
     ){
       textNum 
       imgNum 
       viewNum 
       likeNum
+      dates
       charts 
     }
   }
@@ -196,19 +198,40 @@ function deleteUser (args) {
 
 }
 
-function changeUserRole (args) {
+function exitGroup ({
+  token, 
+  userId,
+  groupId,
+  objectId
+}) {
   const query = `
   mutation {
     data:
-    groupExit(
-      token: "${args.token}",
-      userId: "${args.userId}",
-      groupId: "${args.groupId}",
-      objectId: "${args.objectId}",
-      isAdmin: ${args.isAdmin}
+    groupExit (
+      token: "${token}",
+      userId: "${userId}",
+      groupId: "${groupId}",
+      objectId: "${objectId}"
+    )
+  }`;
+  return axios.post('/graphql', {query});
+}
+
+function changeUserRole ({
+  token,
+  userId,
+  groupId,
+  isAdmin
+}) {
+  const query = `
+  mutation {
+    data:
+    groupRoleSet (
+      token: "${token}",
+      userId: "${userId}",
+      groupId: "${groupId}",
+      isAdmin: "${isAdmin ? true : false}"
     )
   }
-  `;
-  return axios.post('/graphql', {query});
-
+  `
 }

@@ -3,20 +3,6 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link }  from 'react-router-dom';
 
-let list = [{
-    id: 'ddd',
-    nickname: 'test',
-    avatar: '',
-  }, {
-    id: 'ddd1',
-    nickname: 'test',
-    avatar: '',
-  }, {
-    id: 'ddd2',
-    nickname: 'test',
-    avatar: '',
-  }];
-
 class Page extends Component {
     constructor () {
         super();
@@ -26,9 +12,10 @@ class Page extends Component {
       return (
         <div className="search-item" key={item.id}>
           <div className="body">
-            <img src={item.avatar ? `http://localhost:8080/static/user/${item.author.avatar}` :require('../../../../assets/images/default.jpg')}
+            <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` :require('../../../../assets/images/default.jpg')}
                 alt=""/>
             <Link to={`/article/user/${item.id}`} className="text">{item.nickname}</Link>
+            <span className="des">ID：{item.id}</span>
           </div>
           <div className="btns flex-row">
             <button><FontAwesomeIcon icon="plus"/>关注TA</button>
@@ -45,7 +32,7 @@ class Page extends Component {
         return (
           <div className="search-res search-user">
             {
-              list && list.map((item) => {
+              this.props.list && this.props.list.map((item) => {
                 return this.generateItem(item)
               })
             }

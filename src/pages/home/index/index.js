@@ -72,7 +72,8 @@ class Page extends Component {
           let recent = data.data.recent,
               news = data.data.news,
               statistic = data.data.statistic;
-              this.generatePostLink(recent && recent.posts);
+          statistic.charts =  statistic && statistic.charts && statistic.charts.map(item => JSON.parse(item))
+          this.generatePostLink(recent && recent.posts);
           this.setState({
             recentViews: recent && recent.code === 1 ? recent.posts : [],
             news: news && news.code === 1 ? news.options: [],
@@ -99,6 +100,7 @@ class Page extends Component {
       document.title="我的首页 - 墨鱼笔记";
 
       await this.fetchData();
+
       this.refs.loading.toggle();
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
@@ -127,13 +129,13 @@ class Page extends Component {
           {
               type : 'category',
               boundaryGap : false,
-              data : ['周一','周二','周三','周四','周五','周六','周日']
+              data : (this.state.statistic && this.state.statistic.dates) || ['','','','','','','']
           }
       ],
       yAxis : [{
               type : 'value'
       }],
-      series : (this.state.statistic && this.state.statistic.chart) || defaultStatistic.chart
+      series : (this.state.statistic && this.state.statistic.charts) || defaultStatistic.chart
        });
     }
 

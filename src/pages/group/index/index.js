@@ -37,7 +37,7 @@ const defaultStatistic = {
   textNum: 0,
   viewNum: 0,
   imgNum: 0,
-  chart: [{"name":"记录次数",
+  charts: [{"name":"记录次数",
   "type":"line",
   "smooth":true,
   "stack":"总量",
@@ -72,7 +72,7 @@ class Page extends Component {
           tAvatarTip: '',
           searchList: [],
           selectList: [],
-          isAuth: 0,
+          isAuth: 5,
           news: [],
           tipText: '' 
         }
@@ -129,7 +129,16 @@ class Page extends Component {
           group.members = res.member || [];
         })
 
-        // 获取主页成员
+        for(let i = 0, len = group.members.length; i < len; i++) {
+          if (group.members[i].id === userStore.user.userId) {
+            this.setState({
+              isAuth: group.members[i].role
+            })
+            break;
+          }
+        }
+
+        // 获取主页数据
         await Qlquery.getHomeData({
           groupId: group.id,
           token: this.props.userStore.user.token,
@@ -137,7 +146,8 @@ class Page extends Component {
         })
         .then(({data}) => {
           let news = data.data.news,
-              statistics = data.data.statistics;
+              statistics = data.data.statistic;
+              statistics.charts =  statistics && statistics.charts && statistics.charts.map(item => JSON.parse(item))
           this.setState({
             news: news.options,
             statistics: statistics
@@ -460,20 +470,31 @@ class Page extends Component {
         let res = data.data.data;
         group.members = res.member || [];
       })
+      for(let i = 0, len = group.members.length; i < len; i++) {
+        if (group.members[i].id === userStore.user.userId) {
+          this.setState({
+            isAuth: group.members[i].role
+          })
+          break;
+        }
+      }
 
-      // 获取团队成员
+      // 获取首页数据
       await Qlquery.getHomeData({
         groupId: group.id,
         token: this.props.userStore.user.token,
         userId: this.props.userStore.user.userId
       })
       .then(({data}) => {
-        let news = data.data.news;
-        this.setState({
-          news: news.options
+        let news = data.data.news,
+            statistics = data.data.statistic;
+            statistics.charts =  statistics && statistics.charts && statistics.charts.map(item => JSON.parse(item))
+            this.setState({
+          news: news.options,
+          statistics: statistics
         })
       })
-           
+
       this.setState({
         groupList: groupList,
         group: {
@@ -511,13 +532,13 @@ class Page extends Component {
         {
             type : 'category',
             boundaryGap : false,
-            data : ['周一','周二','周三','周四','周五','周六','周日']
+            data : (this.state.statistics && this.state.statistics.dates) || ['','','','','','','']
         }
     ],
     yAxis : [{
             type : 'value'
     }],
-    series :(this.state.statistic && this.state.statistic.chart) || defaultStatistic.chart
+    series :(this.state.statistics && this.state.statistics.charts) || defaultStatistic.charts
      });
     this.refs.loading.toggle();
   }
@@ -749,7 +770,7 @@ class Page extends Component {
   }
 
   async deleteUser (userId) {
-    await Qlquery.deleteUser({
+    await Qlquery.exitGroup({
       token: this.props.userStore.user.token,
       userId: this.props.userStore.user.userId,
       groupId: this.state.group.id,
@@ -778,7 +799,32 @@ class Page extends Component {
     })
   }
 
+  generateMemberDeleteBtn (roleId, userId) {
+    if (this.state.isAuth === 6) {
+      // 创始人不可以移除自己
+      if(userId === this.props.userStore.user.userId) {
+        return '';
+      }
+      return (
+        <FontAwesomeIcon icon={["far", "trash-alt"]}
+                         onClick={this.deleteUser.bind(this, userId)}/>
+      );
+    }
+
+    if (userId === this.props.userStore.user.userId) {
+      return (
+        <FontAwesomeIcon icon={["far", "trash-alt"]}
+                         onClick={this.deleteUser.bind(this, userId)}/>
+      );
+    }
+    return '';
+  }
+
   generateMemberRoleBtn (roleId, userId) {
+    if(this.state.isAuth !== 6) {
+      return;
+    }
+
     if (roleId === 4) {
       return (
         <button className="radius-btn input-btn" 
@@ -933,28 +979,6 @@ class Page extends Component {
                             </tr>
                             {
                               this.state.group.members && this.state.group.members.map((item) => {
-                                if (item.id === this.props.userStore.user.userId) {
-                                  return (
-                                  <tr key={item.id}>
-                                    <td className="member">
-                                      <div className="flex-row flex-align">
-                                        <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')}
-                                            className="avatar"
-                                            alt={item.id}/>
-                                        <div className="info">
-                                          <p className="text">{item.nickname}</p>
-                                          <p className="des">{item.id}</p>
-                                        </div>                              
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <p>{this.generateGroupAuth(item.role)}</p>
-                                    </td> 
-                                    <td className="icon">
-                                    </td>
-                                  </tr>                                  
-                                  )
-                                } else {
                                   return (
                                     <tr key={item.id}> 
                                       <td>
@@ -972,13 +996,11 @@ class Page extends Component {
                                         <p>{this.generateGroupAuth(item.role)}</p>
                                       </td> 
                                       <td className="icon">
-                                        <FontAwesomeIcon icon={["far", "trash-alt"]}
-                                                         onClick={this.deleteUser.bind(this, item.id)}/>
+                                        {this.generateMemberDeleteBtn(item.role, item.id)}
                                         {this.generateMemberRoleBtn(item.role, item.id)}
                                       </td>
                                     </tr>
                                   )
-                                }
                               })
                             }
                           </tbody>

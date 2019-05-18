@@ -227,3 +227,4 @@ function getOwnerInfo (params, userId) {
        }`;
       return axios.post('/graphql', {query})
 }
+

@@ -202,15 +202,22 @@ class Page extends Component {
           this.setState({
             tipText: '成功接受邀请'
           })
-        } else {
+        } else if(res === 2) {
           this.setState({
-            tipText: '接受邀请失败:('
+            tipText: '邀请已失效'
+          })
+        } else if(res === 3) {
+          this.setState({
+            tipText: '你已是团队成员'
           })
         }
         this.refs.tooltip.show();
       })
       .catch((err) => {
-        console.log(err)
+        this.setState({
+          tipText: '接受邀请失败:('
+        })
+        this.refs.tooltip.show();
       })
     }
 

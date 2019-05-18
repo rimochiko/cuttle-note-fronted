@@ -289,6 +289,7 @@ class Page extends Component {
         obj: nextMatch.obj || USER,
         id: nextMatch.id
       }
+      this.refs.loading.toggle();
       if (params.obj !== prevMatch.obj) {
         await this.fetchOwnerData(params);
         await this.fetchIdData(params);
@@ -298,6 +299,7 @@ class Page extends Component {
       } else if (params.id !== prevMatch.id) {
         await this.fetchIdData(params);
       }
+      this.refs.loading.toggle();
    }
 
     /**

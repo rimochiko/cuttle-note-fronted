@@ -59,6 +59,7 @@ function getHomeData (args) {
             userId: "${args.userId}"
           ){
           textNum 
+          dates
           imgNum 
           viewNum 
           likeNum

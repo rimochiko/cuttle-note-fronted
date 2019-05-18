@@ -104,18 +104,21 @@
             }
         }
         .body {
-            padding: 1.5rem 2rem;
             line-height: 1.8;
             .title {
+                padding: 1rem 0; 
                 display: block;
-                font-size: 1.2rem;
-                margin-bottom: .5rem;
+                font-size: 1.1rem;
+                margin: 0rem 1.5rem;
             }
             .text {
                 color: #999;
             }
             .key {
                 color: #aa95e5;
+            }
+            .cover {
+                width: 100%;
             }
         }
     }

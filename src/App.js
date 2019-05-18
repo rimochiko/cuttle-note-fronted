@@ -59,7 +59,7 @@ class App extends Component {
           <Route path="/info/:from?" component={InfoPage} />
           <Route path="/collect" component={CollectPage} />
           <Route path="/trash" component={TrashPage} />  
-          <Route path="/search/article" component={SearchPage} />        
+          <Route path="/search/:type/:search?/:page?" component={SearchPage} />        
           <Route path="/register" component={RegisterPage}/>   
           <Route path="/login" component={LoginPage}/>
         </Switch>

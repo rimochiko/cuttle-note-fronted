@@ -141,7 +141,8 @@ export default class Store {
         await axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
-          this.infoNum = res || 0;
+          console.log(res);
+          this.infoNum = res;
         })
         .catch((err) => {
           console.log(err);

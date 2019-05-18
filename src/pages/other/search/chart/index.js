@@ -100,26 +100,28 @@ class Page extends Component {
       return (
         <div className="search-item search-chart" key={item.id}>
           <div className="body">
-            <Link className="title" to="/">{item.post.id}</Link>
-            <p className="text">{item.post.content}</p>
+            <Link className="title" to="/">{item.title}</Link>
+            <img src={item.url ? item.url : "http://localhost:8080/static/chart/9d59bd026f22eefd6b0b941f3387e91b.png"}
+                 alt=""
+                 className="cover"/>
           </div>
           <div className="author flex-row">  
             <div className="detail flex-row">
-              <img src={item.author.avatar ? `http://localhost:8080/static/user/${item.author.avatar}` :require('../../../../assets/images/default.jpg')}
+              <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` :require('../../../../assets/images/default.jpg')}
                     alt=""/>
-              <Link to={`/article/user/${item.author.id}`} className="text">{item.author.nickname}</Link>
+              <Link to={`/article/user/${item.authorId}`} className="text">{item.authorName}</Link>
               {
-                this.generateGroupLable(item.group)
+                this.generateGroupLable({id:item.groupId, nickname: item.groupName})
               }
             </div>
-            <p className="date">{item.post.date}</p>
+            <p className="date">{item.date}</p>
           </div>
       </div>
       )
     }
 
     generateGroupLable (group) {
-      if(group) {
+      if(group.id) {
         return (
           <Link to={`/article/group/${group.id}`} className="group-label">
               <FontAwesomeIcon icon="users"/>{group.nickname}
@@ -132,7 +134,7 @@ class Page extends Component {
         return (
           <div className="search-res search-chart">
             {
-              list && list.map((item) => {
+              this.props.list && this.props.list.map((item) => {
                 return this.generateItem(item)
               })
             }
