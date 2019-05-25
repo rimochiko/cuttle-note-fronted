@@ -217,6 +217,7 @@ class Page extends Component {
         publish: 1,
         imgbase: state.imgBase
       };
+
       // 加入团队信息
       if (state.space.type === GROUP) {
         params.groupId = state.space.id

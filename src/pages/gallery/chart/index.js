@@ -402,6 +402,7 @@ class Section extends Component {
         )
     }
 
+
     render () {
         return (
             <div className="article">
@@ -419,17 +420,9 @@ class Section extends Component {
                 </div>
                 <div className="body">
                     <div className="content">
-                    <GGEditor>
-                    <Mind  className="edit-canvas"
-                            ref="graph"
-                            style={{ width: 980, height: 500 }} 
-                            data={this.state.post.content || {
-                                roots: [{
-                                label: '中心主题',
-                                children: []
-                                }]
-                            }}/>
-                    </GGEditor>
+                    {
+                        this.generateGraph()
+                    }
                     </div>
                     {
                         this.generateExtra()

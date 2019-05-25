@@ -276,8 +276,7 @@ class Page extends Component {
    * 生成团队操作按钮
    */
   generateOptions () {
-    // 
-    if (this.state.isAuth === 0) {
+    if (this.state.isAuth === 6) {
       return (
         <ul className="ul-list-link">
           <li><Link to={`/library/group/${this.state.group.id}`}><FontAwesomeIcon icon="book" />文库</Link></li>
@@ -564,20 +563,6 @@ class Page extends Component {
     * 创建一个团队
     */
    createGroup (args) {
-     const query = `
-     mutation {
-      data:
-      groupSave(
-          token: "${this.props.userStore.user.token}",
-          userId: "${this.props.userStore.user.userId}",
-          groupId: "${this.state.tId}",
-          des: "${this.state.tDes}",
-          name: "${this.state.tName}",
-          auth: ${this.state.tPublic ? 1 : 0},
-          avatar: "${this.state.tAvatar}"
-      )
-     }
-    `
     Qlquery.createGroup({
       token: this.props.userStore.user.token,
       userId: this.props.userStore.user.userId,
@@ -607,6 +592,37 @@ class Page extends Component {
         tipText: '创建团队失败:('
       });
       this.refs.tooltip.show()
+     })
+   }
+
+   /**
+    * 更新团队资料
+    */
+   updateGroup (args) {
+     Qlquery.updateGroup({
+        token: this.props.userStore.user.token,
+        userId: this.props.userStore.user.userId,
+        groupId: this.state.tId,
+        des: this.state.tDes,
+        name: this.state.tName,
+        auth: this.state.tPublic,
+        avatar: this.state.tAvatar,
+        role: this.state.isAuth
+     })
+     .then(({data}) => {
+       let res = data.data.data,
+           text = '';
+       if (res === 1) {
+         // 修改成功
+         text = "团队资料更新成功，请刷新查看"
+       } else {
+         text = "团队资料更新失败"
+       }
+       this.toggleSetting();
+       this.setState({
+         tipText: text
+       });
+       this.refs.tooltip.show();
      })
    }
   
@@ -1015,33 +1031,33 @@ class Page extends Component {
                             <div className="input-group">
                               <label className="input-label" 
                                      >小组ID</label>
-                              <input className="input-text"
-                                     type="text" 
-                                     placeholder="请输入域名"
-                                     value={this.state.tId}
-                                     onChange={(e) => {
-                                       this.setState({
-                                         tId: e.target.value
-                                       })
-                                     }}
-                                     onBlur={()=> {
-                                       if(!this.state.tId) {
-                                         this.setState({
-                                           tIdTip: '团队ID不能为空'
-                                         })
-                                         return;
-                                       }
-                                       if(!this.state.Id.match(/^(\w|_){1,10}$/)) {
-                                         this.setState({
-                                           tIdTip: '团队ID只能包含字母数字和下划线'
-                                         })
-                                         return;
-                                       }
-                                      this.checkGroupId.bind(this)
-                                      this.setState({
-                                        tIdTip: ''
-                                      })
-                                     }}/>
+                                  <input className="input-text"
+                                      type="text" 
+                                      placeholder="只能包含字母、数字或下划线"
+                                      value={this.state.tId}
+                                      onChange={(e) => {
+                                        this.setState({
+                                          tId: e.target.value
+                                        })
+                                      }}
+                                      onBlur={()=> {
+                                        if(!this.state.tId) {
+                                          this.setState({
+                                            tIdTip: '团队ID不能为空'
+                                          })
+                                          return;
+                                        }
+                                        if(!this.state.Id.match(/^(\w|_){1,10}$/)) {
+                                          this.setState({
+                                            tIdTip: '团队ID只能包含字母数字和下划线'
+                                          })
+                                          return;
+                                        }
+                                        this.checkGroupId.bind(this)
+                                        this.setState({
+                                          tIdTip: ''
+                                        })
+                                      }}/>                                                              
                               <span className="input-mark">{this.state.tIdTip || "必填项"}</span>
                             </div>
 
@@ -1146,7 +1162,7 @@ class Page extends Component {
                         <div className="flex-row">
                           <div className="flex-column input-side">
                             <div className="input-static-group">
-                              <label className="input-label">小组域名</label>
+                              <label className="input-label">小组ID</label>
                               <div className="input-static">
                                 <p className="input-pure-text">{this.state.group.id}</p>
                               </div>
@@ -1222,7 +1238,8 @@ class Page extends Component {
 
                             <div className="input-group">
                               <button className="input-btn radius-btn"
-                                      disabled={!this.judgeSubmitForm(1)}>确认</button>
+                                      disabled={!this.judgeSubmitForm(1)}
+                                      onClick={this.updateGroup.bind(this)}>确认</button>
                             </div>
                           </div>
                          

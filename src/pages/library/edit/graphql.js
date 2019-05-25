@@ -1,13 +1,19 @@
+import axios from 'axios';
+
 export default {
     createPost,
     updatePost,
-    getOnePost
+    getOnePost,
+    uploadImage,
+    sendEditStatus,
+    deleteDraft
 }
 
 function createPost (args) {
+    let query;
     if (args.groupId) {
         if (args.parentId) {
-            return `
+            query = `
             mutation {
                 data:
                 groupTextPostSave (
@@ -26,7 +32,7 @@ function createPost (args) {
                 }
             }`;        
         } else {
-            return `
+            query = `
             mutation {
                 data:
                 groupTextPostSave (
@@ -46,7 +52,7 @@ function createPost (args) {
         }
     } else {
         if (args.parentId) {
-            return `
+            query = `
             mutation {
                 data:
                 userTextPostSave (
@@ -64,7 +70,7 @@ function createPost (args) {
                 }
             }`;        
         } else {
-            return `
+            query = `
             mutation {
                 data:
                 userTextPostSave (
@@ -83,30 +89,48 @@ function createPost (args) {
         }
     }
 
+    return axios({
+        url: '/graphql',
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+     })
+
 }
 
 function updatePost (args) {
-    return `
+    const query = `
     mutation {
         data:
         userTextPostUpdate (
-            postId: ${args.postId},
+            postId: ${args.postId || 0},
             token: "${args.token}",
             userId: "${args.userId}",
             title: "${args.title || '无标题'}",
             content: "${args.content}",
             isAuth: ${args.Auth ? args.Auth : 1},
             publish: ${args.publish},
+            draftId: ${args.draftId || 0}
         ) {
             code,
             date,
             postId
         }
     }`;
+    return axios({
+        url: '/graphql',
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+     })
 }
 
 function getOnePost (args) {
-    return `
+    const query = `
     query {
       data:
       post(
@@ -139,4 +163,77 @@ function getOnePost (args) {
       }
     }
     `
+    return axios({
+        url: '/graphql',
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+     })
+  }
+
+  function uploadImage ({userId, token, imgbase}) {
+      const query = `
+      mutation {
+        data:
+        uploadImage(
+            userId: "${userId}",
+            token: "${token}",
+            imgbase: "${imgbase}"            
+        ) {
+            code,
+            url
+        }
+      }
+      `;
+      return axios({
+        url: '/graphql',
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+     })
+  }
+
+  function sendEditStatus ({postId, userId, token, isLock}) {
+    let query;
+    if (isLock) {
+        query = `
+        mutation {
+            data:
+            lockPost(
+                postId: ${postId},
+                userId: "${userId}",
+                token: "${token}"
+            )
+        }
+        `;
+    } else {
+        query = `
+        mutation {
+            data:
+            unlockPost(
+                postId: ${postId},
+                userId: "${userId}",
+                token: "${token}"
+            )
+        }
+        `
+    }
+
+    return axios.post('/graphql', {query});
+  }
+
+  function deleteDraft ({token, userId, postId}) {
+      const query = `
+        postDelete(
+            postId: ${postId},
+            token: "${token}",
+            userId: "${userId}",
+            absolute: 1
+        )
+      `;
+      return axios.post('/graphql', {query});   
   }

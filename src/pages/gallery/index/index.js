@@ -357,12 +357,11 @@ class Page extends Component {
      */
     generateOption () {
       // 判断是否有写入权
-      console.log(this.state.isAuth);
       if (this.state.isAuth) {
         return (
-          <Link to="/article/edit" title="创建新文章">
+          <span title="创建新文章" onClick={this.toggleCreate.bind(this)}>
             <FontAwesomeIcon icon="plus" />
-          </Link>
+          </span>
         )
       } else if(this.state.object.type === USER){
         if (this.state.object.isFollow) {

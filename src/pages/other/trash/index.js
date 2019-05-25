@@ -89,11 +89,62 @@ class Page extends Component {
           <p className="info">{this.getTrashIcon(item.type)}{item.title}</p>
           <p className="date">{item.date}</p>
           <p className="option">
-            <button className="input-btn radius-btn">恢复</button>
-            <button className="sub-btn radius-btn">彻底删除</button>
+            <button className="input-btn radius-btn" onClick={this.recoverPost.bind(this, item.id)}>恢复</button>
+            <button className="sub-btn radius-btn" onClick={this.completeRemove.bind(this, item.id)}>彻底删除</button>
           </p>
         </div>
       )
+    }
+
+    /**
+     * 恢复草稿
+     */
+    recoverPost (id) {
+      const query = `
+        query {
+          data:
+          postRecover(
+            userId: "${this.props.userStore.user.userId}",
+            token: "${this.props.userStore.user.token}",
+            postId: ${id}
+          )
+        }
+      `;
+      axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res.code === 1) {
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+
+    /**
+     * 完全删除
+     */
+    completeRemove (id) {
+      const query = `
+        query {
+          data:
+          postDelete(
+            userId: "${this.props.userStore.user.userId}",
+            token: "${this.props.userStore.user.token}",
+            postId: ${id},
+            absolute: 1
+          )
+        }
+      `;
+      axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res.code === 1) {
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
     }
 
     render () {

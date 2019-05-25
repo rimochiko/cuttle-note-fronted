@@ -18,6 +18,7 @@ import Article from '../article';
 import Dashboard from '../dashboard';
 import axios from 'axios';
 import qlQuery from './graphql';
+import { library } from '@fortawesome/fontawesome-svg-core';
 
 const USER = "user",
       GROUP = "group";
@@ -45,6 +46,7 @@ class Page extends Component {
             createDate: '',
             comments: []
           },
+          draftList: [],
           isOpted: false
         }
         this.getOwnerInfo = this.getOwnerInfo.bind(this);
@@ -214,7 +216,8 @@ class Page extends Component {
        let res = data.data.data;
        if(res.code === 1) {
          this.setState({
-           posts: res.posts
+           posts: res.posts,
+           draftList: res.drafts
          })
        } else {
          this.setState({
@@ -355,40 +358,56 @@ class Page extends Component {
       }
     }
 
+    toggleDraft () {
+      this.refs.draft.toggle();
+    }
+
     /**
      * 生成关注按钮
      */
     generateOption () {
       // 判断是否有写入权
-      console.log(this.state.isAuth);
       if (this.state.isAuth) {
         return (
-          <Link to="/article/edit" title="创建新文章">
-            <FontAwesomeIcon icon="plus" />
-          </Link>
+          <div className="option">
+            <Link to="/article/edit" title="创建新文章">
+              <FontAwesomeIcon icon="plus" />
+            </Link>
+            <span title="草稿箱" onClick={this.toggleDraft.bind(this)}>
+              <FontAwesomeIcon icon="box" />
+            </span>            
+          </div>
         )
       } else if(this.state.object.type === USER){
         if (this.state.object.isFollow) {
           return (
-            <div onClick={this.unfollowUser.bind(this)}>
-              <FontAwesomeIcon icon="minus"/>取消关注
+            <div className="option">
+              <div onClick={this.unfollowUser.bind(this)}>
+                <FontAwesomeIcon icon="minus"/>取消关注
+              </div>              
             </div>
           ) 
         } else {
           return (
-            <div onClick={this.followUser.bind(this)}>
-              <FontAwesomeIcon icon="plus"/>关注TA
+            <div className="option">
+              <div onClick={this.followUser.bind(this)}>
+                <FontAwesomeIcon icon="plus"/>关注TA
+              </div>              
             </div>
           )
         }
 
       } else if(this.state.object.type === GROUP) {
         return (
-          <div>
+          <div className="option">
             <FontAwesomeIcon icon="plus"/>加入团队
           </div>
+
         )
       }
+      return (
+        <div className="option"></div>
+      )
     }
     render () {
         return (
@@ -396,6 +415,31 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
+                    <Modal title="草稿箱" ref="draft">
+                      <div className="draft-box">
+                        <div className="draft-header">
+                          <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
+                          <button className="btn">舍弃全部草稿</button>
+                        </div>
+                        {
+                          this.state.draftList && this.state.draftList.map((item) => {
+                            return (
+                              <div className="draft-item" key={item.id}>
+                                <Link to={{pathname:'/article/edit', 
+                                           query: {postId: item.id,
+                                                   parentId: item.parentId}}} 
+                                      className="title">{item.title}</Link>
+                                <p className="des">
+                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`}>{item.author}</Link>
+                                  保存于{item.date} · <span className="link">舍弃</span>
+                                </p>
+                              </div>  
+                            )
+                          })
+                        }
+                        
+                      </div>
+                    </Modal>
                     <Modal title="文章信息" ref="info">
                       <ul>
                         <li>
@@ -428,11 +472,9 @@ class Page extends Component {
                             <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                           </DropDown>                        
                         </div>
-                        <div className="option">
-                          {
-                            this.generateOption()
-                          }
-                        </div>
+                        {
+                          this.generateOption()
+                        }
                       </div>
                       <div className="tree">
                         <Tree data={this.state.posts} base="library" owner={this.state.object} activeId={this.props.match.params && this.props.match.params.id}/>

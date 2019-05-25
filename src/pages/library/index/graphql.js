@@ -24,6 +24,14 @@ function userPostQuery (args) {
        author: "${args.author}"
      ) {
        code,
+       drafts {
+        id
+        status
+        title
+        date
+        author
+        parentId
+       }
        posts {
         id
         status

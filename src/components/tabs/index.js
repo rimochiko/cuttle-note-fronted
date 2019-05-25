@@ -34,16 +34,28 @@ class Tabs extends Component {
             <div className="mck-tabs">
               <ul className="mck-tabs-head">
               {
-                      tabHead && tabHead.map((item) => {
-                      if (item.key === this.props.defaultActiveKey) {
-                         return (
-                          <li key={item.key} className="active">{item.name}</li>
-                         ) 
-                      } else {
-                        return (
-                            <li key={item.key} onClick={this.toggleActive.bind(this, item.key)}>{item.name}</li>
-                        ) 
-                      }
+                    tabHead && tabHead.map((item) => {
+                    if (this.state.activeKey === null) {
+                        if (item.key === this.props.defaultActiveKey) {
+                            return (
+                                <li key={item.key} className="active">{item.name}</li>
+                            )
+                        } else {
+                            return (
+                                <li key={item.key} onClick={this.toggleActive.bind(this, item.key)}>{item.name}</li>
+                            ) 
+                        }
+                    } else {
+                        if (item.key === this.state.activeKey) {
+                            return (
+                                <li key={item.key} className="active">{item.name}</li>
+                            )
+                        } else {
+                            return (
+                                <li key={item.key} onClick={this.toggleActive.bind(this, item.key)}>{item.name}</li>
+                            ) 
+                        }
+                    }
                   })
               }
               </ul>

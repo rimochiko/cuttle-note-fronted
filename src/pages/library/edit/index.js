@@ -2,27 +2,33 @@ import React, {Component} from 'react';
 import './index.scss';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import Modal from '../../../components/modal';
 import Tabs from '../../../components/tabs';
 import Switch from '../../../components/switch';
 import Loading from '../../../components/loading';
 import Tooltip from '../../../components/tooltip';
+
+import CodeModal from './components/code';
+import ImageModal from './components/image';
+
 import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import Qlquery from './graphql';
-import axios from 'axios';
+import TurndownService from 'turndown';
 
-const TabPane = Tabs.TabPane;
 
 const USER = "user",
       GROUP = "group";
 
+const turndownService = new TurndownService();
 @inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
         super();
         this.state = {
+          isUpdate: false,
           title: '',
           isAuth: 0,
           content: '',
@@ -33,6 +39,7 @@ class Page extends Component {
           },
           postId: null,
           parentId: null,
+          draftId: null,
           space: {
             id: '',
             name: '',
@@ -42,14 +49,18 @@ class Page extends Component {
           blurTime: null,
           blur: 0,
           markdown: '',
+          isBold: false,
+          isItalic: false,
+          isBlockquote: false,
+          isCode: false,
           linkName: '',
           linkHref: '',
-          imgAlt: '',
-          imgSrc: '',
           tipText: '',
-          selectText: ''
+          selectText: '',
+          lastEditRange: null
         }
         this.generateLink = this.generateLink.bind(this);
+        this.generateSaveStatus = this.generateSaveStatus.bind(this);
     }
 
     async componentDidMount () {
@@ -60,21 +71,19 @@ class Page extends Component {
       }
 
       if (this.props.location.query && this.props.location.query.postId) {
-        
         document.title = "编辑文章 - 墨鱼笔记";
         this.setState({
-          postId: this.props.location.query.postId,
-          parentId: this.props.location.query.parentId
+          postId: this.props.location.query.postId
         })
+        
+        // 如果有postId，说明是编辑文档，要先发送编辑状态，再获取文章
+       
 
-
-        // 如果有postId，说明是编辑文档，要先获取文档内容
-        const query = Qlquery.getOnePost({
+        Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: this.state.postId,
           token: this.props.userStore.user.token 
-        });
-        await axios.post('/graphql', {query})
+        })
         .then(({data}) => {
           let res = data.data.data;
           if(res.code === 1) {
@@ -101,10 +110,11 @@ class Page extends Component {
               lastSaveTime: res.post.recentTime,
               lastSaveUser: res.post.recentUser,
               parentId: res.post.parent,
-              space: space
+              space: space,
+              isUpdate: true
             })
           } else {
-            console.log("请求文章失败")
+            this.showTooltip("请求文章内容失败");
           }
         })
         .catch((err) => {
@@ -126,23 +136,40 @@ class Page extends Component {
       this.refs.loading.toggle();
     }
 
+    /**
+     * 发送加锁信号
+     */
+    async sendLock () {
+      await Qlquery.sendEditStatus({
+        userId: this.props.userStore.user.userId,
+        postId: this.state.postId,
+        token: this.props.userStore.user.token,
+        isLock: true 
+      })
+      .then(({data}) => {
+        let res = data.data.data;
+        if (res === 0) {
+          // 别人正在编辑
+          this.showTooltip("你的伙伴正在编辑此文档，请稍后再试")
+          setTimeout(() => {
+            window.history.go(-1);
+          }, 1000);
+        }
+      })
+    }
+
+    /** 获取选中文字 */
     getSelection () {
       let res = ''
       if (window.getSelection) {
-        //获取Selection对象
         let se = window.getSelection()
-        //获取起始位置，这个是字符的序号位置，而不是坐标
         let start = se.anchorOffset;
-        //获取结束位置
         let  end = se.focusOffset;
-        //获取起始的dom元素
         if (!se.anchorNode || !se.focusNode) {
           return res;
         }
         let startEl = se.anchorNode.parentElement;
-        //获取结束的dom元素
         let endEl = se.focusNode.parentElement;
-        //获取起始dom元素的文本内容
         let startText = startEl.innerText;
         if (startEl == endEl) {
           res = startText.substring(start, end);
@@ -159,6 +186,13 @@ class Page extends Component {
       let editBox = this.refs.editBox;
       // 获取目前editBox所在光标位置
       editBox.focus();
+      var selection = getSelection()
+      // 判断是否有最后光标对象存在
+      if (this.state.lastEditRange) {
+          // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
+          selection.removeAllRanges()
+          selection.addRange(this.state.lastEditRange)
+      }
 
       switch(command){
         case "bold": 
@@ -181,11 +215,11 @@ class Page extends Component {
           document.execCommand('formatBlock', false, `<h${args}>`);
         break;
         case "quote":
-          document.execCommand('formatBlock', false, '<blockquote>');
+          this.insertBlockquote();
           break; 
         case "image": 
-          if (this.state.imgSrc) {
-            document.execCommand("insertImage", false, this.state.imgSrc);
+          if (args.url) {
+            document.execCommand("insertImage", false, args.url);
           }
         break;
         case "code": 
@@ -198,59 +232,13 @@ class Page extends Component {
 			}
     }
 
-
     componentWillUnmount () {
       this.setState({
         draftTime: null,
         blurTime: null,
         blur: 0,
+        changeTimer: null
       })
-    }
-
-
-    textStyleCommand (e, command) {
-      var obj = {
-        bold: function (text) {
-          return `**${text}**`
-        },
-        italic: function (text) {
-          return `*${text}*`
-        },
-        listul: function (text) {
-          text.replace(/\n/, '');
-          return `- ${text}*`
-        },
-        listol: function (text) {
-          text.split('\n').map((item, index) => {
-            return `${index+1}.${item}`;
-          })
-          return text.join('\n');
-        },
-        heading: function (text, level) {
-          // 待改进
-          let front = '';
-          for (let i=0; i < level; i++) {
-            front+='#';
-          }
-          return `${front} ${text}`;
-        },
-        link: function (text, link) {
-          this.refs.addLink.show();
-        },
-        quote: function (text) {
-
-        },
-        code: function (text) {
-
-        },
-        image: function (text) {
-
-        },
-        markdown: function () {
-        }
-
-      }
-
     }
 
     /**
@@ -259,7 +247,7 @@ class Page extends Component {
     async saveDraft () {
       let state = this.state;
       let params = {
-        token: this.props.userStore.user.token,
+          token: this.props.userStore.user.token,
           userId: this.props.userStore.user.userId,
           title: this.state.title,
           content: this.state.content,
@@ -272,40 +260,94 @@ class Page extends Component {
         params.groupId = state.space.id;
       }
 
-      if (!state.postId) {
-        const query = Qlquery.createPost(params);
+      this.setState({
+        lastSaveTime: '正在保存草稿'
+      })
 
-        axios.post('/graphql', {query})
-        .then(({data}) => {
-          let res = data.data.data;
-          if (res.code === 1) {
-            this.setState({
-              postId: res.postId,
-              lastSaveTime: res.date
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-      } else {
-        // 修改post状态
+      // 如果是更新文档
+      if (state.isUpdate) {
         params.postId = state.postId;
-        const query = Qlquery.updatePost(params);
-
-        axios.post('/graphql', {query})
-        .then(({data}) => {
-          let res = data.data.data;
-          if (res.code === 1) {
-            this.setState({
-              lastSaveTime: res.date
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
+        if (!state.draftId) {
+          Qlquery.createPost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              this.setState({
+                draftId: res.postId,
+                lastSaveTime: res.date
+              });
+            } else {
+              this.setState({
+                lastSaveTime: '保存失败'
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        } else {
+          // 修改post状态
+          params.draftId = state.draftId;
+          Qlquery.updatePost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              this.setState({
+                lastSaveTime: res.date
+              });
+            } else {
+              this.setState({
+                lastSaveTime: '保存失败'
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        }
+      } else {
+        // 创建文档
+        if (!state.draftId) {
+          Qlquery.createPost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              this.setState({
+                draftId: res.postId,
+                lastSaveTime: res.date
+              });
+            } else {
+              this.setState({
+                lastSaveTime: '保存失败'
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        } else {
+          // 修改post状态
+          params.draftId = state.draftId;
+          Qlquery.updatePost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              this.setState({
+                lastSaveTime: res.date
+              });
+            } else {
+              this.setState({
+                lastSaveTime: '保存失败'
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        }
       }
+
+
     }
 
     /**
@@ -328,28 +370,13 @@ class Page extends Component {
       if (state.space.type === GROUP) {
         params.groupId = state.space.id;
       }
-      console.log(this.state.postId);
 
-      /*if (!this.state.postId) {
-        const query = Qlquery.createPost(params);
-        axios.post('/graphql', {query})
-        .then(({data}) => {
-          let res = data.data.data;
-          if (res.code === 1) {
-            // 跳转页面
-            let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
-            this.props.history.push(url)
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-      } else {
-        // 修改post状态
-        params.postId = this.state.postId;
-        const query = Qlquery.updatePost(params);
+      // 如果是发布确认修改的文章
+      if (state.isUpdate) {
+        params.draftId = state.draftId;
+        params.postId = state.postId;
 
-        axios.post('/graphql', {query})
+        Qlquery.updatePost(params)
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 1) {
@@ -360,53 +387,194 @@ class Page extends Component {
         .catch((err) => {
           console.log(err);
         })
-      }*/      
+
+      } else {
+        if (state.draftId) {
+          // 修改草稿状态
+          params.draftId = this.state.draftId;
+          Qlquery.updatePost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+              this.props.history.push(url)
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        } else {
+          // 发布文章
+          Qlquery.createPost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if (res.code === 1) {
+              // 跳转页面
+              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+              this.props.history.push(url)
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        }
+      }  
     }
 
     /**
-     * 开始聚焦编辑
+     * 数据输入变化
      */
-    editGetFocus () {
-      // 开启定时器，1分钟保存一次
-      if (!this.state.draftTime) {
+    editGetChange () {
+      // 如果数据有变化，5秒保存一次草稿
+      if (!this.state.changeTimer) {
         this.setState({
-          draftTime: setTimeout(() => {
-            this.setState({
-              content: this.refs.editBox && this.refs.editBox.innerHTML.replace('"', '&quot;'),
-            });
-            this.saveDraft();
-          }, 60000)
-        })
+          changeTimer: setTimeout(() => {
+            let content = this.refs.editBox.innerText;
+            if (content.length >= 10) {
+              this.saveDraft()
+            }
+          }, 5000)
+        })        
       }
 
-      // 加锁编辑
     }
 
     /**
      * 离开聚焦
      */
     editGetBlur () {
-        this.setState({
-          blurTime: setTimeout(() => {
-            this.setState ({
-              content: this.refs.editBox && this.refs.editBox.innerHTML.replace('"', '&quot;'),
-              blur: this.state.blur + 1
-            })
-            if (this.state.blur > 60) {
-              this.setState({
-                draftTime: null
-              })
-            }
-          }, 1000)
-        })        
+      var selection = getSelection();
+      this.setState({
+        lastEditRange: selection.getRangeAt(0)
+      })       
+    }
+
+    insertNode(node, needAdd = false) {
+      let editBox = this.refs.editBox;
+      editBox.focus();
+      var selection = getSelection();
+      let lastNode = node;
+      let anchorNode = selection.anchorNode;
+      // 判断选定对象范围是编辑框还是文本节点
+      if(anchorNode.nodeName != '#text') {
+          // 如果是编辑框范围。则创建表情文本节点进行插入
+            let parentNode = anchorNode === this.refs.editBox ? anchorNode : anchorNode.parentNode;
+              if (parentNode.childNodes.length > 1) {
+                  // 如果文本框的子元素大于0，则表示有其他元素，则按照位置插入表情节点
+                  for (var i = 1; i < parentNode.childNodes.length; i++) {
+                    if (parentNode.childNodes[i - 1] == anchorNode) {
+                        if (node.nodeName === "BR") {
+                          lastNode = parentNode.childNodes[i];
+                        }
+                        parentNode.insertBefore(node, parentNode.childNodes[i]);
+                        if (needAdd) {
+                          parentNode.insertBefore(document.createElement('br'), parentNode.childNodes[i]);
+                        }
+                        break;
+                    }
+                  }
+                  if (i === parentNode.childNodes.length) {
+                    parentNode.appendChild(node);
+                  }
+              } else {
+                  parentNode.appendChild(node)
+                  if (needAdd) {
+                    parentNode.appendChild(document.createElement('br'));
+                  }
+            }            
+
+          
+      } else {
+          // 如果是文本节点则先获取光标对象
+          var range = selection.getRangeAt(0)
+          // 光标位置在末尾，则添加到后面
+          var textNode = range.startContainer;
+          let value = textNode.nodeValue;
+          let offset = range.startOffset;
+          let parentNode = textNode.parentNode;
+          if (range.startOffset < value.length - 1) {
+              let frontText = document.createTextNode(value.substring(0, offset)),
+                  backText = document.createTextNode(value.substring(offset, value.length));
+              parentNode.insertBefore(frontText,textNode);
+              parentNode.insertBefore(node,textNode);
+              parentNode.insertBefore(backText,textNode);
+              parentNode.removeChild(textNode);
+          } else {
+              // br的存在使得有多个孩子
+              if(parentNode.childNodes.length > 1) {
+                for (var i = 1, len = parentNode.childNodes.length; i < len; i++ ){
+                  if (parentNode.childNodes[i - 1] === textNode) {
+                    if (node.nodeName === "BR") {
+                      lastNode = parentNode.childNodes[i];
+                    }
+                    parentNode.insertBefore(node, parentNode.childNodes[i]);
+                    if (needAdd) {
+                      parentNode.insertBefore(document.createElement('br'), parentNode.childNodes[i]);
+                    }
+                    break;
+                  }
+                }
+                if (i === parentNode.childNodes.length) {
+                  parentNode.appendChild(node);
+                }
+              } else {
+                parentNode.appendChild(node);
+                if (needAdd) {
+                  parentNode.appendChild(document.createElement('br'));
+                }
+              }
+          }
+      }
+      // 创建新的光标对象
+      var range = document.createRange()
+      range.selectNodeContents(lastNode)
+      if (node.nodeName !== "BR" && node.childNodes && node.childNodes.length) {
+          let len = node.childNodes.length;
+          range.setStart(node.childNodes[len-1], node.childNodes[len-1].length || 0)
+      } else {
+        range.setStart(lastNode, 0);
+      }
+      range.collapse(true)
+      selection.removeAllRanges()
+      selection.addRange(range)
+      this.setState({
+         lastEditRange:selection.getRangeAt(0)
+      })
     }
 
     toggleMarkdown () {
+      this.setState({
+        markdown: turndownService.turndown(this.refs.editBox.innerHTML)
+      })
       this.refs.markdown.toggle();
     }
 
     toggleMoreSetting () {
       this.refs.setting.toggle();
+    }
+
+    toggleCode () {
+      this.refs.addCode.toggle();
+    }
+
+    insertBlockquote () {
+      // 获取选取文字
+      let select = window.getSelection(),
+          selectText = select.toString();
+      let blockquote = document.createElement('blockquote');
+      // 如果没有选取文字，就设为Br
+      if (!selectText) {
+        blockquote.appendChild(document.createElement('br'));
+      } else {
+        // console.log(selectText);
+        let text = selectText && selectText.split('\n');
+        for (let i = 0, len = text.length; i < len; i++) {
+          blockquote.appendChild(document.createTextNode(text[i]));
+          blockquote.appendChild(document.createElement('br'));
+        }
+        select.anchorNode.parentNode.removeChild(select.anchorNode);
+      }
+      this.insertNode(blockquote, true);
     }
 
     // 插入链接
@@ -425,26 +593,107 @@ class Page extends Component {
         this.refs.tooltip.show()
         return;
       }
-      this.addTextStyle.bind(this, 'link');
+      this.addTextStyle.bind('link');
       this.refs.addLink.toggle();
     }
     insertDirectLink () {
+      let name = this.state.linkName;
       if (this.state.linkHref.search(/(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/) < 0) {
         this.setState({
           tipText: '网址格式错误'
         })
         this.refs.tooltip.show()
         return;
+      } else if (!name) {
+        name = this.state.linkHref;
       }
-      let link = `<a href="${this.state.linkHref}" target="_blank">${this.state.linkName || this.state.linkHref}</a>`;
-      this.refs.editBox.innerHTML = this.refs.editBox.innerHTML + link;
+      let link = document.createElement('a');
+      link.href = this.state.linkHref;
+      link.target = "_blank"
+      link.appendChild(document.createTextNode(name));
+      this.insertNode(link);
       this.refs.addLink.toggle();
+    }
+    
+    showTooltip (text) {
+      this.setState({
+        tipText: text
+      })
+      this.refs.tooltip.show();
+    }
+
+     // 插入图片
+     toggleImageModal () {
+      this.setState({
+        imgSrc: '',
+        imgSrcBase: '',
+        imgSrcText: '',
+        imgSrcTip: ''
+      })
+      this.refs.addImage.toggle();
+    }
+    insertUploadImage () {
+      if (!this.state.imgSrcBase) {
+        this.setState({
+          tipText: '上传图片不能为空'
+        })
+        this.refs.tooltip.show()
+        return;
+      }
+
+      // 上传图片
+      Qlquery.uploadImage({
+        token: this.props.userStore.user.token,
+        userId: this.props.userStore.user.userId,
+        imgbase: this.state.imgSrcBase
+      })
+      .then(({data}) => {
+        let res =data.data.data;
+        console.log(res);
+        if (res.code === 1) {
+          this.setState({
+            imgSrc: res.url
+          })
+          this.addTextStyle('image');
+          this.refs.addImage.toggle();
+        } else {
+          this.setState({
+            tipText: '上传图片出错'
+          })
+          this.refs.tooltip.show()
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+
+    }
+    insertDirectImage () {
+      if (this.state.imgSrc.search(/(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/) < 0) {
+        this.setState({
+          tipText: '图片地址格式错误'
+        })
+        this.refs.tooltip.show()
+        return;
+      }
+      this.addTextStyle.bind(this, 'image');
+      this.refs.addLink.toggle();
+    }
+
+    insertCode (code) {
+      this.refs.editBox.innerHTML = this.refs.editBox.innerHTML + code;
+    }
+    
+    // 获取图片信息
+    insertImage (args) {
+      this.addTextStyle('image', args);
     }
 
     componentWillUnmount () {
       this.setState({
         draftTime: null,
-        blurTime: null
+        blurTime: null,
+        changeTimer: null
       })
     }
 
@@ -500,6 +749,71 @@ class Page extends Component {
       }
     }
 
+    editGetFocus () {
+      clearTimeout(this.state.changeTimer);
+      this.setState({
+        changeTimer: null
+      })
+    }
+
+    editGetEnter (e) {
+      let code = e.keyCode
+      this.editGetFocus();
+      if (code === 13) {
+        // 要判断是在什么标签内回车，再进行分别的添加
+        let selection = getSelection();
+        this.setState({
+          lastEditRange: selection.getRangeAt(0)
+        })
+        let parentNode = selection.anchorNode.parentNode;
+        let node = selection.anchorNode;
+        if (parentNode.nodeName === "CODE" || parentNode.nodeName === "BLOCKQUOTE") {
+          // 说明要在code标签里添加换行
+          this.insertNode(document.createElement('br'));
+          e.preventDefault();
+        }
+        
+      }
+    }
+
+    /**
+     * 移除草稿
+     */
+    deleteDraft () {
+      if (this.state.draftId) {
+        Qlquery.deleteDraft({
+          token: this.props.userStore.user.token,
+          userId: this.props.userStore.user.userId,
+          draftId: this.state.draftId
+        })
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res === 1) {
+            // 删除成功
+            this.setState({
+              draftId: null
+            })
+          }
+        })
+      }
+    }
+
+    generateSaveStatus () {
+      if (this.state.draftId) {
+        return (
+          <span>
+            {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}（<span onClick={this.deleteDraft.bind(this)}>舍弃</span>）
+          </span>
+        )
+      } else {
+        return (
+          <span>
+          {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}
+          </span>
+        )
+      }
+    }
+
     render () {
         return (
           <div className="page">
@@ -538,48 +852,14 @@ class Page extends Component {
                     </div>
                   </div>
               </Modal>
+              <CodeModal ref="addCode"
+                         getResult={this.insertCode.bind(this)}/>
 
-              <Modal title="添加图片" ref="addImage">
-                <div className="edit-link-body">
-                  <Tabs defaultActiveKey="1">
-                    <TabPane tab="本地上传" key="1">
-                      <div className="input-group">
-                        <label>选择图片</label>
-                        <input type="file" />
-                      </div>
-                      <div className="input-group">
-                        <label>图片描述</label>
-                        <input type="text" onChange={(e) => {
-                          this.setState({
-                            imgName: e.target.value
-                          })
-                        }}/>
-                      </div>
-                      <div className="input-group">
-                        <button className="radius-btn input-btn">上传</button>
-                      </div>
-                    </TabPane>
-                    <TabPane tab="网络获取" key="2">
-                      <div className="input-group">
-                        <label>图片地址</label>
-                        <input type="text" onChange={(e) => {
-                          this.setState({
-                            imgSrc: e.target.value
-                          })
-                        }}/>
-                      </div>
-                      <div className="input-group">
-                        <label>图片描述</label>
-                        <input type="text" />
-                      </div>
-                      <div className="input-group">
-                        <button className="radius-btn input-btn">确定</button>
-                      </div>
-                    </TabPane>
-                  </Tabs>
-                </div>   
-              </Modal>
-
+              <ImageModal ref="addImage"
+                          showTip={this.showTooltip.bind(this)}
+                          getResult={this.insertImage.bind(this)}
+                          sendData={Qlquery.uploadImage.bind(this)}/>
+              
               <div className="edit-page flex-1">
                 <div className="edit-header">
                   <input type="text"
@@ -660,7 +940,7 @@ class Page extends Component {
                         <button
                           className="single-tool" 
                           title="代码"
-                          onClick={this.addTextStyle.bind(this, 'code')}>
+                          onClick={this.toggleCode.bind(this)}>
                           <FontAwesomeIcon icon="code"/>
                         </button>
                       </li>
@@ -668,7 +948,7 @@ class Page extends Component {
                         <div
                           className="single-tool" 
                           title="图片"
-                          onClick={this.addTextStyle.bind(this, 'image')}>
+                          onClick={this.toggleImageModal.bind(this)}>
                           <FontAwesomeIcon icon="image"/>
                         </div>
                       </li>
@@ -686,8 +966,7 @@ class Page extends Component {
                         <div className="single-tool" 
                             title="Markdown语法"
                             onClick={this.toggleMarkdown.bind(this)}>
-                            <FontAwesomeIcon icon={['fab','markdown']}/>
-                            
+                            <FontAwesomeIcon icon={['fab','markdown']}/>  
                         </div>
                       </li>
                     </ul>
@@ -696,25 +975,30 @@ class Page extends Component {
                 <div className="edit-body"
                     contentEditable ref="editBox"
                     onBlur={this.editGetBlur.bind(this)}
-                    onFocus={this.editGetFocus.bind(this)}
+                    onKeyDown={this.editGetEnter.bind(this)}
+                    onKeyUp={this.editGetChange.bind(this)}
                     dangerouslySetInnerHTML={{
                       __html: this.state.content
                     }}
                     >
-                  
                 </div>
                 <div className="edit-footer">
                   <p>
                     <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
                     {this.state.space.name}
-                    </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}</p>
+                    </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.generateSaveStatus()}</p>
                   <div className="btns-box">
-                    <button className="radius-btn sub-btn" onClick={this.saveDraft.bind(this)}>保存到草稿箱</button>
+                    <button className="radius-btn sub-btn" onClick={()=> {
+                      clearTimeout(this.state.changeTimer);
+                      this.setState({
+                        changeTimer: null
+                      })
+                      this.saveDraft.apply(this);
+                    }}>保存草稿</button>
                     <button className="radius-btn input-btn" onClick={this.publishPost.bind(this)}>发布</button>
                   </div>
                 </div>
               </div>
-                  
               </div>
           </div>
         );

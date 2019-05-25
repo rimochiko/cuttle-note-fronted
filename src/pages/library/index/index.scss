@@ -25,6 +25,11 @@
         }        
     }
     .option {
+        display: flex;
+        justify-content: end;
+        span {
+            margin-left: .5rem;
+        }
         a,span,div {
             display: block;
             @extend .section;
@@ -175,6 +180,54 @@
     .des {
         font-size: .85rem;
         color: #a3a5b6;
+    }
+}
+
+.draft-box {
+    padding: 1.5rem;        
+    width: 40rem;
+    height: 30rem;
+    color: #3e4077;
+    display: flex;
+    flex-direction: column;
+    .draft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eef0f3;
+        .title {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+        .btn {
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            border: 1px solid #ccc;
+            background-color: #FFF;
+            color: #666;
+            padding: .2rem .6rem;
+            border-radius: .2rem;
+            font-size: .8rem;
+        }
+    }
+    .draft-item {
+        margin-bottom: 1rem;
+        overflow-y: scroll;
+        flex: 1;
+        .title {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: .8rem;
+        }
+        .des {
+            font-size: .85rem;
+            color: #8493b8;
+        }
+        .link {
+            color: #3e4077;
+            cursor: pointer;
+        }
     }
 }
 

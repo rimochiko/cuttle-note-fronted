@@ -162,7 +162,7 @@ class Page extends Component {
         <div className="item-history" key={item.id}>
           <p className="info">{this.getHistoryIcon(item.type)}<Link to={item.link}>{item.title}</Link></p>
           <p className="author">
-            <img src={`http://localhost:8080/static/user/${item.author.avatar}` || require('../../../assets/images/default.jpg')} alt=""/><Link to="/">{item.author.nickname}</Link></p>
+            <img src={item.author.avatar ? `http://localhost:8080/static/user/${item.author.avatar}` : require('../../../assets/images/default.jpg')} alt=""/><Link to="/">{item.author.nickname}</Link></p>
           <p className="date">{item.date}</p>
           <p className="option">
               {item.group && item.group.id ? `${item.group.nickname}的空间` : `${item.author.nickname}的空间`}

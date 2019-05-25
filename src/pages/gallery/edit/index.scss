@@ -50,7 +50,14 @@
     }
 }    
 
-
+.edit-item-bar {
+    width: 160px;
+    height: 500px;
+    padding: 20px;
+    flex-grow: 0;
+    background-color: #fdfdfd;
+    border-right: 1px solid #eef0f3;
+}
 
 .chart-edit-shapes {
     width: 3rem;

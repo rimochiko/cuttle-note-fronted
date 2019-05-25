@@ -11,7 +11,9 @@ export default {
   sendInvite,
   getHomeData,
   exitGroup,
-  changeUserRole
+  changeUserRole,
+  deleteUser,
+  updateGroup
 }
 
 function getGroupEasy (args) {
@@ -221,7 +223,8 @@ function changeUserRole ({
   token,
   userId,
   groupId,
-  isAdmin
+  isAdmin,
+  objectId
 }) {
   const query = `
   mutation {
@@ -230,8 +233,48 @@ function changeUserRole ({
       token: "${token}",
       userId: "${userId}",
       groupId: "${groupId}",
-      isAdmin: "${isAdmin ? true : false}"
+      objectId: "${objectId}",
+      isAdmin: ${isAdmin ? true : false}
     )
   }
   `
+  return axios.post('/graphql', {query});
+}
+
+function updateGroup ({
+  token,
+  userId,
+  groupId,
+  name,
+  auth,
+  avatar,
+  des,
+  role
+}) {
+  if (role !== 6) {
+    return;
+  }
+
+  const query = `
+  mutation {
+    data:
+    groupUpdate(
+        token: "${token}",
+        userId: "${userId}",
+        groupId: "${groupId}",
+        des: "${des || ''}",
+        name: "${name}",
+        auth: ${auth ? 1 : 0},
+        avatar: "${avatar}"
+    )    
+  }
+  `
+  return axios({
+    url: '/graphql',
+    method: 'post',
+    headers:{
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: encodeURIComponent("query")+"="+encodeURIComponent(query)
+ })
 }
