@@ -78,10 +78,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
 
@@ -105,10 +108,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
     
@@ -132,10 +138,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(");
         })
     }
 
@@ -158,10 +167,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }    
 
@@ -206,14 +218,19 @@ class Section extends Component {
                         id: '',
                         name: ''
                     },
+                    comment: '',
                     post: Object.assign({}, this.state.post, {
                         comments: res.comments
                     })
                 });
+                this.props.showTooltip("添加评论成功:)")
+            } else {
+                this.props.showTooltip("电波发送失败:(");
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
 

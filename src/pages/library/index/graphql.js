@@ -75,6 +75,14 @@ function groupPostQuery (args) {
        groupId: "${args.groupId}"
      ) {
        code,
+       drafts {
+        id
+        status
+        title
+        date
+        author
+        parentId
+       }
        posts {
         id
         status
@@ -211,7 +219,6 @@ function getOwnerInfo (params, userId) {
          isFollow:
          isFollowed(
           userId:"${userId}",
-          token: "",
           followId: "${params.owner}"
          )
          data:

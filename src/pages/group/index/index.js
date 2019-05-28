@@ -316,7 +316,7 @@ class Page extends Component {
                   {
                     this.state.group.members&&this.state.group.members.map((item) => (
                       <li key={item.id}>
-                        <img src={`http://localhost:8080/static/user/${item.avatar}` ||  require('../../../assets/images/default.jpg')} 
+                        <img src={item.avatar ?`http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} 
                              alt={item.name}
                              title={item.name}/>
                       </li>
@@ -505,40 +505,43 @@ class Page extends Component {
         }
       })
     }
-    let  myChart = echarts.init(document.getElementById('statist-graph'));
-    // 绘制图表
-    myChart.setOption({
-      tooltip : {
-        trigger: 'axis',
-        axisPointer: {
-            type: 'cross',
-            label: {
-                backgroundColor: '#6a7985'
-            }
-        }
-    },
-    legend: {
-        data:['浏览量','人气量','记录次数']
-    },
-    grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true,
-        backgroundColor: '#f7f7fb'
-    },
-    xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : (this.state.statistics && this.state.statistics.dates) || ['','','','','','','']
-        }
-    ],
-    yAxis : [{
-            type : 'value'
-    }],
-    series :(this.state.statistics && this.state.statistics.charts) || defaultStatistic.charts
-     });
+
+    if (this.state.group.id) {
+      let  myChart = echarts.init(document.getElementById('statist-graph'));
+      // 绘制图表
+      myChart.setOption({
+        tooltip : {
+          trigger: 'axis',
+          axisPointer: {
+              type: 'cross',
+              label: {
+                  backgroundColor: '#6a7985'
+              }
+          }
+      },
+      legend: {
+          data:['浏览量','人气量','记录次数']
+      },
+      grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+          backgroundColor: '#f7f7fb'
+      },
+      xAxis : [
+          {
+              type : 'category',
+              boundaryGap : false,
+              data : (this.state.statistics && this.state.statistics.dates) || ['','','','','','','']
+          }
+      ],
+      yAxis : [{
+              type : 'value'
+      }],
+      series :(this.state.statistics && this.state.statistics.charts) || defaultStatistic.charts
+      });
+    }
     this.refs.loading.toggle();
   }
   
@@ -966,7 +969,7 @@ class Page extends Component {
                           this.state.selectList&&this.state.selectList.map((item) => {
                             return (
                               <li key={item.id}>
-                                <p><img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} 
+                                <p><img src={item.avatar ? item.avatar : require('../../../assets/images/default.jpg')} 
                                         alt={item.id}/>{item.nickname}</p>
                                 <span onClick={this.removeSelectItem.bind(this, item.id)}>
                                     <FontAwesomeIcon icon="times"/>
@@ -999,7 +1002,7 @@ class Page extends Component {
                                     <tr key={item.id}> 
                                       <td>
                                       <div className="flex-row flex-align">
-                                        <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')}
+                                        <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')}
                                             className="avatar"
                                             alt={item.id}/>
                                         <div className="info">
@@ -1047,7 +1050,7 @@ class Page extends Component {
                                           })
                                           return;
                                         }
-                                        if(!this.state.Id.match(/^(\w|_){1,10}$/)) {
+                                        if(!this.state.tId.match(/^(\w|_){1,10}$/)) {
                                           this.setState({
                                             tIdTip: '团队ID只能包含字母数字和下划线'
                                           })

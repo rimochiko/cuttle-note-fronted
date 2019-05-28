@@ -10,6 +10,7 @@ import Tree from '../../../components/tree';
 import Modal from '../../../components/modal';
 import DropDown from '../../../components/dropdown'; 
 import Loading from '../../../components/loading';
+import Tooltip from '../../../components/tooltip';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
@@ -17,8 +18,7 @@ import { inject, observer } from 'mobx-react';
 import Article from '../article';
 import Dashboard from '../dashboard';
 import axios from 'axios';
-import qlQuery from './graphql';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import Qlquery from './graphql';
 
 const USER = "user",
       GROUP = "group";
@@ -47,7 +47,7 @@ class Page extends Component {
             comments: []
           },
           draftList: [],
-          isOpted: false
+          tipText: ''
         }
         this.getOwnerInfo = this.getOwnerInfo.bind(this);
         this.getPostList = this.getPostList.bind(this);
@@ -140,7 +140,7 @@ class Page extends Component {
      */
     async fetchIdData (params) {
       if(params.id) {
-        const query = qlQuery.getOnePost({
+        const query = Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: params.id,
           token: this.props.userStore.user.token 
@@ -154,11 +154,11 @@ class Page extends Component {
               post: res.post
             })
           } else {
-            console.log("请求文章失败")
+            this.showTooltip("请求文章失败");
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.showTooltip(err);
         })
       }
     }
@@ -168,7 +168,7 @@ class Page extends Component {
      */
     async getOwnerInfo (params, userId) {
       let owner = {};
-      qlQuery.getOwnerInfo(params, userId)
+      await Qlquery.getOwnerInfo(params, userId)
       .then(({data}) => {
         let res = data.data.data;
         let isFollow = data.data.isFollow;
@@ -190,8 +190,16 @@ class Page extends Component {
       })
       .catch((err) => {
         console.log(err);
+        this.showTooltip(err);
       })
       return owner;
+    }
+
+    showTooltip (text) {
+      this.setState({
+        tipText: text
+      });
+      this.refs.tooltip.show();
     }
     
     /**
@@ -199,13 +207,13 @@ class Page extends Component {
      */
     async getPostList (params) { 
       const query = params.obj === USER ?
-      qlQuery.userPostQuery({
+      Qlquery.userPostQuery({
          userId: this.props.userStore.user.userId,
          token: this.props.userStore.user.token,
          type: 0,
          author: params.owner        
       }):
-      qlQuery.groupPostQuery({
+      Qlquery.groupPostQuery({
         userId: this.props.userStore.user.userId,
         token: this.props.userStore.user.token,
         type: 0,
@@ -226,8 +234,9 @@ class Page extends Component {
        }
      })
      .catch((err) => {
-       console.log(err);
-     })
+      console.log(err);
+      this.showTooltip("电波传达失败:(")
+    })
     }
     
     /** 
@@ -238,13 +247,13 @@ class Page extends Component {
     }
     async removePost () {
       const query = this.state.object.type === USER ? 
-      qlQuery.userDelPostQuery({
+      Qlquery.userDelPostQuery({
           userId:this.props.userStore.user.userId,
           postId: this.state.post.id,
           token:this.props.userStore.user.token
       })
       : 
-      qlQuery.groupDelPostQuery({
+      Qlquery.groupDelPostQuery({
         userId:this.props.userStore.user.userId,
         postId: this.state.post.id,
         token:this.props.userStore.user.token,
@@ -257,9 +266,57 @@ class Page extends Component {
         if(res) {
           // 删除成功
           let match = this.props.match.params;
-          this.props.history.push(`library/${match.obj}/`);
+          this.showRemovePost();
+          this.showTooltip("文章已放入回收站:)")
+          this.props.history.push(`/library/${match.obj}/`);
         } else {
           // 删除失败
+          this.showTooltip("电波传达失败:(")
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+    /**
+     * 移除草稿
+     * @param {} props 
+     */
+    async deleteDraft (id) {
+      const query = this.state.object.type === USER ? 
+      Qlquery.userDelPostQuery({
+          userId:this.props.userStore.user.userId,
+          postId: id,
+          token:this.props.userStore.user.token
+      })
+      : 
+      Qlquery.groupDelPostQuery({
+        userId:this.props.userStore.user.userId,
+        postId: id,
+        token:this.props.userStore.user.token,
+        groupId:this.state.object.id
+      });
+
+      await axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res) {
+          // 删除成功
+          this.showTooltip("草稿已移除:)")
+          let index;
+          this.state.draftList && this.state.draftList.forEach((item, index) => {
+            if (item.id === id) {
+              index = index;
+            }
+          });
+          let draft = this.state.draftList.slice();
+          draft.splice(index, 1);
+          this.setState({
+            draftList: draft
+          }) 
+        } else {
+          // 删除失败
+          this.showTooltip("电波传达失败:(")
         }
       })
       .catch((err) => {
@@ -325,16 +382,21 @@ class Page extends Component {
     // 关注用户
     async followUser () {
       if (this.state.object && this.state.object.type === USER && this.state.object.id) {
-        await qlQuery.addFollow({
+        await Qlquery.addFollow({
           userId:this.props.userStore.user.userId,
           followId: this.state.object.id,
           token:this.props.userStore.user.token
         })
         .then(({data}) => {
-          if (data === 1) {
+          let res = data.data.data;
+          if (res === 1) {
+            let object = Object.assign({}, this.state.object, {isFollow: true})
             this.setState({
-              isOpted: true
+              object: object
             })
+            this.showTooltip("关注用户成功:)");
+          } else {
+            this.showTooltip("关注用户失败:(");
           }
         })
       }
@@ -343,16 +405,21 @@ class Page extends Component {
     // 取消用户
     async unfollowUser () {
       if (this.state.object && this.state.object.type === USER && this.state.object.id) {
-        await qlQuery.cancelFollow({
+        await Qlquery.cancelFollow({
           userId:this.props.userStore.user.userId,
           followId: this.state.object.id,
           token:this.props.userStore.user.token
         })
         .then(({data}) => {
-          if (data === 1) {
+          let res = data.data.data;
+          if (res === 1) {
+            let object = Object.assign({}, this.state.object, {isFollow: false})
             this.setState({
-              isOpted: false
+              object: object
             })
+            this.showTooltip("取消关注成功:)");
+          } else {
+            this.showTooltip("取消关注失败:)");
           }
         })
       }
@@ -415,6 +482,7 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
+                    <Tooltip ref="tooltip" text={this.state.tipText}/>
                     <Modal title="草稿箱" ref="draft">
                       <div className="draft-box">
                         <div className="draft-header">
@@ -431,7 +499,7 @@ class Page extends Component {
                                       className="title">{item.title}</Link>
                                 <p className="des">
                                   <Link to={`library/${this.state.object.type}/${this.state.object.id}`}>{item.author}</Link>
-                                  保存于{item.date} · <span className="link">舍弃</span>
+                                  保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
                                 </p>
                               </div>  
                             )
@@ -490,6 +558,7 @@ class Page extends Component {
                             {...props} 
                             removePost={this.showRemovePost.bind(this)}
                             infoPost={this.showInfoPost.bind(this)}
+                            showTooltip={this.showTooltip.bind(this)}
                             post={this.state.post}
                             isAuth={this.state.isAuth}
                           />)} 

@@ -14,13 +14,13 @@ import { inject, observer } from 'mobx-react';
 import Chart from '../chart';
 import Dashboard from '../dashboard';
 import axios from 'axios';
-import qlQuery from './graphql';
+import Qlquery from './graphql';
 import Modal from '../../../components/modal';
 
 const USER = "user",
       GROUP = "group";
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
@@ -41,8 +41,11 @@ class Page extends Component {
                 comments: []
             },
             spaceList: [],
-            isAuth: false
+            draftList: [],
+            isAuth: false,
+            tipText: ''
         }
+        this.generateOption = this.generateOption.bind(this);
     }
     
     async componentDidMount () {
@@ -129,7 +132,7 @@ class Page extends Component {
      */
     async fetchIdData (params) {
       if(params.id) {
-        const query = qlQuery.getOnePost({
+        const query = Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: params.id,
           token: this.props.userStore.user.token 
@@ -157,15 +160,21 @@ class Page extends Component {
      */
     async getOwnerInfo (params,userId) {
       let owner = {};
-      await qlQuery.getOwnerInfo(params,userId)
+      await Qlquery.getOwnerInfo(params,userId)
       .then(({data}) => {
         let res = data.data.data;
         let isFollow = data.data.isFollow;
+        let avatar;
+        if (params.obj === USER) {
+          avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
+        } else if (params.obj === GROUP) {
+          avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
+        }
         if(res.id) {
           owner = {
             id: res.id,
             name: res.nickname,
-            avatar: res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg'),
+            avatar: avatar,
             type: params.obj,
             isFollow: isFollow
           }
@@ -173,8 +182,16 @@ class Page extends Component {
       })
       .catch((err) => {
         console.log(err);
+        this.showTooltip(err);
       })
       return owner;
+    }
+
+    showTooltip (text) {
+      this.setState({
+        tipText: text
+      });
+      this.refs.tooltip.show();
     }
     
     /**
@@ -182,12 +199,12 @@ class Page extends Component {
      */
     async getPostList (params) { 
       const query = params.obj === USER ?
-      qlQuery.userPostQuery({
+      Qlquery.userPostQuery({
          userId: this.props.userStore.user.userId,
          token: this.props.userStore.user.token,
          author: params.owner        
       }):
-      qlQuery.groupPostQuery({
+      Qlquery.groupPostQuery({
         userId: this.props.userStore.user.userId,
         token: this.props.userStore.user.token,
         groupId: params.owner  
@@ -197,7 +214,8 @@ class Page extends Component {
        let res = data.data.data;
        if(res.code === 1) {
          this.setState({
-           posts: res.posts
+           posts: res.posts,
+           draftList: res.drafts
          })
        } else {
          this.setState({
@@ -207,6 +225,7 @@ class Page extends Component {
      })
      .catch((err) => {
        console.log(err);
+       this.showTooltip("电波传达失败:(")
      })
     }
     
@@ -218,13 +237,13 @@ class Page extends Component {
     }
     async removePost () {
       const query = this.state.object.type === USER ? 
-      qlQuery.userDelPostQuery({
+      Qlquery.userDelPostQuery({
           userId:this.props.userStore.user.userId,
           postId: this.state.post.id,
           token:this.props.userStore.user.token
       })
       : 
-      qlQuery.groupDelPostQuery({
+      Qlquery.groupDelPostQuery({
         userId:this.props.userStore.user.userId,
         postId: this.state.post.id,
         token:this.props.userStore.user.token,
@@ -237,9 +256,59 @@ class Page extends Component {
         if(res) {
           // 删除成功
           let match = this.props.match.params;
-          this.props.history.push(`gallery/${match.obj}/`);
+          this.showRemovePost();
+          this.showTooltip("文章已放入回收站:)")
+          this.props.history.push(`/library/${match.obj}/`);
         } else {
           // 删除失败
+          this.showTooltip("电波传达失败:(")
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        this.showTooltip("电波传达失败:(")
+      })
+    }
+
+    /**
+     * 移除草稿
+     * @param {} props 
+     */
+    async deleteDraft (id) {
+      const query = this.state.object.type === USER ? 
+      Qlquery.userDelPostQuery({
+          userId:this.props.userStore.user.userId,
+          postId: id,
+          token:this.props.userStore.user.token
+      })
+      : 
+      Qlquery.groupDelPostQuery({
+        userId:this.props.userStore.user.userId,
+        postId: id,
+        token:this.props.userStore.user.token,
+        groupId:this.state.object.id
+      });
+
+      await axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res) {
+          // 删除成功
+          this.showTooltip("草稿已移除:)")
+          let index;
+          this.state.draftList && this.state.draftList.forEach((item, index) => {
+            if (item.id === id) {
+              index = index;
+            }
+          });
+          let draft = this.state.draftList.slice();
+          draft.splice(index, 1);
+          this.setState({
+            draftList: draft
+          }) 
+        } else {
+          // 删除失败
+          this.showTooltip("电波传达失败:(")
         }
       })
       .catch((err) => {
@@ -319,17 +388,25 @@ class Page extends Component {
       // 关注用户
       async followUser () {
         if (this.state.object && this.state.object.type === USER && this.state.object.id) {
-          await qlQuery.addFollow({
+          await Qlquery.addFollow({
             userId:this.props.userStore.user.userId,
             followId: this.state.object.id,
             token:this.props.userStore.user.token
           })
           .then(({data}) => {
-            if (data === 1) {
+            let res = data.data.data;
+            if (res === 1) {
+              let object = Object.assign({}, this.state.object, {isFollow: true})
               this.setState({
-                isOpted: true
+                object: object
               })
+              this.showTooltip("关注用户成功:)");
+            } else {
+              this.showTooltip("关注用户失败:(");
             }
+          })
+          .catch((err)=> {
+            console.log(err);
           })
         }
       }
@@ -337,20 +414,30 @@ class Page extends Component {
       // 取消用户
       async unfollowUser () {
         if (this.state.object && this.state.object.type === USER && this.state.object.id) {
-          await qlQuery.cancelFollow({
+          await Qlquery.cancelFollow({
             userId:this.props.userStore.user.userId,
             followId: this.state.object.id,
             token:this.props.userStore.user.token
           })
           .then(({data}) => {
-            if (data === 1) {
+            let res = data.data.data;
+            if (res === 1) {
+              let object = Object.assign({}, this.state.object, {isFollow: false})
               this.setState({
-                isOpted: false
+                object: object
               })
+              this.showTooltip("取消关注成功:)");
+            } else {
+              this.showTooltip("取消关注失败:)");
             }
           })
         }
       }
+      
+      toggleDraft () {
+        this.refs.draft.toggle();
+      }
+
       
     /**
      * 生成关注按钮
@@ -359,32 +446,45 @@ class Page extends Component {
       // 判断是否有写入权
       if (this.state.isAuth) {
         return (
-          <span title="创建新文章" onClick={this.toggleCreate.bind(this)}>
-            <FontAwesomeIcon icon="plus" />
-          </span>
+          <div className="option">
+            <span title="创建新文章" onClick={this.toggleCreate.bind(this)}>
+              <FontAwesomeIcon icon="plus" />
+            </span>            
+            <span title="草稿箱" onClick={this.toggleDraft.bind(this)}>
+              <FontAwesomeIcon icon="box" />
+            </span>  
+          </div>
+
         )
       } else if(this.state.object.type === USER){
         if (this.state.object.isFollow) {
           return (
-            <div onClick={this.unfollowUser.bind(this)}>
-              <FontAwesomeIcon icon="minus"/>取消关注
+            <div className="option">
+              <div onClick={this.unfollowUser.bind(this)}>
+                <FontAwesomeIcon icon="minus"/>取消关注
+              </div>              
             </div>
           ) 
         } else {
           return (
-            <div onClick={this.followUser.bind(this)}>
-              <FontAwesomeIcon icon="plus"/>关注TA
+            <div className="option">
+              <div onClick={this.followUser.bind(this)}>
+                <FontAwesomeIcon icon="plus"/>关注TA
+              </div>
             </div>
           )
         }
 
       } else if(this.state.object.type === GROUP) {
         return (
-          <div>
+          <div className="option">
             <FontAwesomeIcon icon="plus"/>加入团队
           </div>
         )
       }
+      return (
+        <div className="option"></div>
+      )
     }
 
     render () {
@@ -393,6 +493,30 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
+                    <Modal title="草稿箱" ref="draft">
+                      <div className="draft-box">
+                        <div className="draft-header">
+                          <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
+                          <button className="btn">舍弃全部草稿</button>
+                        </div>
+                        {
+                          this.state.draftList && this.state.draftList.map((item) => {
+                            return (
+                              <div className="draft-item" key={item.id}>
+                                <Link to={{pathname:'/article/edit', 
+                                           query: {postId: item.id,
+                                                   parentId: item.parentId}}} 
+                                      className="title">{item.title}</Link>
+                                <p className="des">
+                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`}>{item.author}</Link>
+                                  保存于{item.date} · <span className="link">舍弃</span>
+                                </p>
+                              </div>  
+                            )
+                          })
+                        }
+                      </div>
+                    </Modal>
                     <Modal title="创建新图画" ref="create">
                       <div className="gallery-type-modal">
                         <Link to="/photo/edit/mind" className="gallery-type">
@@ -416,9 +540,7 @@ class Page extends Component {
                                 <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                             </DropDown>                      
                         </div>
-                        <div className="option">
-                            {this.generateOption()}
-                        </div>
+                        {this.generateOption()}
                       </div>                        
                       <div className="imglist">
                         <ul className="component-img-list">
@@ -453,6 +575,7 @@ class Page extends Component {
                             removePost={this.showRemovePost.bind(this)}
                             infoPost={this.showInfoPost.bind(this)}
                             post={this.state.post}
+                            showTooltip={this.showTooltip.bind(this)}
                             isAuth={this.state.isAuth}
                           />)} 
                         />

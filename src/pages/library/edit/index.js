@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import Qlquery from './graphql';
 import TurndownService from 'turndown';
+import history from 'history/createBrowserHistory' 
 
 
 const USER = "user",
@@ -45,9 +46,6 @@ class Page extends Component {
             name: '',
             type: ''
           },
-          draftTime: null,
-          blurTime: null,
-          blur: 0,
           markdown: '',
           isBold: false,
           isItalic: false,
@@ -57,7 +55,9 @@ class Page extends Component {
           linkHref: '',
           tipText: '',
           selectText: '',
-          lastEditRange: null
+          lastEditRange: null,
+          changeTimer: null,
+          lockTimer: null
         }
         this.generateLink = this.generateLink.bind(this);
         this.generateSaveStatus = this.generateSaveStatus.bind(this);
@@ -77,12 +77,11 @@ class Page extends Component {
         })
         
         // 如果有postId，说明是编辑文档，要先发送编辑状态，再获取文章
-       
-
         Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: this.state.postId,
-          token: this.props.userStore.user.token 
+          token: this.props.userStore.user.token,
+          isUpdate: true
         })
         .then(({data}) => {
           let res = data.data.data;
@@ -111,11 +110,29 @@ class Page extends Component {
               lastSaveUser: res.post.recentUser,
               parentId: res.post.parent,
               space: space,
-              isUpdate: true
+              isUpdate: true,
+              lockTimer: setTimeout(() => {
+                if (!this.refs.editBox) {
+                  clearInterval(this.state.lockTimer);
+                  this.setState({
+                    lockTimer: null
+                  })
+                }
+                this.sendLock();
+              }, 15000)
             })
           } else {
-            this.showTooltip("请求文章内容失败");
-          }
+            if (res.code === 2) {
+              this.showTooltip("文档内容有更新，请重新读取");
+            } else if (res.code === 3) {
+              this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
+            } else {
+              this.showTooltip("请求文章内容失败");
+            }
+            setTimeout(() => {
+              history.goBack();
+            }, 1000);
+          }   
         })
         .catch((err) => {
           console.log(err);
@@ -131,6 +148,7 @@ class Page extends Component {
           space: space,
           parentId: (this.props.location.query && this.props.location.query.parentId) || null
         });
+        console.log(this.state);
       }
       this.refs.editBox.innerHTML = (this.state.post && this.state.post.content) || '';
       this.refs.loading.toggle();
@@ -148,12 +166,19 @@ class Page extends Component {
       })
       .then(({data}) => {
         let res = data.data.data;
-        if (res === 0) {
-          // 别人正在编辑
-          this.showTooltip("你的伙伴正在编辑此文档，请稍后再试")
+        if (res.code !== 0) {
+          // 保存一份草稿
+          this.saveDraft();
+          if (res.code === 2) {
+            this.showTooltip("文档内容有更新，请重新读取");
+          } else if (res.code === 3) {
+            this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
+          } else {
+            this.showTooltip("请求文章内容失败");
+          }
           setTimeout(() => {
-            window.history.go(-1);
-          }, 1000);
+            history.goBack();
+          }, 1000);          
         }
       })
     }
@@ -346,8 +371,6 @@ class Page extends Component {
           })
         }
       }
-
-
     }
 
     /**
@@ -429,6 +452,10 @@ class Page extends Component {
       if (!this.state.changeTimer) {
         this.setState({
           changeTimer: setTimeout(() => {
+            if (!this.refs.editBox) {
+              clearTimeout(this.state.changeTimer);
+              return;
+            }
             let content = this.refs.editBox.innerText;
             if (content.length >= 10) {
               this.saveDraft()
@@ -691,10 +718,9 @@ class Page extends Component {
 
     componentWillUnmount () {
       this.setState({
-        draftTime: null,
-        blurTime: null,
-        changeTimer: null
-      })
+        changeTimer: null,
+        lockTimer: null
+      });
     }
 
     generateLink () {

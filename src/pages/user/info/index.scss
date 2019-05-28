@@ -61,6 +61,7 @@
                 border: 1.5px solid #fff;
                 background-color: #fa474f;
             }
+
             margin-right: 1rem;
             img {
                 border-radius: 50%;
@@ -167,6 +168,20 @@
                     padding: .3rem 1rem;
                     color: #3e4077;
                     border-radius: .3rem;
+                }
+                .info-replenish {
+                    margin-top: .4rem;
+                    padding-top: .4rem;
+                    border-top: 1px dashed #aaa;
+                    display: block;
+                    color: #999;
+                    font-size: .8rem;
+                    .label {    
+                        margin-right: .5rem;
+                    }
+                    a {
+                        color: $purple;
+                    }
                 }
             }
             .date {

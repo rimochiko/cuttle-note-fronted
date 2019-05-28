@@ -19,6 +19,7 @@ class Page extends Component {
           posts: []
         }
         this.getTrashList = this.getTrashList.bind(this);
+        this.generateTrash = this.generateTrash.bind(this);
     }
 
     async componentDidMount () {
@@ -147,6 +148,21 @@ class Page extends Component {
       })
     }
 
+    generateTrash () {
+      if (this.state.posts && this.state.posts.length) {
+        return  this.state.posts.map((item, index) => {
+          return this.getTrashList(item);
+        });
+      } else {
+        return (
+          <div className="other-no-tip">
+            <p className="title">你的回收站没有任何文章！</p>
+            <p className="des">回收站的文章在删除15天后会自动回收哦~</p>
+          </div>
+        )
+      }
+    }
+
     render () {
         return (
             <div className="page">
@@ -164,9 +180,7 @@ class Page extends Component {
                           <div className="trash-box wrapper">
                               <div className="item-list">
                               {
-                                this.state.posts.map((item, index) => {
-                                  return this.getTrashList(item);
-                                })
+                                this.generateTrash()
                               }
                               </div>
                           </div>

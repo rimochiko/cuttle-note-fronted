@@ -54,7 +54,8 @@ function getUserInfo(args){
             date
             content
             type
-            status
+            status,
+            detail
           }
         }
     }`;

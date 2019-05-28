@@ -73,7 +73,7 @@ function comment ({postId, token, userId, replyId, comment}) {
                 token: "${token}",
                 userId: "${userId}",
                 replyId: ${replyId || ''},
-                content: "${comment}",
+                content: "${escape(comment)}",
             ) {
                 code
                 comments {
@@ -96,7 +96,7 @@ function comment ({postId, token, userId, replyId, comment}) {
               postId: ${postId},
               token: "${token}",
               userId: "${userId}",
-              content: "${comment}",
+              content: "${escape(comment)}",
           ) {
               code
               comments {

@@ -81,6 +81,13 @@ function userPostQuery (args) {
        author: "${args.author}"
      ) {
        code,
+       drafts {
+        id
+        status
+        title
+        date
+        author
+       }
        posts {
         id
         status
@@ -103,6 +110,13 @@ function groupPostQuery (args) {
        groupId: "${args.groupId}"
      ) {
        code,
+       drafts {
+        id
+        status
+        title
+        date
+        author
+       }
        posts {
         id
         status

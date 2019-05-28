@@ -111,11 +111,27 @@
           margin-top: 1rem;
           margin-bottom: 1rem;
       }
-      h1,h2,h3,h4,h5 {
-          margin-top: 1rem;
-          margin-bottom: 1rem;
-      }
-      h1 {
+    ul {
+        list-style: circle;
+        padding-left: 1rem;
+        margin: 1rem 0;
+    }
+    ol {
+        list-style: decimal;
+        padding-left: 1rem;
+        margin: 1rem 0;
+    }
+    b {
+        font-weight: bold;
+    }
+    i {
+        font-style: italic;
+    }
+    p {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    h1 {
         font-size: 1.5rem;
     }
     h2 {
@@ -127,15 +143,30 @@
     h4 {
         font-size: 1.2rem;
     }
-      img {
-          max-width: 100%;
-      }
-      b {
-          font-weight: bold;
-      }
-      i {
-          font-style: italic;
-      }
+    blockquote {
+        background-color: #f7f7fb;
+        padding: .5rem 2rem;
+        color: #8d8db0;
+        border-radius: .5rem;
+        margin: 1rem 0;
+    }
+    img {
+        max-width: 100%;
+    }
+    pre {
+        background: #2a324b;
+        border-radius: .5rem;
+        color: #ef596f;
+        font-family: 'consolas';
+        padding: .5rem 2rem;
+        margin: 1rem 0;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    a {
+        text-decoration: underline;
+    }
   }
 
   .extra {
@@ -157,6 +188,9 @@
                   margin-right: .1rem;
                   &.collect {
                       color: #ffec55;
+                  }
+                  &.thumbs {
+                      color: $purple;
                   }
               }
               &:last-child {

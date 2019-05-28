@@ -63,10 +63,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
 
@@ -90,10 +93,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(");
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
     
@@ -116,10 +122,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(");
         })
     }
 
@@ -142,10 +151,13 @@ class Section extends Component {
                 this.setState({
                     post: post
                 });
+            } else {
+                this.props.showTooltip("电波发送失败:(")
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }    
 
@@ -183,14 +195,19 @@ class Section extends Component {
                         id: '',
                         name: ''
                     },
+                    comment: '',
                     post: Object.assign({}, this.state.post, {
                         comments: res.comments
                     })
                 });
+                this.props.showTooltip("添加评论成功:)")
+            } else {
+                this.props.showTooltip("电波发送失败:(");
             }
         })
         .catch((err) => {
             console.log(err);
+            this.props.showTooltip("电波发送失败:(")
         })
     }
 
@@ -305,9 +322,8 @@ class Section extends Component {
                                 this.setState({
                                     comment: value
                                 })
-                                console.log(this.state.comment)
                               }}
-                              defaultValue={this.state.comment}>
+                              value={this.state.comment}>
                     </textarea>
                     <div className="input-btn-box">
                       <button className="input-btn radius-btn" onClick={this.comment.bind(this)}>提交</button>
@@ -368,7 +384,7 @@ class Section extends Component {
                 </div>
                 </div>
                 <div className="body">
-                    <div className="content" dangerouslySetInnerHTML={{__html: this.state.post.content}}>
+                    <div className="content" dangerouslySetInnerHTML={{__html: unescape(this.state.post.content)}}>
                     </div>
                     {
                         this.generateExtra()

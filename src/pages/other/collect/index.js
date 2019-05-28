@@ -19,7 +19,8 @@ class Page extends Component {
         this.state = {
           posts: []
         }
-        this.getCollectList = this.getCollectList.bind(this);
+        this.getCollectItem = this.getCollectItem.bind(this);
+        this.generateCollect = this.generateCollect.bind(this);
     }
 
     async componentDidMount() {
@@ -125,7 +126,7 @@ class Page extends Component {
     /** 
      * 获取收藏阅读记录
      * */
-   getCollectList (item, index) {
+   getCollectItem (item, index) {
       return (
         <div className="item-collect" key={item.id}>
           <p className="info">
@@ -136,13 +137,28 @@ class Page extends Component {
           </p>
           <p className="author">
              <img alt={item.author.nickname}
-                  src={`http://localhost:8080/static/user/${item.author.avatar}` || require('../../../assets/images/default.jpg')}/><Link to="/">{item.author.nickname}</Link></p>
+                  src={item.author.avatar ? `http://localhost:8080/static/user/${item.author.avatar}` : require('../../../assets/images/default.jpg')}/><Link to="/">{item.author.nickname}</Link></p>
           <p className="from"><Link to="/">{item.author.nickname}的空间</Link></p>
           <p className="option">
             <span className="collect active" onClick={this.cancelCollect.bind(this, item.id, index)}><FontAwesomeIcon icon="star"/></span>
           </p>
         </div>
       )
+    }
+
+    generateCollect () {
+      if(this.state.posts && this.state.posts.length) {
+        return  this.state.posts.map((item, index) => {
+            return this.getCollectList(item, index);
+          });
+      } else {
+        return (
+          <div className="other-no-tip">
+            <p className="title">你还没有任何收藏的文档哦！</p>
+            <p className="des">快去发现自己喜欢的文档吧！</p>
+          </div>
+        )
+      }
     }
 
 
@@ -162,9 +178,7 @@ class Page extends Component {
                           <div className="collect-box wrapper">
                             <div className="item-list">
                             {
-                              this.state.posts.map((item, index) => {
-                                return this.getCollectList(item, index);
-                              })
+                              this.generateCollect()
                             }
                             </div>
                           </div>

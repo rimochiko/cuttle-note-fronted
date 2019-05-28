@@ -224,7 +224,7 @@ class Page extends Component {
     /**
      * 生成消息主题
      */
-    generateExtraContent(id, type) {
+    generateExtraContent(id, type, detail) {
       // 团队邀请通知
       if (type === 22) {
         return (
@@ -233,6 +233,15 @@ class Page extends Component {
           </div> 
         );
       };
+
+      if (type === 8 && detail) {
+        let obj = JSON.parse(detail);
+        return (
+          <divl className="info-replenish">
+            <p><span className="label">文章评论通知</span>(<Link to={`${obj.type ? "library":"gallery"}/${obj.link}`}>{obj.title}</Link>)</p>
+          </divl>
+        )
+      }
 
     }
 
@@ -259,7 +268,7 @@ class Page extends Component {
                           this.state.members&&this.state.members.map((item) => {
                             return (
                             <li key={item.id}>
-                              <img src={`http://localhost:8080/static/user/${item.avatar}` || require('../../../assets/images/default.jpg')} title={item.nickname}/>
+                              <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} title={item.nickname}/>
                               <p>{item.nickname}({item.id})</p>
                             </li>  
                             )
@@ -293,7 +302,7 @@ class Page extends Component {
                                     <div className="info-avatar">
                                       {item.status === 1 ? <span className="buble"></span> : '' }
                                       <img 
-                                        src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
+                                        src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
                                         alt={item.from.nickname}/>
                                     </div>
                                     <div className="info-detail">
@@ -314,7 +323,7 @@ class Page extends Component {
                         <div className="infos flex-1">
                           <div className="chat-header">
                             <p className="text">{this.state.user.nickname}</p>
-                            <p className="des">{this.state.user.des}</p>
+                            <p className="des">{this.state.user.des || "暂无个人简介"}</p>
                           </div>
                           <div className="chat-body flex-scroll-y">
                           {
@@ -323,13 +332,13 @@ class Page extends Component {
                                 return (
                                   <div className="chat-one-item" key={item.id}>
                                     <div className="item-avatar">
-                                    <img src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
+                                    <img src={item.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
                                          alt={item.from.nickname}/>
                                     </div>
                                     <div className="item-main">
                                       <div className="buble">
                                         {item.content}
-                                        {this.generateExtraContent(item.id,item.type)}
+                                        {this.generateExtraContent(item.id,item.type, item.detail)}
                                       </div>
                                       <p className="date">{item.date}</p>
                                     </div>
@@ -339,7 +348,7 @@ class Page extends Component {
                                 return (
                                   <div className="chat-one-item mine" key={item.id}>
                                     <div className="item-avatar">
-                                    <img src={`http://localhost:8080/static/user/${item.from.avatar}` || require('../../../assets/images/default.jpg')}
+                                    <img src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
                                          alt={item.from.nickname}/>
                                     </div>
                                     <div className="item-main">
