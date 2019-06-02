@@ -5,7 +5,9 @@ export default {
     groupPostQuery,
     userDelPostQuery,
     groupDelPostQuery,
-    getOnePost
+    getOnePost,
+    cancelFollow,
+    addFollow
 }
 
 

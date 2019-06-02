@@ -263,6 +263,7 @@ class Section extends Component {
                         }/>
                 </GGEditor>
             );
+            default: ;
         }
     }
 

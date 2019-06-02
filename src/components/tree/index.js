@@ -72,10 +72,15 @@ class Tree extends Component {
         }
         let ownerId = this.props.owner.id,
             ownerType = this.props.owner.type,
+            ownerName = this.props.owner.name,
             base = this.props.base;
         arr.forEach((item) => {
             item.isOpen = false;
             item.link = `/${base}/${ownerType}/${ownerId}/${item.id}`
+            if (ownerType === "group") {
+                item.groupId = ownerId
+                item.groupName = ownerName
+            }
             if(activeId && item) {
                 flat.push(item);
             }
@@ -150,7 +155,9 @@ class Tree extends Component {
                           to={{
                             pathname: '/article/edit',
                             query: {
-                                parentId: item.id
+                                parentId: item.id,
+                                groupId: item.groupId || null,
+                                groupName: item.groupName || null
                             }
                           }}>+</Link>
                 )

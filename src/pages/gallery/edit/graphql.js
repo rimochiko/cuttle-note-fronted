@@ -5,11 +5,6 @@ export default {
     getOnePost
 }
 
-const MIND = "mind",
-      FLOW = "flow",
-      GROUP = "group",
-      USER = "user";
-
 function createChart (args) {
     const query = !args.groupId ? `
     mutation {
@@ -64,7 +59,8 @@ function updateChart (args) {
         data:
         userImgPostUpdate (
             token: "${args.token}",
-            postId: ${args.postId},
+            postId: ${args.postId || 0},
+            draftId: ${args.draftId || 0},
             userId: "${args.userId}",
             title: "${args.title}",
             content: "${escape(args.content)}",
@@ -82,7 +78,8 @@ function updateChart (args) {
         groupImgPostUpdate (
             token: "${args.token}",
             userId: "${args.userId}",
-            postId: ${args.postId},
+            postId: ${args.postId || 0},
+            draftId: ${args.draftId || 0},
             title: "${args.title}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},

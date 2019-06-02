@@ -4,9 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link }  from 'react-router-dom';
 
 class Page extends Component {
-    constructor () {
-        super();
-    }
 
     generateItem (item) {
       return (

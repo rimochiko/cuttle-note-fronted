@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 
 class Page extends Component {
     constructor () {

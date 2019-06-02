@@ -216,7 +216,7 @@ class Section extends Component {
             return (
                 <p>
                     <Link title="编辑" to={{pathname:'/article/edit', 
-                                           query: {postId: this.state.post.id,
+                                            query: {postId: this.state.post.id,
                                                    parentId: this.state.post.parent}}}>
                         <FontAwesomeIcon icon="pen"/>
                     </Link>
@@ -338,7 +338,8 @@ class Section extends Component {
                         if (item.receiverId) {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')}
+                                     alt=""/>
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link> 回复 <Link to="/">{item.receiverName}</Link>：
                                 {item.content}
@@ -350,7 +351,8 @@ class Section extends Component {
                         } else {
                             return (
                             <li className="li-comment-single" key={item.id}>
-                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} />
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')}
+                                     alt=""/>
                                 <div className="author-comment">
                                 <Link to="/">{item.creatorName}</Link>：
                                 {item.content}

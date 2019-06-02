@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { Command } from 'gg-editor';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

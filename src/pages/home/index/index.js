@@ -14,19 +14,9 @@ import 'echarts/lib/component/legend';
 import { inject, observer } from 'mobx-react';
 
 import Qlquery from './graphql';
-import { Group } from 'echarts/lib/util/graphic';
 import Loading from '../../../components/loading';
 
-const FILE_LIKE = 2,
-      FILE_COLLECT = 3,
-      FILE_CREATE = 5,
-      FILE_COMMENT = 8;
-
-// 团队动作相关
-const GROUP_JOIN = 25;
-
-// 个人操作相关
-const USER_FOLLOW = 44;
+const FILE_CREATE = 5;
 
 const GROUP = "group",
       USER = "user",

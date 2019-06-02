@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import tabPane from './tabPane.js';
 import './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class Tabs extends Component {
     constructor () {
@@ -60,16 +58,15 @@ class Tabs extends Component {
               }
               </ul>
               {
-                  children.map((item) => {
-                      if (this.state.activeKey === null) {
-                          if (item.key === this.props.defaultActiveKey) {
-                              return item;
-                          }
-                      } else {
-                          if (item.key === this.state.activeKey) {
-                              return item;
-                          }
-                      }
+                 children && children.map((item) => {
+                    if (this.state.activeKey === null) {
+                        if (item.key === this.props.defaultActiveKey) {
+                            return item;
+                        }
+                    }
+                    if (item.key === this.state.activeKey) {
+                        return item;
+                    }
                   })
               }
             </div>

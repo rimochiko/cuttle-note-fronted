@@ -74,10 +74,11 @@ class Page extends Component {
       switch (type) {
         case 1: return (
           <FontAwesomeIcon icon="file-alt" />
-        );break;
+        );
         case 2: return (
           <FontAwesomeIcon icon="file-image" />
         );
+        default: ;
       }
     }
 

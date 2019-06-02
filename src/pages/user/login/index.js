@@ -172,7 +172,7 @@ class Page extends Component {
                     </div>
                     
                     <div className="other-login">
-                      <a href="#">忘记密码？</a>
+                      <span>忘记密码？</span>
                       <p>三方登录 <FontAwesomeIcon icon={["fab","qq"]} />
                       <FontAwesomeIcon icon={["fab","weibo"]} />
                       <FontAwesomeIcon icon={["fab","weixin"]} /></p>

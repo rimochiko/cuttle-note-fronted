@@ -1,8 +1,5 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {CSSTransition} from 'react-transition-group';
 import cs from 'classnames';
 
 class Loading extends Component {

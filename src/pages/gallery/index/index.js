@@ -296,9 +296,9 @@ class Page extends Component {
           // 删除成功
           this.showTooltip("草稿已移除:)")
           let index;
-          this.state.draftList && this.state.draftList.forEach((item, index) => {
+          this.state.draftList && this.state.draftList.forEach((item, index1) => {
             if (item.id === id) {
-              index = index;
+              index = index1;
             }
           });
           let draft = this.state.draftList.slice();
@@ -447,7 +447,7 @@ class Page extends Component {
       if (this.state.isAuth) {
         return (
           <div className="option">
-            <span title="创建新文章" onClick={this.toggleCreate.bind(this)}>
+            <span title="创建新图画" onClick={this.toggleCreate.bind(this)}>
               <FontAwesomeIcon icon="plus" />
             </span>            
             <span title="草稿箱" onClick={this.toggleDraft.bind(this)}>
@@ -478,7 +478,9 @@ class Page extends Component {
       } else if(this.state.object.type === GROUP) {
         return (
           <div className="option">
-            <FontAwesomeIcon icon="plus"/>加入团队
+            <div>
+              <FontAwesomeIcon icon="plus"/>加入团队
+            </div>
           </div>
         )
       }
@@ -488,6 +490,7 @@ class Page extends Component {
     }
 
     render () {
+      let owner = this.state.object;
         return (
             <div className="page">
                 <Sidebar />
@@ -499,31 +502,38 @@ class Page extends Component {
                           <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
                           <button className="btn">舍弃全部草稿</button>
                         </div>
+                        <div className="draft-list">
                         {
                           this.state.draftList && this.state.draftList.map((item) => {
                             return (
                               <div className="draft-item" key={item.id}>
-                                <Link to={{pathname:'/article/edit', 
+                                <Link to={{pathname:'/photo/edit', 
                                            query: {postId: item.id,
-                                                   parentId: item.parentId}}} 
+                                                  groupId: owner && owner.type === GROUP ? owner.id:null,
+                                                  groupName: owner && owner.type === GROUP ? owner.name:null}}} 
                                       className="title">{item.title}</Link>
                                 <p className="des">
-                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`}>{item.author}</Link>
+                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`} className="link">{item.author}</Link>
                                   保存于{item.date} · <span className="link">舍弃</span>
                                 </p>
                               </div>  
                             )
                           })
                         }
+                        </div>
                       </div>
                     </Modal>
                     <Modal title="创建新图画" ref="create">
                       <div className="gallery-type-modal">
-                        <Link to="/photo/edit/mind" className="gallery-type">
+                        <Link to={{pathname: '/photo/edit/mind',
+                                   query: {groupId: owner && owner.type === GROUP ? owner.id:null,
+                                           groupName: owner && owner.type === GROUP ? owner.name:null}}} className="gallery-type">
                           <FontAwesomeIcon icon="brain"></FontAwesomeIcon>
                           <p>思维图</p>
                         </Link>
-                        <Link to="/photo/edit/flow" className="gallery-type">
+                        <Link to={{pathname: '/photo/edit/flow',
+                                   query: {groupId: owner && owner.type === GROUP ? owner.id:null,
+                                           groupName: owner && owner.type === GROUP ? owner.name:null}}} className="gallery-type">
                           <FontAwesomeIcon icon="project-diagram"></FontAwesomeIcon>
                           <p>流程图</p>
                         </Link>

@@ -21,7 +21,7 @@ function getGroupEasy (args) {
             `query {
               data:
               groupEasy(
-                id:"${args.id}\
+                id:"${args.id}"
               ) {
                 id
                 avatar

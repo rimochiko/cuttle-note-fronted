@@ -6,7 +6,7 @@ import Loading from '../../../components/loading';
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Link, Switch,Route} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 import Qlquery from './graphql';
 
@@ -29,9 +29,16 @@ class Page extends Component {
           },
           members: [],
           searchId: '',
-          sendText: ''
+          sendText: '',
+          selectUser: {
+            id: '',
+            nickname: '',
+            avatar: '',
+          },
+          selectText: ''
         }
         this.generateExtraContent = this.generateExtraContent.bind(this);
+        this.generateInfoAdd = this.generateInfoAdd.bind(this);
     }
 
     async componentDidMount () {
@@ -74,7 +81,7 @@ class Page extends Component {
     // 获取用户消息
     async getUserInfo (from) {
       let userStore = this.props.userStore;
-      let fromUser = from || this.state.users[0] && this.state.users[0].from.id;
+      let fromUser = from || (this.state.users[0] && this.state.users[0].from.id);
       let user = null;
 
       if(!fromUser) return;
@@ -138,24 +145,35 @@ class Page extends Component {
     /**
      * 搜索用户
      */
-    async searchMembers () {
+    async searchMembers (e) {
       let userStore = this.props.userStore;
-      await Qlquery.searchUsers({
-        userId: userStore.user.userId,
-        token: userStore.user.token,
-        search: this.state.searchId
-      })
-      .then(({data}) => {
-        let res = data.data.data;
-        if (res.code === 1) {
+      let search = e.target.value;
+
+      if (!this.state.searchId) {
+        await Qlquery.searchUsers({
+          userId: userStore.user.userId,
+          token: userStore.user.token,
+          search: search
+        })
+        .then(({data}) => {
+          let res = data.data.data;
+          if (res.code === 1) {
+            this.setState({
+              members: res.users
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err);
           this.setState({
-            members: res.users
+            members: []
           })
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+        })
+      } else {
+        this.setState({
+          members: []
+        })
+      }
     }
     
     /**
@@ -182,7 +200,7 @@ class Page extends Component {
             sendMessage: ''
           });
         }
-      })
+      })        
     }
    
     /**
@@ -202,6 +220,7 @@ class Page extends Component {
           this.setState({
             tipText: '成功接受邀请'
           })
+          // 如果要显示的话，还得后台返回消息数据
         } else if(res === 2) {
           this.setState({
             tipText: '邀请已失效'
@@ -237,12 +256,72 @@ class Page extends Component {
       if (type === 8 && detail) {
         let obj = JSON.parse(detail);
         return (
-          <divl className="info-replenish">
+          <div className="info-replenish">
             <p><span className="label">文章评论通知</span>(<Link to={`${obj.type ? "library":"gallery"}/${obj.link}`}>{obj.title}</Link>)</p>
-          </divl>
+          </div>
         )
       }
+    }
 
+    selectInfoUser (id, nickname, avatar) {
+      let user = {
+        id: id,
+        nickname: nickname,
+        avatar: avatar ? `http://localhost:8080/static/user/${avatar}` : require('../../../assets/images/default.jpg')
+      }
+      this.setState({
+        selectUser: user,
+        members: []
+      });
+    }
+
+    clearSelectUser () {
+      this.setState({
+        selectUser: {
+          id: '',
+          nickname: '',
+          avatar: '',
+        } 
+      })
+    }
+
+    // 添加新对话
+    async addBubble () {
+      let userStore = this.props.userStore;
+      await Qlquery.sendMessage({
+        userId: userStore.user.userId,
+        token: userStore.user.token,
+        objectId: this.state.user.id,
+        content: this.state.selectText
+      })
+      .then(({data}) => {
+        let res = data.data.data;
+        if (res.code === 1) {
+          // 发送成功
+          this.refs.addBubble.toggle();
+          this.setState({
+            selectText: ''
+          });
+        }
+      })
+    }
+
+    generateInfoAdd () {
+      if (this.state.selectUser.id) {
+        return (
+          <div className="aim-user">
+            <span>TO：{this.state.selectUser.nickname}({this.state.selectUser.id})</span>
+            <span><FontAwesomeIcon icon="window-close" onClick={this.clearSelectUser.bind(this)}/></span>
+          </div>
+        )
+      } else {
+        return (
+          <input type="text"
+            placeholder="搜索ID" 
+            className="input"
+            onChange={this.searchMembers.bind(this)}/>
+        )
+      }
     }
 
     render () {
@@ -253,30 +332,37 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-column flex-1">
                     <Modal title="添加对话" ref="addBubble">
-                    <div className="add-mem">
-                        <input type="text"
-                               placeholder="搜索ID" 
-                               className="input"
-                               onChange={(e) => {
-                                 this.setState({
-                                   searchId: e.target.value
-                                 });
-                                 this.searchMembers();
-                               }}/>
+                    <div className="add-infos">
+                      <div className="mem-search">
+                        {
+                          this.generateInfoAdd()
+                        }
                         <ul className="ul-add-mem">
                         {
                           this.state.members&&this.state.members.map((item) => {
                             return (
-                            <li key={item.id}>
-                              <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')} title={item.nickname}/>
+                            <li key={item.id}
+                                onClick={this.selectInfoUser.bind(this, item.id, item.nickname, item.avatar)}>
+                              <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../../assets/images/default.jpg')}
+                                   title={item.nickname}
+                                   alt=""/>
                               <p>{item.nickname}({item.id})</p>
                             </li>  
                             )
                           })
                         }
-                        </ul>
+                        </ul>                        
+                      </div>
+                        <textarea cols="3"
+                                  placeholder="输入要发送的消息..." 
+                                  onChange={(e) => {
+                                this.setState({
+                                  selectText: e.target.value
+                                })
+                              }}></textarea>
                         <div className="btns">
-                          <button className="radius-btn input-btn">添加对话</button>  
+                          <button className="radius-btn input-btn"
+                                  onClick={this.addBubble.bind(this)}>发送对话</button>  
                         </div>
                       </div>
                     </Modal>
@@ -288,9 +374,6 @@ class Page extends Component {
                               <button className="send-btn" onClick={this.toggleAddBubble.bind(this)}>
                                 <FontAwesomeIcon icon="pen"></FontAwesomeIcon>
                               </button>
-                            </div>
-                            <div className="info-search">
-                              <input type="text" placeholder="搜索信息"/>
                             </div>
                             <div className="info-user-list bg-box">
                             {
@@ -365,7 +448,7 @@ class Page extends Component {
                           </div>
 
                           <div className="chat-footer">
-                            <textarea cols="3" onChange={(e) => {
+                            <textarea cols="3" value={this.state.sendText} onChange={(e) => {
                               this.setState({
                                 sendText: e.target.value
                               })

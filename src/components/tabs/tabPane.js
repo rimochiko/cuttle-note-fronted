@@ -2,10 +2,6 @@ import React, {Component} from 'react';
 import './index.scss';
 
 class TabPanel extends Component {
-    constructor () {
-        super();
-    }
-
     render () {
         const { children } = this.props;
         return (

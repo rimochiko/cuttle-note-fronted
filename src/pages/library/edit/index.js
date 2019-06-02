@@ -4,7 +4,6 @@ import Sidebar from '../../../layouts/sidebar/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Modal from '../../../components/modal';
-import Tabs from '../../../components/tabs';
 import Switch from '../../../components/switch';
 import Loading from '../../../components/loading';
 import Tooltip from '../../../components/tooltip';
@@ -16,7 +15,9 @@ import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import Qlquery from './graphql';
 import TurndownService from 'turndown';
-import history from 'history/createBrowserHistory' 
+import creatHistory from 'history/createBrowserHistory' 
+
+const history = creatHistory();
 
 
 const USER = "user",
@@ -110,21 +111,29 @@ class Page extends Component {
               lastSaveUser: res.post.recentUser,
               parentId: res.post.parent,
               space: space,
-              isUpdate: true,
-              lockTimer: setTimeout(() => {
-                if (!this.refs.editBox) {
-                  clearInterval(this.state.lockTimer);
-                  this.setState({
-                    lockTimer: null
-                  })
-                }
-                this.sendLock();
-              }, 15000)
+              isUpdate: true
             })
+
+            // 如果是团队编辑
+            if (this.state.space.type === GROUP) {
+              this.setState({
+                lockTimer: setTimeout(() => {
+                  console.log('locker')
+                  if (!this.refs.editBox) {
+                    clearInterval(this.state.lockTimer);
+                    this.setState({
+                      lockTimer: null
+                    })
+                  }
+                  this.sendLock();
+                }, 15000)
+              })
+            }
+
           } else {
-            if (res.code === 2) {
+            if (res.code === 1) {
               this.showTooltip("文档内容有更新，请重新读取");
-            } else if (res.code === 3) {
+            } else if (res.code === 2) {
               this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
             } else {
               this.showTooltip("请求文章内容失败");
@@ -139,16 +148,27 @@ class Page extends Component {
         })
       } else {
         document.title = "创建新文章 - 墨鱼笔记";
-        let space =  {
-          id: this.props.userStore.user.userId,
-          name: this.props.userStore.user.nickname,
-          type: "user"            
+        // 确认是否是创建团队文章
+        let space;
+        if (this.props.location.query && this.props.location.query.groupId) {
+          // 获取团队信息
+          space =  {
+            id: this.props.location.query.groupId,
+            name: this.props.location.query.groupName,
+            type: GROUP      
+          }
+        } else {
+          space =  {
+            id: this.props.userStore.user.userId,
+            name: this.props.userStore.user.nickname,
+            type: USER       
+          }
         }
+        
         this.setState({
           space: space,
           parentId: (this.props.location.query && this.props.location.query.parentId) || null
         });
-        console.log(this.state);
       }
       this.refs.editBox.innerHTML = (this.state.post && this.state.post.content) || '';
       this.refs.loading.toggle();
@@ -166,12 +186,13 @@ class Page extends Component {
       })
       .then(({data}) => {
         let res = data.data.data;
-        if (res.code !== 0) {
+        console.log('lockres:' + res);
+        if (res !== 0) {
           // 保存一份草稿
           this.saveDraft();
-          if (res.code === 2) {
+          if (res === 1) {
             this.showTooltip("文档内容有更新，请重新读取");
-          } else if (res.code === 3) {
+          } else if (res === 2) {
             this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
           } else {
             this.showTooltip("请求文章内容失败");
@@ -255,15 +276,6 @@ class Page extends Component {
         break;
         default:;
 			}
-    }
-
-    componentWillUnmount () {
-      this.setState({
-        draftTime: null,
-        blurTime: null,
-        blur: 0,
-        changeTimer: null
-      })
     }
 
     /**
@@ -398,7 +410,7 @@ class Page extends Component {
       if (state.isUpdate) {
         params.draftId = state.draftId;
         params.postId = state.postId;
-
+    
         Qlquery.updatePost(params)
         .then(({data}) => {
           let res = data.data.data;
@@ -413,6 +425,7 @@ class Page extends Component {
 
       } else {
         if (state.draftId) {
+          console.log(params);
           // 修改草稿状态
           params.draftId = this.state.draftId;
           Qlquery.updatePost(params)
@@ -463,7 +476,6 @@ class Page extends Component {
           }, 5000)
         })        
       }
-
     }
 
     /**
@@ -483,13 +495,13 @@ class Page extends Component {
       let lastNode = node;
       let anchorNode = selection.anchorNode;
       // 判断选定对象范围是编辑框还是文本节点
-      if(anchorNode.nodeName != '#text') {
+      if(anchorNode.nodeName !== '#text') {
           // 如果是编辑框范围。则创建表情文本节点进行插入
             let parentNode = anchorNode === this.refs.editBox ? anchorNode : anchorNode.parentNode;
               if (parentNode.childNodes.length > 1) {
                   // 如果文本框的子元素大于0，则表示有其他元素，则按照位置插入表情节点
                   for (var i = 1; i < parentNode.childNodes.length; i++) {
-                    if (parentNode.childNodes[i - 1] == anchorNode) {
+                    if (parentNode.childNodes[i - 1] === anchorNode) {
                         if (node.nodeName === "BR") {
                           lastNode = parentNode.childNodes[i];
                         }
@@ -643,10 +655,12 @@ class Page extends Component {
     }
     
     showTooltip (text) {
-      this.setState({
-        tipText: text
-      })
-      this.refs.tooltip.show();
+      if (this.refs.tooltip) {
+        this.setState({
+          tipText: text
+        })
+        this.refs.tooltip.show();        
+      }
     }
 
      // 插入图片
@@ -717,6 +731,8 @@ class Page extends Component {
     }
 
     componentWillUnmount () {
+      clearTimeout(this.state.lockTimer)
+      clearTimeout(this.state.changeTimer)
       this.setState({
         changeTimer: null,
         lockTimer: null
@@ -792,7 +808,6 @@ class Page extends Component {
           lastEditRange: selection.getRangeAt(0)
         })
         let parentNode = selection.anchorNode.parentNode;
-        let node = selection.anchorNode;
         if (parentNode.nodeName === "CODE" || parentNode.nodeName === "BLOCKQUOTE") {
           // 说明要在code标签里添加换行
           this.insertNode(document.createElement('br'));
@@ -1009,7 +1024,7 @@ class Page extends Component {
                     >
                 </div>
                 <div className="edit-footer">
-                  <p>
+                  <p><span className="label">{this.state.space.type === GROUP ? "团队": "个人"}</span>
                     <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
                     {this.state.space.name}
                     </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.generateSaveStatus()}</p>

@@ -1,4 +1,4 @@
-import{ observable, action, computed, autorun } from 'mobx';
+import{ observable, action} from 'mobx';
 import axios from 'axios';
 
 export default class Store {
@@ -80,7 +80,7 @@ export default class Store {
         token: user.token,
         userId: user.userId,
         nickname: user.nickname,
-        avatar: user.avatar && user.avatar.search(/^http:\/\//) == -1 ? `http://localhost:8080/static/user/${user.avatar}` : user.avatar
+        avatar: user.avatar && user.avatar.search(/^http:\/\//) === -1 ? `http://localhost:8080/static/user/${user.avatar}` : user.avatar
       }
       this.user = res;
       window.localStorage.setItem('user', JSON.stringify(res));
@@ -141,7 +141,6 @@ export default class Store {
         await axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
-          console.log(res);
           this.infoNum = res;
         })
         .catch((err) => {

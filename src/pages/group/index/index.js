@@ -19,19 +19,11 @@ import 'echarts/lib/component/legend';
 
 import Qlquery from './graphql';
 
-import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 
-const FILE_LIKE = 2,
-      FILE_COLLECT = 3,
-      FILE_CREATE = 5,
-      FILE_COMMENT = 8;
-
-// 团队动作相关
-const GROUP_JOIN = 25;
+const FILE_CREATE = 5;
 
 // 个人操作相关
-const USER_FOLLOW = 44;
 const defaultStatistic = {
   likeNum: 0,
   textNum: 0,
@@ -82,7 +74,6 @@ class Page extends Component {
 
     async fetchGroupData(id) {
       let userStore = this.props.userStore;
-      let params = id;
 
       if(userStore.groupList.length) {
         let group;
@@ -106,6 +97,7 @@ class Page extends Component {
            await Qlquery.getGroupEasy({id})
            .then(({data}) => {
              let res = data.data.data;
+             console.log('获取到团队信息')
              if(res.id) {
                group = {
                  id: res.id,
@@ -119,6 +111,8 @@ class Page extends Component {
            })
           }
         }
+
+        console.log('获取团队');
 
         // 获取团队成员
         await Qlquery.getMembers({
@@ -153,10 +147,10 @@ class Page extends Component {
             statistics: statistics
           })
         })
-       
+
         this.setState({
           group: {
-            name: group.name,
+            name: group.name || group.nickname,
             des: group.des,
             id: group.id,
             avatar: group.avatar || null,
@@ -306,7 +300,7 @@ class Page extends Component {
          <div className="group-box right flex-column">
             <div className="us-about">
               <div className="cover">
-                <img src={ this.state.group.avatar || require('../../../assets/images/default_g.jpg')}
+                <img src={this.state.group.avatar || require('../../../assets/images/default_g.jpg')}
                      alt={this.state.group.name}/>
               </div>
               <p className="title">{this.state.group.name}</p>
@@ -417,94 +411,20 @@ class Page extends Component {
     let params = this.props.match.params;
     await userStore.getGroup();
 
-    if(userStore.groupList.length) {
-      let group;
-      if (!(params && params.id)) {
-        group =  {
-          name: userStore.groupList[0].nickname,
-          des: userStore.groupList[0].des,
-          id: userStore.groupList[0].id,
-          avatar: userStore.groupList[0].avatar || null
-        };
-      } else {
-        // 如果域名有团队
-        userStore.groupList.forEach((item) => {
-          if (item.id === params.id) {
-            group = item;
-          }
-        })
-        
-        // 如果group不存在，要请求group的信息
-        if (!group) {
-         await Qlquery.getGroupEasy(params)
-         .then(({data}) => {
-           let res = data.data.data;
-           if(res.id) {
-             group = {
-               id: res.id,
-               name: res.nickname,
-               avatar: `http://localhost:8080/static/group/${res.avatar}`
-             }
-           }
-         })
-         .catch((err) => {
-           console.log(err);
-         })
-        }
+    let groupList = userStore.groupList.map((item) => {
+      return {
+        id: item.id,
+        text: item.nickname,
+        avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
+        link: `/group/${item.id}`
       }
-
-      let groupList = userStore.groupList.map((item) => {
-        return {
-          id: item.id,
-          text: item.nickname,
-          avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
-          link: `/group/${item.id}`
-        }
-      })
-      // 获取团队成员
-      await Qlquery.getMembers({
-        groupId: group.id
-      })
-      .then(({data}) => {
-        let res = data.data.data;
-        group.members = res.member || [];
-      })
-      for(let i = 0, len = group.members.length; i < len; i++) {
-        if (group.members[i].id === userStore.user.userId) {
-          this.setState({
-            isAuth: group.members[i].role
-          })
-          break;
-        }
-      }
-
-      // 获取首页数据
-      await Qlquery.getHomeData({
-        groupId: group.id,
-        token: this.props.userStore.user.token,
-        userId: this.props.userStore.user.userId
-      })
-      .then(({data}) => {
-        let news = data.data.news,
-            statistics = data.data.statistic;
-            statistics.charts =  statistics && statistics.charts && statistics.charts.map(item => JSON.parse(item))
-            this.setState({
-          news: news.options,
-          statistics: statistics
-        })
-      })
-
-      this.setState({
-        groupList: groupList,
-        group: {
-          name: group.name,
-          des: group.des,
-          id: group.id,
-          avatar: group.avatar || null,
-          members: group.members
-        }
-      })
-    }
+    })
+    this.setState({
+      groupList: groupList
+    })
+    await this.fetchGroupData(params && params.id);
+    console.log(this.state.group);
+    
 
     if (this.state.group.id) {
       let  myChart = echarts.init(document.getElementById('statist-graph'));
@@ -659,7 +579,6 @@ class Page extends Component {
     let defaultId = this.state.groupList[0] && this.state.groupList[0].id,
         prevMatch = (this.props.match.params && this.props.match.params.id) || defaultId,
         nextMatch = (nextProps.match.params && nextProps.match.params.id) || defaultId
-
     if (prevMatch === nextMatch) {
       return;
     }
@@ -895,7 +814,6 @@ class Page extends Component {
         }
         return true;   
     }
-    return false;
   }
 
   judgeTempAvatar (e) {
@@ -910,7 +828,7 @@ class Page extends Component {
           base64 = e.target.result,
           baseStr = base64.substring(base64.indexOf(tag) + tag.length);
       let eqTagIndex=baseStr.indexOf("=");
-          baseStr=eqTagIndex!=-1?baseStr.substring(0,eqTagIndex):baseStr;
+          baseStr=eqTagIndex!==-1?baseStr.substring(0,eqTagIndex):baseStr;
       let strLen=baseStr.length;
       let fileSize=(strLen-(strLen/8)*2)/1024;
       if(fileSize >= 64) {

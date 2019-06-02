@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import Header from '../../../layouts/header/header';
-import Sidebar from '../../../layouts/sidebar/sidebar';
 import Tooltip from '../../../components/tooltip';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -115,7 +113,7 @@ class Page extends Component {
             base64 = e.target.result,
             baseStr = base64.substring(base64.indexOf(tag) + tag.length);
         let eqTagIndex=baseStr.indexOf("=");
-            baseStr=eqTagIndex!=-1?baseStr.substring(0,eqTagIndex):baseStr;
+            baseStr=eqTagIndex!== -1?baseStr.substring(0,eqTagIndex):baseStr;
         let strLen=baseStr.length;
         let fileSize=(strLen-(strLen/8)*2)/1024;
         if(fileSize >= 64) {
@@ -168,7 +166,7 @@ class Page extends Component {
                         <input type="radio"
                               value="0" 
                               name="sex" 
-                              checked={this.state.tSex == 0}
+                              checked={this.state.tSex === 0}
                               onChange={(e) => {
                                 this.setState({
                                   tSex: 0
@@ -177,7 +175,7 @@ class Page extends Component {
                         <input type="radio" 
                               value="1" 
                               name="sex" 
-                              checked={this.state.tSex == 1}
+                              checked={this.state.tSex === 1}
                               onChange={(e) => {
                                 this.setState({
                                   tSex: 1

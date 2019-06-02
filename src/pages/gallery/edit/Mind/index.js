@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import GGEditor, { Mind } from 'gg-editor';
 import {
   MindToolbar
@@ -8,12 +8,25 @@ class App extends Component {
   constructor(){
     super();
     this.state = {     
+        isInit: false,
         data: {
           roots: [{
             label: '中心主题',
             children: []
           }]
         }
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (!this.state.isInit && nextProps.chart) {
+      this.setState({
+        isInit: true,
+        data: nextProps.chart
+      })
+      if (this.refs.mind) {
+        this.refs.mind.graph.read(nextProps.chart);
+      }
     }
   }
 

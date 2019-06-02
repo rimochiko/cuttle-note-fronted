@@ -33,17 +33,7 @@ import {
 import './assets/styles/normal.scss'
 
 class App extends Component {
-  
-  constructor () {
-    super();
-  }
 
-  componentWillMount() {
-    // 判断路由
-    
-  }
-  componentDidMount(){
-  }
   render() {
     return (
       <Router>
@@ -62,6 +52,7 @@ class App extends Component {
           <Route path="/search/:type/:search?/:page?" component={SearchPage} />        
           <Route path="/register" component={RegisterPage}/>   
           <Route path="/login" component={LoginPage}/>
+          <Redirect to="/"/>
         </Switch>
       </Router>
     );

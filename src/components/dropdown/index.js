@@ -4,12 +4,9 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class DropDown extends Component {
-    constructor () {
-        super();
-    }
 
     render () {
-        const { children, type} = this.props;
+        const { children} = this.props;
         return (
             <div className="mck-dropdown">
                 {children}

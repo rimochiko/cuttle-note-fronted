@@ -232,7 +232,7 @@
         padding-bottom: 1rem;
         border-bottom: 1px solid #eef0f3;
         .title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-right: 1rem;
         }
         .btn {
@@ -245,22 +245,25 @@
             font-size: .8rem;
         }
     }
-    .draft-item {
-        margin-bottom: 1rem;
+    .draft-list {
         overflow-y: scroll;
         flex: 1;
+    }
+    .draft-item {
+        margin-bottom: 1rem;
         .title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1.8;
             margin-bottom: .8rem;
         }
         .des {
-            font-size: .85rem;
+            font-size: .8rem;
             color: #8493b8;
         }
         .link {
             color: #3e4077;
             cursor: pointer;
+            margin-right: .5rem;
         }
     }
 }

@@ -13,9 +13,6 @@ import {
 
 
 class Page extends Component {
-    constructor () {
-        super();
-    }
     toggleLoading () {
         this.refs.loading.toggle();
     }

@@ -3,46 +3,7 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link }  from 'react-router-dom';
 
-let list = [{
-  id: 0,
-  author: {
-    id: 'ddd',
-    nickname: 'test',
-    avatar: '',
-  },
-  post: {
-    id: 0,
-    title: '测试文章',
-    content: '夜夜夜夜耶耶耶',
-    date: '2018-02-12'
-  },
-  group: {
-    id: "dddd",
-    nickname: "军团"
-  }
-}, {
-  id: 0,
-  author: {
-    id: 'ddd',
-    nickname: 'test',
-    avatar: '',
-  },
-  post: {
-    id: 0,
-    title: '测试文章',
-    content: '夜夜夜夜耶耶耶',
-    date: '2018-02-12'
-  },
-  group: {
-    id: "dddd",
-    nickname: "军团"
-  }
-}];
-
 class Page extends Component {
-    constructor () {
-        super();
-    }
 
     generateItem (item) {
       return (
@@ -80,7 +41,7 @@ class Page extends Component {
         return (
           <div className="search-res search-article">
             {
-              list && list.map((item) => {
+              this.props.list && this.props.list.map((item) => {
                 return this.generateItem(item)
               })
             }

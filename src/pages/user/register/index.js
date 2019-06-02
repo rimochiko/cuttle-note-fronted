@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { inject, observer } from 'mobx-react';
 import Tooltip from '../../../components/tooltip';
 import Tool from '../tool';

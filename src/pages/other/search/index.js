@@ -5,7 +5,6 @@ import Loading from '../../../components/loading';
 import Tooltip from '../../../components/tooltip';
 import './index.scss';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Route, NavLink, Switch}  from 'react-router-dom';
 
 import Article from './article';

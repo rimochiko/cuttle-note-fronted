@@ -130,7 +130,6 @@ class Page extends Component {
           })
         }
       })
-
       // 获取文章列表
       this.getPostList(params);
     }
@@ -217,7 +216,7 @@ class Page extends Component {
         userId: this.props.userStore.user.userId,
         token: this.props.userStore.user.token,
         type: 0,
-        groupId: params.owner  
+        groupId: params.owner 
       });
      await axios.post('/graphql', {query})
      .then(({data}) => {
@@ -229,7 +228,8 @@ class Page extends Component {
          })
        } else {
          this.setState({
-           isAuth: false
+           posts: [],
+           draftList: []
          })
        }
      })
@@ -304,9 +304,9 @@ class Page extends Component {
           // 删除成功
           this.showTooltip("草稿已移除:)")
           let index;
-          this.state.draftList && this.state.draftList.forEach((item, index) => {
+          this.state.draftList && this.state.draftList.forEach((item, index1) => {
             if (item.id === id) {
-              index = index;
+              index = index1;
             }
           });
           let draft = this.state.draftList.slice();
@@ -434,10 +434,13 @@ class Page extends Component {
      */
     generateOption () {
       // 判断是否有写入权
+      let owner = this.state.object;
       if (this.state.isAuth) {
         return (
           <div className="option">
-            <Link to="/article/edit" title="创建新文章">
+            <Link to={{pathname: '/article/edit',
+                       query: {groupId: owner && owner.type === GROUP ? owner.id:null,
+                               groupName: owner && owner.type === GROUP ? owner.name:null}}} title="创建新文章">
               <FontAwesomeIcon icon="plus" />
             </Link>
             <span title="草稿箱" onClick={this.toggleDraft.bind(this)}>
@@ -467,7 +470,9 @@ class Page extends Component {
       } else if(this.state.object.type === GROUP) {
         return (
           <div className="option">
-            <FontAwesomeIcon icon="plus"/>加入团队
+            <div>
+              <FontAwesomeIcon icon="plus"/>加入团队
+            </div>
           </div>
 
         )
@@ -489,23 +494,24 @@ class Page extends Component {
                           <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
                           <button className="btn">舍弃全部草稿</button>
                         </div>
-                        {
-                          this.state.draftList && this.state.draftList.map((item) => {
-                            return (
-                              <div className="draft-item" key={item.id}>
-                                <Link to={{pathname:'/article/edit', 
-                                           query: {postId: item.id,
-                                                   parentId: item.parentId}}} 
-                                      className="title">{item.title}</Link>
-                                <p className="des">
-                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`}>{item.author}</Link>
-                                  保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
-                                </p>
-                              </div>  
-                            )
-                          })
-                        }
-                        
+                        <div className="draft-list">
+                          {
+                            this.state.draftList && this.state.draftList.map((item) => {
+                              return (
+                                <div className="draft-item" key={item.id}>
+                                  <Link to={{pathname:'/article/edit', 
+                                            query: {postId: item.id,
+                                                    parentId: item.parentId}}} 
+                                        className="title">{item.title}</Link>
+                                  <p className="des">
+                                    <Link to={`library/${this.state.object.type}/${this.state.object.id}`} className="link">{item.author}</Link>
+                                     保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
+                                  </p>
+                                </div>  
+                              )
+                            })
+                          }
+                        </div>
                       </div>
                     </Modal>
                     <Modal title="文章信息" ref="info">
@@ -535,7 +541,9 @@ class Page extends Component {
                       <div className="relate">
                         <div className="switch">
                           <DropDown data={this.state.spaceList} type="switch">
-                            <img src={this.state.object.avatar || require('../../../assets/images/default.jpg')} className="link-img"/>
+                            <img src={this.state.object.avatar || require('../../../assets/images/default.jpg')}
+                                 className="link-img"
+                                 alt=""/>
                             {this.state.object.name}的空间
                             <FontAwesomeIcon icon="caret-down" className="link-svg"/>
                           </DropDown>                        
