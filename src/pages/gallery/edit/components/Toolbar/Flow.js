@@ -13,6 +13,22 @@ const MindToolbar = () => {
       <ToolbarButton command="zoomIn" icon="search-minus" text="放大" />
       <ToolbarButton command="zoomOut" icon="search-plus" text="缩小" />
       <ToolbarButton command="resetZoom" icon="window-restore" text="实际尺寸" />
+      <div className="divide"></div>
+      <div className="command-group">
+        <div className="item">
+          <img src={require('../../../../../assets/images/tool/line-1.svg')} width="16" alt="line"/>
+        </div>
+        <div className="item">
+          <img src={require('../../../../../assets/images/tool/line-2.svg')} width="16" alt="line"/>
+        </div>
+        <div className="item">
+          <img src={require('../../../../../assets/images/tool/line-3.svg')} width="16" alt="line"/>
+        </div>        
+      </div>
+      <div className="divide"></div>
+      <div className="command-group">
+        <input type="text" disabled placeholder="元素文字..."/>
+      </div>
     </Toolbar>
   );
 };

@@ -2,7 +2,10 @@ import axios from 'axios'
 export default {
     createChart,
     updateChart,
-    getOnePost
+    getOnePost,
+    sendEditStatus,
+    deleteDraft,
+    lockPost
 }
 
 function createChart (args) {
@@ -138,3 +141,60 @@ function getOnePost (args) {
     `
     return axios.post('/graphql', {query})
   }
+
+  function sendEditStatus ({postId, userId, token, isLock}) {
+    let query;
+    if (isLock) {
+        query = `
+        mutation {
+            data:
+            lockPost(
+                postId: ${postId},
+                userId: "${userId}",
+                token: "${token}"
+            )
+        }
+        `;
+    } else {
+        query = `
+        mutation {
+            data:
+            unlockPost(
+                postId: ${postId},
+                userId: "${userId}",
+                token: "${token}"
+            )
+        }
+        `
+    }
+    
+    return axios.post('/graphql', {query});
+    }
+    
+    function deleteDraft ({token, userId, postId}) {
+        const query = `
+        postDelete(
+            postId: ${postId},
+            token: "${token}",
+            userId: "${userId}",
+            absolute: 1
+        )
+        `;
+        return axios.post('/graphql', {query});   
+    }
+    
+    function lockPost ({
+        token,
+        userId,
+        postId
+    }) {
+        // 0-加锁成功,1-他人正在编辑,2-内容有变动
+        const query = `
+        lockPost(
+            userId: "${userId}",
+            token: "${token}",
+            postId: ${postId}
+        )
+        `
+        return axios.post('/graphql', {query});   
+    }

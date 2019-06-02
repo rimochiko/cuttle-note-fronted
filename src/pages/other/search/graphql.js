@@ -39,15 +39,18 @@ function searchArticle (args) {
         articleSearch(
             search: "${args.search}"
         ) {
-            id
-            title
-            content
-            date
-            authorId
-            authorName
-            avatar
-            groupId
-            groupName
+            count,
+            res {
+                id
+                title
+                content
+                date
+                authorId
+                authorName
+                avatar
+                groupId
+                groupName
+            }
         }
     }`
     return axios.post('/graphql', {query});
@@ -59,15 +62,18 @@ function searchChart (args) {
         chartSearch(
             search: "${args.search}"
         ) {
-            id
-            title
-            date
-            url
-            authorId
-            authorName
-            avatar
-            groupId
-            groupName
+            count,
+            res {
+                id
+                title
+                content
+                date
+                authorId
+                authorName
+                avatar
+                groupId
+                groupName
+            }
         }
     }`
     return axios.post('/graphql', {query});
@@ -79,12 +85,16 @@ function searchGroup (args) {
         groupSearch(
             search: "${args.search}"
         ) {
-            id
-            nickname
-            avatar
-            adminId
-            adminAvatar
-            adminName
+            count,
+            res {
+                id
+                nickname
+                avatar
+                adminId
+                adminAvatar
+                adminName                
+            }
+
         }
     }`
     return axios.post('/graphql', {query});
@@ -96,9 +106,12 @@ function searchUser (args) {
         userSearch(
             search: "${args.search}"
         ) {
-            id
-            nickname
-            avatar
+            count,
+            res {
+                id
+                nickname
+                avatar
+            }
         }
     }`
     return axios.post('/graphql', {query});

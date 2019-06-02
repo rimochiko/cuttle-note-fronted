@@ -4,6 +4,14 @@ import {
   MindToolbar
  } from '../components/Toolbar/';
 
+import {
+  MindContext
+} from '../components/Context';
+
+import {
+  MindDetail
+} from '../components/Detail';
+
 class App extends Component {
   constructor(){
     super();
@@ -55,6 +63,7 @@ class App extends Component {
                ref="mind"
                style={{ width: 1360, height: 500 }} 
                data={this.state.data} />
+        <MindContext />
       </GGEditor>
     )
   }

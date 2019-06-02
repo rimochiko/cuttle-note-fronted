@@ -6,6 +6,9 @@
     .search-item {
         margin-bottom: 2rem;
         @extend .section;
+        .title {
+            color: #999;
+        }
     }
     &.search-article {
         .author {
@@ -51,12 +54,15 @@
                 display: block;
                 font-size: 1.2rem;
                 margin-bottom: .5rem;
+                em {
+                    color: #aa95e5;
+                }
             }
             .text {
                 color: #999;
-            }
-            .key {
-                color: #aa95e5;
+                em {
+                    color: #aa95e5;
+                }
             }
         }
     }

@@ -4,12 +4,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link }  from 'react-router-dom';
 
 class Page extends Component {
+  generateLink (postId, userId, groupId) {
+    let type = groupId ? "group" : "user";
+    let space = groupId ? groupId : userId;
+    return `/article/${type}/${space}/${postId}`;
+  }
 
     generateItem (item) {
       return (
         <div className="search-item search-chart" key={item.id}>
           <div className="body">
-            <Link className="title" to="/">{item.title}</Link>
+            <Link className="title" to={this.generateLink(item.id, item.authorId, item.groupId)}>{item.title}</Link>
             <img src={item.url ? item.url : "http://localhost:8080/static/chart/9d59bd026f22eefd6b0b941f3387e91b.png"}
                  alt=""
                  className="cover"/>

@@ -3,7 +3,17 @@ import GGEditor, { Flow } from 'gg-editor';
 import {
   FlowToolbar
  } from '../components/Toolbar/';
- import ItemBar from '../components/ItemBar/Flow';
+
+import {
+  FlowContext
+} from '../components/Context';
+
+import {
+  FlowDetail
+} from '../components/Detail';
+
+import Mini from '../components/Mini';
+import ItemBar from '../components/ItemBar/Flow';
 
 class App extends Component {
   constructor(){
@@ -47,10 +57,14 @@ class App extends Component {
           <ItemBar/>
           <Flow  className="edit-canvas"
                 ref="flow"
-                style={{ width: 1160, height: 540 }} 
+                style={{ width: 500, height: 500 }} 
                 data={this.state.data} />
+          <div>
+            <FlowDetail />
+            <Mini/>
+          </div>
         </div>
-
+        <FlowContext />
       </GGEditor>
     )
   }

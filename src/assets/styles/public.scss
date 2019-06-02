@@ -17,6 +17,12 @@ $fontBlack: #3e4077;
     overflow-y: scroll;
 }
 
+.flex-overflow-y {
+    flex: 1;
+    overflow-y: scroll;
+    height: 100vh;    
+}
+
 .overflow {
     height: 100vh;
     overflow: hidden;

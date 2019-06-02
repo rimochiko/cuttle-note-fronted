@@ -514,7 +514,7 @@ class Page extends Component {
                                       className="title">{item.title}</Link>
                                 <p className="des">
                                   <Link to={`library/${this.state.object.type}/${this.state.object.id}`} className="link">{item.author}</Link>
-                                  保存于{item.date} · <span className="link">舍弃</span>
+                                  保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
                                 </p>
                               </div>  
                             )

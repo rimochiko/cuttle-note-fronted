@@ -154,7 +154,7 @@ class Page extends Component {
           <p className="author">
             <img src={item.author.avatar ? `http://localhost:8080/static/user/${item.author.avatar}` : require('../../../assets/images/default.jpg')} alt=""/><Link to="/">{item.author.nickname}</Link></p>
           <p className="date">{item.date}</p>
-          <p className="option">
+          <p className="space">
               {item.group && item.group.id ? `${item.group.nickname}的空间` : `${item.author.nickname}的空间`}
           </p>
         </div>

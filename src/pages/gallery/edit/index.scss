@@ -18,12 +18,38 @@
 
 
 .ul-chart-tools {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
     padding: .3rem 1rem;
     background-color: #f7f7fb;
     border-top: 1px solid #eef0f3;
     border-bottom: 1px solid #eef0f3;
+    .command-group {
+        display: flex;
+        align-items: center;
+        .item {
+            font-size: .9rem;
+            padding: .8rem;
+            margin: 0 .2rem;
+            border-radius: .3rem;
+            cursor: pointer;
+            &:hover {
+                background: #e9e9f8;
+            }
+        }
+        input {
+            margin-left: .5rem;
+            border-radius: .2rem;
+            border: 1px solid #ccc;
+            padding: .4rem .8rem;
+            color: #999;
+            &:disabled {
+                background-color: #f2f2f5;
+            }
+        }
+    }
     .command {
         display: block;
         color: #7f83b8;
@@ -50,12 +76,40 @@
 
 .edit-item-bar {
     width: 160px;
-    height: 500px;
+    height: 460px;
     padding: 20px;
     flex-grow: 0;
+    position: relative;
+    z-index: 3;
     background-color: #fdfdfd;
     border-right: 1px solid #eef0f3;
 }
+
+.chart-context-box {
+    display: none;
+    box-shadow: 0 10px 15px #eeeef8;
+    border-radius: .5rem;
+    background-color: #FFF;
+    overflow: hidden;
+    .command {
+        padding: .8rem 1rem;
+        font-size: .85rem;
+        color: #7f83b8;
+        cursor: pointer;
+        transition: all .2s;
+        &:hover {
+            background-color: #f1f1fd;
+        }
+        svg {
+            margin-right: .5rem;
+        }
+        &.disable {
+            opacity: .5;
+            cursor: default;
+        }
+    }    
+}
+
 
 .chart-edit-shapes {
     width: 3rem;
@@ -92,6 +146,7 @@
 
 .chart-edit-canvas {
     flex: 1;
+    position: relative;
     .edit-canvas {
         position: relative;
         canvas {
