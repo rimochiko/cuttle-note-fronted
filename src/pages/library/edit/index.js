@@ -829,10 +829,11 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if (res === 1) {
+          if (res) {
             // 删除成功
             this.setState({
-              draftId: null
+              draftId: null,
+              lastSaveTime: ''
             })
           }
         })
@@ -843,7 +844,7 @@ class Page extends Component {
       if (this.state.draftId) {
         return (
           <span>
-            {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}（<span onClick={this.deleteDraft.bind(this)}>舍弃</span>）
+            {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}（<span className="btn-text" onClick={this.deleteDraft.bind(this)}>舍弃</span>）
           </span>
         )
       } else {

@@ -7,13 +7,16 @@ export default {
     getOnePost,
     addFollow,
     cancelFollow,
-    getOwnerInfo
+    getOwnerInfo,
+    deleteAllDraft,
+    deletePost,
+    postListQuery
 }
 
 const USER = "user";
 
 function userPostQuery (args) {
-    return `
+    const query = `
     query {
       data:
       userPosts(
@@ -61,10 +64,11 @@ function userPostQuery (args) {
        }
      }
    }`;
+   return axios.post('/graphql', {query});
 }
 
 function groupPostQuery (args) {
-    return `
+    const query = `
     query {
       data:
       groupPosts(
@@ -112,11 +116,33 @@ function groupPostQuery (args) {
        }
      }
    }`;
+   return axios.post('/graphql', {query});
+}
+
+function postListQuery ({
+  token,
+  userId,
+  groupId,
+  author
+}) {
+  if (groupId) {
+    return groupPostQuery({
+      userId,
+      token,
+      groupId
+    })
+  } else {
+    return userPostQuery({
+      userId,
+      token,
+      author
+   })
+  }
 }
 
 
 function userDelPostQuery (args) {
-    return `
+    const query = `
     mutation {
       data:
       postDelete(
@@ -125,10 +151,11 @@ function userDelPostQuery (args) {
         token:"${args.token}"
       )
     }`
+    return axios.post('/graphql', {query});
 }
 
 function groupDelPostQuery (args) {
-    return `
+    const query = `
     mutation {
         data:
         postDelete(
@@ -138,10 +165,11 @@ function groupDelPostQuery (args) {
             groupId:"${args.groupId}",
         )
     }`
+    return axios.post('/graphql', {query});
 }
 
 function getOnePost (args) {
-  return `
+  const query = `
   query {
     data:
     post(
@@ -182,6 +210,7 @@ function getOnePost (args) {
     }
   }
   `
+  return axios.post('/graphql', {query});
 }
 
 function addFollow (args) {
@@ -240,5 +269,62 @@ function getOwnerInfo (params, userId) {
          }
        }`;
       return axios.post('/graphql', {query})
+}
+
+function deletePost ({
+  token,
+  userId,
+  groupId,
+  postId
+}) {
+  if (groupId) {
+    return groupDelPostQuery({
+      userId,
+      postId,
+      token,
+      groupId
+    });
+  } else {
+    return userDelPostQuery({
+      userId,
+      postId,
+      token
+    });
+  }
+}
+
+function deleteAllDraft ({
+  token,
+  userId,
+  groupId
+}) {
+  let query;
+  if (groupId) {
+      query = `
+        mutation {
+            data:
+            postAllRemove(
+                token: "${token}",
+                userId: "${userId}",
+                groupId: "${groupId}",
+                isDraft: 1,
+                type: 0,
+            )
+        }
+      `
+  } else {
+    query = `
+    mutation {
+        data:
+        postAllRemove(
+            token: "${token}",
+            userId: "${userId}",
+            isDraft: 1,
+            type: 0
+        )
+    }
+    `
+  }
+  return axios.post('/graphql', {query});
 }
 

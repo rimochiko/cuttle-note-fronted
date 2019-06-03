@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import DropDown from '../../../components/dropdown/';
 import Loading from '../../../components/loading/';
+import Tooltip from '../../../components/tooltip/';
 
 import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,7 +14,6 @@ import {
 import { inject, observer } from 'mobx-react';
 import Chart from '../chart';
 import Dashboard from '../dashboard';
-import axios from 'axios';
 import Qlquery from './graphql';
 import Modal from '../../../components/modal';
 
@@ -132,12 +132,11 @@ class Page extends Component {
      */
     async fetchIdData (params) {
       if(params.id) {
-        const query = Qlquery.getOnePost({
+        await Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: params.id,
           token: this.props.userStore.user.token 
-        });
-        await axios.post('/graphql', {query})
+        })
         .then(({data}) => {
           let res = data.data.data;
           if(res.code === 1) {
@@ -146,7 +145,7 @@ class Page extends Component {
               post: res.post
             })
           } else {
-            console.log("请求文章失败")
+            this.showTooltip("请求文章失败:(");
           }
         })
         .catch((err) => {
@@ -197,19 +196,19 @@ class Page extends Component {
     /**
      * 获取空间文章列表
      */
-    async getPostList (params) { 
-      const query = params.obj === USER ?
-      Qlquery.userPostQuery({
+    async getPostList (params) {
+      let objs = {
          userId: this.props.userStore.user.userId,
          token: this.props.userStore.user.token,
-         author: params.owner        
-      }):
-      Qlquery.groupPostQuery({
-        userId: this.props.userStore.user.userId,
-        token: this.props.userStore.user.token,
-        groupId: params.owner  
-      });
-     await axios.post('/graphql', {query})
+      }
+
+      if (params.obj === GROUP) {
+        objs.groupId = params.owner;
+      } else {
+        objs.author = params.owner;
+      }
+
+     await Qlquery.postListQuery(objs)
      .then(({data}) => {
        let res = data.data.data;
        if(res.code === 1) {
@@ -219,8 +218,11 @@ class Page extends Component {
          })
        } else {
          this.setState({
-           isAuth: false
+           isAuth: false,
+           posts: [],
+           draftList: []
          })
+         this.showTooltip('无权访问或该空间不存在:(');
        }
      })
      .catch((err) => {
@@ -236,21 +238,17 @@ class Page extends Component {
       this.refs.remove.toggle()
     }
     async removePost () {
-      const query = this.state.object.type === USER ? 
-      Qlquery.userDelPostQuery({
+      let params = {
           userId:this.props.userStore.user.userId,
           postId: this.state.post.id,
-          token:this.props.userStore.user.token
-      })
-      : 
-      Qlquery.groupDelPostQuery({
-        userId:this.props.userStore.user.userId,
-        postId: this.state.post.id,
-        token:this.props.userStore.user.token,
-        groupId:this.state.object.id
-      });
+          token:this.props.userStore.user.token        
+      }
 
-      await axios.post('/graphql', {query})
+      if (this.state.object.type === GROUP) {
+        params.groupId = this.state.object.id;
+      }
+
+      await Qlquery.deletePost(params)
       .then(({data}) => {
         let res = data.data.data;
         if(res) {
@@ -272,48 +270,62 @@ class Page extends Component {
 
     /**
      * 移除草稿
-     * @param {} props 
      */
     async deleteDraft (id) {
-      const query = this.state.object.type === USER ? 
-      Qlquery.userDelPostQuery({
-          userId:this.props.userStore.user.userId,
-          postId: id,
-          token:this.props.userStore.user.token
-      })
-      : 
-      Qlquery.groupDelPostQuery({
+      let params = {
         userId:this.props.userStore.user.userId,
-        postId: id,
-        token:this.props.userStore.user.token,
-        groupId:this.state.object.id
-      });
-
-      await axios.post('/graphql', {query})
-      .then(({data}) => {
-        let res = data.data.data;
-        if(res) {
-          // 删除成功
-          this.showTooltip("草稿已移除:)")
-          let index;
-          this.state.draftList && this.state.draftList.forEach((item, index1) => {
-            if (item.id === id) {
-              index = index1;
+        token:this.props.userStore.user.token
+      }
+      if (this.state.object.type === GROUP) {
+        params.groupId = this.state.object.id;
+      }
+      if (id) {
+          params.postId = id;
+          Qlquery.deletePost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            console.log(res);
+            if(res) {
+              // 删除成功
+              this.showTooltip("草稿已移除:)")
+              let index;
+              this.state.draftList && this.state.draftList.forEach((item, index1) => {
+                if (item.id === id) {
+                  index = index1;
+                }
+              });
+              let draft = this.state.draftList.slice();
+              draft.splice(index, 1);
+              this.setState({
+                draftList: draft
+              }) 
+            } else {
+              // 删除失败
+              this.showTooltip("电波传达失败:(")
             }
-          });
-          let draft = this.state.draftList.slice();
-          draft.splice(index, 1);
-          this.setState({
-            draftList: draft
-          }) 
-        } else {
-          // 删除失败
-          this.showTooltip("电波传达失败:(")
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+          })
+          .catch((err) => {
+            console.log(err);
+          })        
+      } else {
+        Qlquery.deleteAllDraft(params)
+        .then(({data}) => {
+          let res = data.data.data;
+          if(res) {
+            // 删除成功
+            this.showTooltip("草稿已全部移除:)")
+            this.setState({
+              draftList: []
+            }) 
+          } else {
+            // 删除失败
+            this.showTooltip("电波传达失败:(")
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })   
+      }
     }
 
     
@@ -411,7 +423,7 @@ class Page extends Component {
         }
       }
   
-      // 取消用户
+      // 取消用户关注
       async unfollowUser () {
         if (this.state.object && this.state.object.type === USER && this.state.object.id) {
           await Qlquery.cancelFollow({
@@ -496,11 +508,12 @@ class Page extends Component {
                 <Sidebar />
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
+                    <Tooltip ref="tooltip" text={this.state.tipText}/>
                     <Modal title="草稿箱" ref="draft">
                       <div className="draft-box">
                         <div className="draft-header">
                           <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
-                          <button className="btn">舍弃全部草稿</button>
+                          <button className="btn" onClick={this.deleteDraft.bind(this, null)}>舍弃全部草稿</button>
                         </div>
                         <div className="draft-list">
                         {

@@ -8,9 +8,6 @@ import {
   FlowContext
 } from '../components/Context';
 
-import {
-  FlowDetail
-} from '../components/Detail';
 
 import Mini from '../components/Mini';
 import ItemBar from '../components/ItemBar/Flow';
@@ -57,10 +54,9 @@ class App extends Component {
           <ItemBar/>
           <Flow  className="edit-canvas"
                 ref="flow"
-                style={{ width: 500, height: 500 }} 
+                style={{ width: 1140, height: 500 }} 
                 data={this.state.data} />
           <div>
-            <FlowDetail />
             <Mini/>
           </div>
         </div>

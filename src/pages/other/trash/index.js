@@ -66,6 +66,36 @@ class Page extends Component {
         console.log(err);
       })
     }
+  
+      /**
+     * 清空回收站
+     * @param {*} type 
+     */
+    removeAllPost () {
+      const query = `
+      mutation {
+        data:
+        postAllRemove(
+            userId: "${this.props.userStore.user.userId}",
+            token: "${this.props.userStore.user.token}"
+            isDraft: 0
+        )
+      }
+      `;
+      axios.post('/graphql', {query})
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res.code === 1) {
+          this.setState({
+            posts: []
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+
 
     /** 
      * 获取列表Icon
@@ -173,7 +203,7 @@ class Page extends Component {
                     <Header />
                     <div className="page-header">
                       <h1 className="normal-title">我的回收站</h1>
-                      <div className="empty-btn">
+                      <div className="empty-btn" onClick={this.removeAllPost.bind(this)}>
                         全部清空
                       </div>
                     </div>

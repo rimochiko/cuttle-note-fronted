@@ -139,12 +139,11 @@ class Page extends Component {
      */
     async fetchIdData (params) {
       if(params.id) {
-        const query = Qlquery.getOnePost({
+        await Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: params.id,
           token: this.props.userStore.user.token 
-        });
-        await axios.post('/graphql', {query})
+        })
         .then(({data}) => {
           let res = data.data.data;
           if(res.code === 1) {
@@ -205,38 +204,37 @@ class Page extends Component {
      * 获取空间文章列表
      */
     async getPostList (params) { 
-      const query = params.obj === USER ?
-      Qlquery.userPostQuery({
-         userId: this.props.userStore.user.userId,
-         token: this.props.userStore.user.token,
-         type: 0,
-         author: params.owner        
-      }):
-      Qlquery.groupPostQuery({
+      let objs = {
         userId: this.props.userStore.user.userId,
         token: this.props.userStore.user.token,
-        type: 0,
-        groupId: params.owner 
-      });
-     await axios.post('/graphql', {query})
-     .then(({data}) => {
-       let res = data.data.data;
-       if(res.code === 1) {
-         this.setState({
-           posts: res.posts,
-           draftList: res.drafts
-         })
-       } else {
-         this.setState({
-           posts: [],
-           draftList: []
-         })
-       }
-     })
-     .catch((err) => {
-      console.log(err);
-      this.showTooltip("电波传达失败:(")
-    })
+     }
+
+     if (params.obj === GROUP) {
+       objs.groupId = params.owner;
+     } else {
+       objs.author = params.owner;
+     }
+
+      await Qlquery.postListQuery(objs)
+      .then(({data}) => {
+        let res = data.data.data;
+        if(res.code === 1) {
+          this.setState({
+            posts: res.posts,
+            draftList: res.drafts
+          })
+        } else {
+          this.setState({
+            posts: [],
+            draftList: []
+          })
+          this.showTooltip('无权访问或该空间不存在:(');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        this.showTooltip("电波传达失败:(")
+      })
     }
     
     /** 
@@ -246,21 +244,17 @@ class Page extends Component {
       this.refs.remove.toggle()
     }
     async removePost () {
-      const query = this.state.object.type === USER ? 
-      Qlquery.userDelPostQuery({
-          userId:this.props.userStore.user.userId,
-          postId: this.state.post.id,
-          token:this.props.userStore.user.token
-      })
-      : 
-      Qlquery.groupDelPostQuery({
+      let params = {
         userId:this.props.userStore.user.userId,
         postId: this.state.post.id,
-        token:this.props.userStore.user.token,
-        groupId:this.state.object.id
-      });
+        token:this.props.userStore.user.token        
+      }
 
-      await axios.post('/graphql', {query})
+      if (this.state.object.type === GROUP) {
+        params.groupId = this.state.object.id;
+      }
+
+      await Qlquery.deletePost(params)
       .then(({data}) => {
         let res = data.data.data;
         if(res) {
@@ -276,52 +270,67 @@ class Page extends Component {
       })
       .catch((err) => {
         console.log(err);
+        this.showTooltip("电波传达失败:(");
       })
     }
+
     /**
      * 移除草稿
-     * @param {} props 
      */
-    async deleteDraft (id) {
-      const query = this.state.object.type === USER ? 
-      Qlquery.userDelPostQuery({
-          userId:this.props.userStore.user.userId,
-          postId: id,
-          token:this.props.userStore.user.token
-      })
-      : 
-      Qlquery.groupDelPostQuery({
+    async deleteDraft (id = null) {
+      let params = {
         userId:this.props.userStore.user.userId,
-        postId: id,
-        token:this.props.userStore.user.token,
-        groupId:this.state.object.id
-      });
-
-      await axios.post('/graphql', {query})
-      .then(({data}) => {
-        let res = data.data.data;
-        if(res) {
-          // 删除成功
-          this.showTooltip("草稿已移除:)")
-          let index;
-          this.state.draftList && this.state.draftList.forEach((item, index1) => {
-            if (item.id === id) {
-              index = index1;
+        token:this.props.userStore.user.token
+      }
+      if (this.state.object.type === GROUP) {
+        params.groupId = this.state.object.id;
+      }
+      if (id) {
+          params.postId = id;
+          Qlquery.deletePost(params)
+          .then(({data}) => {
+            let res = data.data.data;
+            if(res) {
+              // 删除成功
+              this.showTooltip("草稿已移除:)")
+              let index;
+              this.state.draftList && this.state.draftList.forEach((item, index1) => {
+                if (item.id === id) {
+                  index = index1;
+                }
+              });
+              let draft = this.state.draftList.slice();
+              draft.splice(index, 1);
+              this.setState({
+                draftList: draft
+              }) 
+            } else {
+              // 删除失败
+              this.showTooltip("电波传达失败:(")
             }
-          });
-          let draft = this.state.draftList.slice();
-          draft.splice(index, 1);
-          this.setState({
-            draftList: draft
-          }) 
-        } else {
-          // 删除失败
-          this.showTooltip("电波传达失败:(")
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+          })
+          .catch((err) => {
+            console.log(err);
+          })        
+      } else {
+        Qlquery.deleteAllDraft(params)
+        .then(({data}) => {
+          let res = data.data.data;
+          if(res) {
+            // 删除成功
+            this.showTooltip("草稿已全部移除:)")
+            this.setState({
+              draftList: []
+            }) 
+          } else {
+            // 删除失败
+            this.showTooltip("电波传达失败:(")
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })   
+      }
     }
 
     
@@ -474,7 +483,6 @@ class Page extends Component {
               <FontAwesomeIcon icon="plus"/>加入团队
             </div>
           </div>
-
         )
       }
       return (
@@ -492,7 +500,7 @@ class Page extends Component {
                       <div className="draft-box">
                         <div className="draft-header">
                           <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
-                          <button className="btn">舍弃全部草稿</button>
+                          <button className="btn" onClick={this.deleteDraft.bind(this,null)}>舍弃全部草稿</button>
                         </div>
                         <div className="draft-list">
                           {

@@ -26,19 +26,9 @@
     background-color: #f7f7fb;
     border-top: 1px solid #eef0f3;
     border-bottom: 1px solid #eef0f3;
-    .command-group {
+    .detail-form {
         display: flex;
-        align-items: center;
-        .item {
-            font-size: .9rem;
-            padding: .8rem;
-            margin: 0 .2rem;
-            border-radius: .3rem;
-            cursor: pointer;
-            &:hover {
-                background: #e9e9f8;
-            }
-        }
+        align-items: center;  
         input {
             margin-left: .5rem;
             border-radius: .2rem;
@@ -47,6 +37,28 @@
             color: #999;
             &:disabled {
                 background-color: #f2f2f5;
+            }
+        }      
+    }
+    .command-group {
+        display: flex;
+        align-items: center;
+        .item {
+            border: none;
+            background: none;
+            display: block;
+            font-size: .9rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0 .2rem;
+            border-radius: .3rem;
+            cursor: pointer;
+            &:disabled {
+                opacity: .25;
+                cursor: default;
+            }
+            &:hover {
+                background: #e9e9f8;
             }
         }
     }

@@ -252,14 +252,18 @@ if (isLock) {
 return axios.post('/graphql', {query});
 }
 
-function deleteDraft ({token, userId, postId}) {
+function deleteDraft ({token, userId, draftId}) {
     const query = `
-    postDelete(
-        postId: ${postId},
-        token: "${token}",
-        userId: "${userId}",
-        absolute: 1
-    )
+    mutation {
+        data:
+        postDelete(
+            postId: ${draftId},
+            token: "${token}",
+            userId: "${userId}",
+            absolute: 1
+        )        
+    }
+
     `;
     return axios.post('/graphql', {query});   
 }
@@ -271,11 +275,15 @@ function lockPost ({
 }) {
     // 0-加锁成功,1-他人正在编辑,2-内容有变动
     const query = `
-    lockPost(
-        userId: "${userId}",
-        token: "${token}",
-        postId: ${postId}
-    )
+    mutation {
+        data:
+        lockPost(
+            userId: "${userId}",
+            token: "${token}",
+            postId: ${postId}
+        )        
+    }
+
     `
     return axios.post('/graphql', {query});   
 }

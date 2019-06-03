@@ -52,8 +52,8 @@ function createChart (args) {
         },
         maxContentLength: Infinity,
         data: encodeURIComponent("query")+"="+encodeURIComponent(query)
-     })
-    }
+    })
+}
 
 
 function updateChart (args) {
@@ -103,7 +103,8 @@ function updateChart (args) {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         data: encodeURIComponent("query")+"="+encodeURIComponent(query)
-     })}
+     })
+}
 
 function getOnePost (args) {
     const query = `
@@ -140,9 +141,9 @@ function getOnePost (args) {
     }
     `
     return axios.post('/graphql', {query})
-  }
+}
 
-  function sendEditStatus ({postId, userId, token, isLock}) {
+function sendEditStatus ({postId, userId, token, isLock}) {
     let query;
     if (isLock) {
         query = `
@@ -167,14 +168,13 @@ function getOnePost (args) {
         }
         `
     }
-    
     return axios.post('/graphql', {query});
-    }
+}
     
-    function deleteDraft ({token, userId, postId}) {
+function deleteDraft ({token, userId, draftId}) {
         const query = `
         postDelete(
-            postId: ${postId},
+            postId: ${draftId},
             token: "${token}",
             userId: "${userId}",
             absolute: 1
@@ -197,4 +197,4 @@ function getOnePost (args) {
         )
         `
         return axios.post('/graphql', {query});   
-    }
+}

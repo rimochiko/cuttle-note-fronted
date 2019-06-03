@@ -444,7 +444,7 @@ class Page extends Component {
       if (this.state.draftId) {
         return (
           <span>
-            {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}（<span onClick={this.deleteDraft.bind(this)}>舍弃</span>）
+            {this.state.lastSaveUser.nickname} 最后保存于 {this.state.lastSaveTime}（<span className="btn-text" onClick={this.deleteDraft.bind(this)}>舍弃</span>）
           </span>
         )
       } else {
@@ -480,7 +480,8 @@ class Page extends Component {
           if (res === 1) {
             // 删除成功
             this.setState({
-              draftId: null
+              draftId: null,
+              lastSaveTime: ''
             })
           }
         })
@@ -546,10 +547,11 @@ class Page extends Component {
                     )}/>
                 </Switch>
                 <div className="edit-footer">
-                  <p>
+                  <p><span className="label">{this.state.space.type === GROUP ? "团队": "个人"}</span>
                     <Link to={this.state.space.type === "user" ? `/library/user/${this.state.space.id}` : `/library/group/${this.state.space.id}`}>
                     {this.state.space.name}
-                    </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.generateSaveStatus()}</p>
+                    </Link>  / <span className="tip-bold">{this.state.title || '未命名'}</span> <FontAwesomeIcon icon={['far', 'caret-square-down']} className="set-btn" onClick={this.toggleMoreSetting.bind(this)}/>{this.generateSaveStatus()}
+                  </p>
                   <div className="btns-box">
                     <button className="radius-btn sub-btn" onClick={()=> {
                       clearTimeout(this.state.changeTimer);
