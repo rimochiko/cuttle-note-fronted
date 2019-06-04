@@ -54,7 +54,7 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            if (res) {
+            if (res.code === 0) {
                 // 喜欢成功
                 let post = Object.assign({},this.state.post, {
                     isLike: true,
@@ -84,7 +84,7 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            if (res) {
+            if (res.code === 0) {
                 // 取消喜欢成功
                 let post = Object.assign({},this.state.post, {
                     isLike: false,
@@ -114,7 +114,7 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            if (res) {
+            if (res.code === 0) {
                 // 收藏成功
                 let post = Object.assign({},this.state.post, {
                     isCollect: true
@@ -143,7 +143,7 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            if (res) {
+            if (res.code === 0) {
                 // 取消收藏成功
                 let post = Object.assign({},this.state.post, {
                     isCollect: false
@@ -188,7 +188,7 @@ class Section extends Component {
         })
         .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
                 // 评论成功
                 this.setState({
                     reply: {
@@ -197,7 +197,7 @@ class Section extends Component {
                     },
                     comment: '',
                     post: Object.assign({}, this.state.post, {
-                        comments: res.comments
+                        comments: res.result
                     })
                 });
                 this.props.showTooltip("添加评论成功:)")

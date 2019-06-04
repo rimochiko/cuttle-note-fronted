@@ -22,8 +22,11 @@ function createChart (args) {
             imgbase: "${args.imgbase || ''}"
         ) {
             code
-            postId
-            date
+            msg
+            result {
+                id,
+                date
+            }
         }
     }`: `
     mutation {
@@ -39,8 +42,11 @@ function createChart (args) {
             groupId: ${args.groupId}
         ) {
             code
-            postId
-            date
+            msg
+            result {
+                id,
+                date
+            }
         }
     }`;
 
@@ -72,8 +78,11 @@ function updateChart (args) {
             imgbase: "${args.imgbase || ''}"
         ) {
             code
-            postId
-            date
+            msg
+            result {
+                id,
+                date
+            }
         }
     }`: `
     mutation {
@@ -91,8 +100,11 @@ function updateChart (args) {
             groupId: "${args.groupId}"
         ) {
             code
-            postId
-            date
+            msg
+            result {
+                id,
+                date
+            }
         }
     }`;
 
@@ -116,7 +128,8 @@ function getOnePost (args) {
         token: "${args.token}"
       ) {
         code,
-        post {
+        msg,
+        result {
           author {
             nickname
             id
@@ -153,7 +166,11 @@ function sendEditStatus ({postId, userId, token, isLock}) {
                 postId: ${postId},
                 userId: "${userId}",
                 token: "${token}"
-            )
+            ) {
+                code
+                msg
+                result
+            }
         }
         `;
     } else {
@@ -164,7 +181,10 @@ function sendEditStatus ({postId, userId, token, isLock}) {
                 postId: ${postId},
                 userId: "${userId}",
                 token: "${token}"
-            )
+            ) {
+                code
+                msg
+            }
         }
         `
     }
@@ -178,7 +198,10 @@ function deleteDraft ({token, userId, draftId}) {
             token: "${token}",
             userId: "${userId}",
             absolute: 1
-        )
+        ) {
+            code
+            msg
+        }
         `;
         return axios.post('/graphql', {query});   
     }
@@ -194,7 +217,10 @@ function deleteDraft ({token, userId, draftId}) {
             userId: "${userId}",
             token: "${token}",
             postId: ${postId}
-        )
+        ) {
+            code
+            msg
+        }
         `
         return axios.post('/graphql', {query});   
 }

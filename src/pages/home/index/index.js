@@ -62,12 +62,17 @@ class Page extends Component {
           let recent = data.data.recent,
               news = data.data.news,
               statistic = data.data.statistic;
-          statistic.charts =  statistic && statistic.charts && statistic.charts.map(item => JSON.parse(item))
-          this.generatePostLink(recent && recent.posts);
+
+          if (statistic && statistic.code === 0) {
+            statistic.result.charts =  statistic.result && statistic.result.charts.map(item => JSON.parse(item))
+          }
+          if (recent && recent.code === 0) {
+            this.generatePostLink(recent.result);            
+          }
           this.setState({
-            recentViews: recent && recent.code === 1 ? recent.posts : [],
-            news: news && news.code === 1 ? news.options: [],
-            statistic: statistic || defaultStatistic
+            recentViews: recent && recent.code === 0 ? recent.result : [],
+            news: news && news.code === 0 ? news.result: [],
+            statistic: statistic.result || defaultStatistic
           })             
       })
     }

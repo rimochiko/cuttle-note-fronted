@@ -18,7 +18,25 @@ const USER = "user";
 function userPostQuery (args) {
     const query = `
     query {
-      data:
+      drafts:
+      draftPosts(
+        userId: "${args.userId}",
+        token: "${args.token}",
+        type: 0,
+        noFind: "${args.noFind}"
+      ) {
+        code,
+        msg,
+        result {
+          id
+          status
+          title
+          date
+          author
+          parent
+        }
+      }
+      posts:
       userPosts(
        userId: "${args.userId}",
        token: "${args.token}",
@@ -26,38 +44,31 @@ function userPostQuery (args) {
        author: "${args.author}"
      ) {
        code,
-       drafts {
-        id
-        status
-        title
-        date
-        author
-        parentId
-       }
-       posts {
+       msg,
+       result {
         id
         status
         title
         author,
-        parentId,
+        parent,
         children {
           id
           status
           title
           author,
-          parentId,
+          parent,
           children {
             id,
             status,
             title,
             author,
-            parentId,
+            parent,
             children {
               id,
               status,
               title,
               author
-              parentId
+              parent
             }
           }
         }
@@ -70,7 +81,26 @@ function userPostQuery (args) {
 function groupPostQuery (args) {
     const query = `
     query {
-      data:
+      drafts:
+      draftPosts(
+        userId: "${args.userId}",
+        token: "${args.token}",
+        type: 0,
+        noFind: "${args.noFind}",
+        groupId: "${args.groupId}"
+      ) {
+        code,
+        msg,
+        result {
+          id
+          status
+          title
+          date
+          author
+          parent
+        }
+      }
+      posts:
       groupPosts(
        userId: "${args.userId}",
        token: "${args.token}",
@@ -78,38 +108,31 @@ function groupPostQuery (args) {
        groupId: "${args.groupId}"
      ) {
        code,
-       drafts {
-        id
-        status
-        title
-        date
-        author
-        parentId
-       }
-       posts {
+       msg,
+       result {
         id
         status
         title
         author,
-        parentId,
+        parent,
         children {
           id
           status
           title
           author,
-          parentId,
+          parent,
           children {
             id,
             status,
             title,
             author,
-            parentId,
+            parent,
             children {
               id,
               status,
               title,
               author
-              parentId
+              parent
             }
           }
         }
@@ -149,7 +172,10 @@ function userDelPostQuery (args) {
         userId:"${args.userId}",
         postId:${args.postId},
         token:"${args.token}"
-      )
+      ) {
+        code,
+        msg
+      }
     }`
     return axios.post('/graphql', {query});
 }
@@ -163,7 +189,10 @@ function groupDelPostQuery (args) {
             postId:${args.postId},
             token:"${args.token}",
             groupId:"${args.groupId}",
-        )
+        ) {
+          code,
+          msg
+        }
     }`
     return axios.post('/graphql', {query});
 }
@@ -178,7 +207,8 @@ function getOnePost (args) {
       token: "${args.token}"
     ) {
       code,
-      post {
+      msg,
+      result {
         id,
         author {
           nickname,
@@ -221,7 +251,10 @@ function addFollow (args) {
       userId: "${args.userId}",
       token: "${args.token}",
       followId: "${args.followId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }
   `;
   return axios.post('/graphql', {query});
@@ -235,7 +268,10 @@ function cancelFollow (args) {
       userId: "${args.userId}",
       token: "${args.token}",
       followId: "${args.followId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }
   `;
   return axios.post('/graphql', {query});
@@ -248,14 +284,22 @@ function getOwnerInfo (params, userId) {
          isFollowed(
           userId:"${userId}",
           followId: "${params.owner}"
-         )
+         ) {
+           code,
+           msg,
+           result
+         }
          data:
          userEasy(
-           id:"${params.owner}"
+           userId:"${params.owner}"
          ) {
-          avatar
-          id
-          nickname
+           code,
+           msg,
+           result {
+            avatar
+            id
+            nickname             
+           }
         }
        }`:
        `query {
@@ -263,9 +307,13 @@ function getOwnerInfo (params, userId) {
          groupEasy(
            id:"${params.owner}"
          ) {
-           id
-           avatar
-           nickname
+            code,
+            msg,
+            result {
+            avatar
+            id
+            nickname             
+            }
          }
        }`;
       return axios.post('/graphql', {query})

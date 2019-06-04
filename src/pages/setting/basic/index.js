@@ -41,19 +41,22 @@ class Page extends Component {
         userId: this.props.userStore.user.userId
       })
       .then(({data})=> {
-          let res = data.data.data;
-          this.setState({
-            nickname: res.nickname,
-            des: res.des,
-            sex: res.sex,
-            location: res.location,
-            avatar: res.avatar,
-            tNickname: res.nickname || '',
-            tDes: res.des || '',
-            tSex: res.sex,
-            tLocation: res.location || '',
-            tAvatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
-          })         
+          let response = data.data.data;
+          if (response.code === 0) {
+            let res = response.result;
+            this.setState({
+              nickname: res.nickname,
+              des: res.des,
+              sex: res.sex,
+              location: res.location,
+              avatar: res.avatar,
+              tNickname: res.nickname || '',
+              tDes: res.des || '',
+              tSex: res.sex,
+              tLocation: res.location || '',
+              tAvatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
+            })              
+          }
       })
       .catch((err) => {
         this.props.userStore.logOut();
@@ -75,8 +78,8 @@ class Page extends Component {
         location: this.state.tLocation
       })
       .then(({data}) => {
-        let res = data.data.data;
-        if (res.code === 1) {
+        let response = data.data.data;
+        if (response.code === 0) {
           // 修改成功
           this.setState({
             tipText: "资料修改成功，请刷新页面"
@@ -84,7 +87,7 @@ class Page extends Component {
           this.refs.tooltip.show()
           this.props.userStore.updateProfile({
             nickname: this.state.tNickname,
-            avatar: res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: ''
+            avatar: response.result.avatar ? `http://localhost:8080/static/user/${response.result.avatar}`: ''
           })
         }
       })

@@ -65,11 +65,11 @@ class Page extends Component {
         token: userStore.user.token
       })
       .then(({data}) => {
-        let res = data.data.data;
-        if (res.code === 1) {
+        let response = data.data.data;
+        if (response.code === 0) {
           // 请求成功
           this.setState({
-            users: res.infos
+            users: response.result
           });
         }
       })
@@ -103,11 +103,11 @@ class Page extends Component {
           fromId: fromUser
         })
         .then(({data}) => {
-          let res = data.data.data;
-          if (res.code === 1) {
+          let response = data.data.data;
+          if (response.code === 0) {
             // 请求成功
             this.setState({
-              infos: res.infos,
+              infos: response.result,
               user: user
             });
           }
@@ -156,10 +156,10 @@ class Page extends Component {
           search: search
         })
         .then(({data}) => {
-          let res = data.data.data;
-          if (res.code === 1) {
+          let response = data.data.data;
+          if (response.code === 0) {
             this.setState({
-              members: res.users
+              members: response.result
             })
           }
         })
@@ -189,13 +189,13 @@ class Page extends Component {
         content: this.state.sendText
       })
       .then(({data}) => {
-        let res = data.data.data;
-        if (res.code === 1) {
+        let response = data.data.data;
+        if (response.code === 0) {
           // 发送成功
           this.setState({
             infos: [
               ...this.state.infos,
-              res.info
+              response.info
             ],
             sendMessage: ''
           });
@@ -215,19 +215,15 @@ class Page extends Component {
         infoId: infoId
       })
       .then(({data}) => {
-        let res = data.data.data;
-        if(res === 1) {
+        let response = data.data.data;
+        if(response.code === 0) {
           this.setState({
             tipText: '成功接受邀请'
           })
           // 如果要显示的话，还得后台返回消息数据
-        } else if(res === 2) {
+        } else {
           this.setState({
-            tipText: '邀请已失效'
-          })
-        } else if(res === 3) {
-          this.setState({
-            tipText: '你已是团队成员'
+            tipText: response.msg
           })
         }
         this.refs.tooltip.show();
@@ -295,8 +291,8 @@ class Page extends Component {
         content: this.state.selectText
       })
       .then(({data}) => {
-        let res = data.data.data;
-        if (res.code === 1) {
+        let response = data.data.data;
+        if (response.code === 0) {
           // 发送成功
           this.refs.addBubble.toggle();
           this.setState({

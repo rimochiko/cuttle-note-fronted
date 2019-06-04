@@ -103,19 +103,20 @@ class Page extends Component {
     })
     .then(({data}) => {
       // 登录成功
-      let res = data.data.data;
-      if (res.code === 1) {
-        let user = {
-          token: res.token,
-          userId: res.userId,
-          nickname: res.nickname,
-          avatar: res.avatar
-        }
+      let response = data.data.data;
+      if (response.code === 0) {
+        let res = response.result,
+            user = {
+              token: res.token,
+              userId: res.userId,
+              nickname: res.nickname,
+              avatar: res.avatar
+            }
         this.props.userStore.logIn(user);
         this.props.history.push('/');
       } else {
         this.setState({
-          tipText: "密码或用户名错误",
+          tipText: response.msg,
           isLoging: false,
           loginText: '登录'
         })

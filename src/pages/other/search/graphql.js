@@ -39,8 +39,10 @@ function searchArticle (args) {
         articleSearch(
             search: "${args.search}"
         ) {
+            code,
+            msg,
             count,
-            res {
+            result {
                 id
                 title
                 content
@@ -62,8 +64,10 @@ function searchChart (args) {
         chartSearch(
             search: "${args.search}"
         ) {
+            code,
+            msg,
             count,
-            res {
+            result {
                 id
                 title
                 content
@@ -85,8 +89,10 @@ function searchGroup (args) {
         groupSearch(
             search: "${args.search}"
         ) {
+            code,
+            msg,
             count,
-            res {
+            result {
                 id
                 nickname
                 avatar
@@ -106,8 +112,10 @@ function searchUser (args) {
         userSearch(
             search: "${args.search}"
         ) {
+            code,
+            msg,
             count,
-            res {
+            result {
                 id
                 nickname
                 avatar

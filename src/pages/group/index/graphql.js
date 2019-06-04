@@ -23,9 +23,13 @@ function getGroupEasy (args) {
               groupEasy(
                 id:"${args.id}"
               ) {
-                id
-                avatar
-                nickname
+                code,
+                msg,
+                result {
+                  id
+                  avatar
+                  nickname
+                }
               }
             }`;
     return axios.post('/graphql', {query})
@@ -39,7 +43,8 @@ function getMembers (args) {
           groupId: "${args.groupId}"
       ) {
           code
-          member {
+          msg
+          result {
             id,
             nickname,
             avatar,
@@ -61,7 +66,8 @@ function searchUsers (args) {
       search: "${args.search}"
     ) {
       code
-      users {
+      msg
+      result {
         id
         avatar
         nickname
@@ -77,7 +83,10 @@ function inviteUser (args) {
       token: "${args.token}",
       userId: "${args.userId}",
       users: ${args.users}
-    )
+    ) {
+      code,
+      msg
+    }
   `;
   return axios.post('/graphql', {query});
 }
@@ -94,7 +103,10 @@ function createGroup (args) {
        name: "${args.tName}",
        auth: ${args.tPublic ? 1 : 0},
        avatar: "${args.tAvatar}"
-   )
+   ) {
+     code,
+     msg
+   }
   }
  `
   return axios({
@@ -113,7 +125,11 @@ function checkGroupId (args) {
     data:
     isGroupExist(
       id: "${args.id}"
-    )
+    ) {
+      code,
+      msg,
+      result
+    }
   }
   `
   return axios.post('/graphql', {query})
@@ -133,7 +149,10 @@ function sendInvite (args) {
       userId: "${args.userId}",
       objects: [${ids}],
       groupId: "${args.groupId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }
   `;
   return axios.post('/graphql', {query})  
@@ -149,7 +168,8 @@ function getHomeData (args) {
       groupId: "${args.groupId}"
     ) {
       code
-      options {
+      msg
+      result {
         id
         user {
           id
@@ -172,12 +192,16 @@ function getHomeData (args) {
       userId: "${args.userId}",
       groupId: "${args.groupId}"
     ){
-      textNum 
-      imgNum 
-      viewNum 
-      likeNum
-      dates
-      charts 
+      code
+      msg
+      result {
+        textNum 
+        imgNum 
+        viewNum 
+        likeNum
+        dates
+        charts 
+      }
     }
   }
   `;
@@ -193,7 +217,10 @@ function deleteUser (args) {
       userId: "${args.userId}",
       groupId: "${args.groupId}",
       objectId: "${args.objectId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }
   `;
   return axios.post('/graphql', {query});
@@ -214,7 +241,10 @@ function exitGroup ({
       userId: "${userId}",
       groupId: "${groupId}",
       objectId: "${objectId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }`;
   return axios.post('/graphql', {query});
 }
@@ -235,7 +265,10 @@ function changeUserRole ({
       groupId: "${groupId}",
       objectId: "${objectId}",
       isAdmin: ${isAdmin ? true : false}
-    )
+    ) {
+      code,
+      msg
+    }
   }
   `
   return axios.post('/graphql', {query});
@@ -266,7 +299,10 @@ function updateGroup ({
         name: "${name}",
         auth: ${auth ? 1 : 0},
         avatar: "${avatar}"
-    )    
+    ) {
+      code,
+      msg
+    }
   }
   `
   return axios({

@@ -28,8 +28,11 @@ function createPost (args) {
                     groupId: "${args.groupId}"
                 ) {
                     code,
-                    postId,
-                    date
+                    msg,
+                    result {
+                        id,
+                        date
+                    }
                 }
             }`;        
         } else {
@@ -46,8 +49,11 @@ function createPost (args) {
                     groupId: "${args.groupId}"
                 ) {
                     code,
-                    postId,
-                    date
+                    msg,
+                    result {
+                        id,
+                        date
+                    }
                 }
             }`;         
         }
@@ -66,8 +72,11 @@ function createPost (args) {
                     parentId: ${args.parentId}
                 ) {
                     code,
-                    postId,
-                    date
+                    msg,
+                    result {
+                        id,
+                        date
+                    }
                 }
             }`;        
         } else {
@@ -83,8 +92,11 @@ function createPost (args) {
                     publish: ${args.publish}
                 ) {
                     code,
-                    postId,
-                    date
+                    msg,
+                    result {
+                        id,
+                        date
+                    }
                 }
             }`;         
         }
@@ -119,8 +131,11 @@ function updatePost (args) {
                 groupId: "${args.groupId}"
             ) {
                 code,
-                date,
-                postId
+                msg,
+                result {
+                    id,
+                    date
+                }
             }
         }`;
     } else {
@@ -138,8 +153,11 @@ function updatePost (args) {
                 draftId: ${args.draftId || 0}
             ) {
                 code,
-                date,
-                postId
+                msg,
+                result {
+                    id,
+                    date
+                }
             }
         }`;
     }
@@ -164,28 +182,29 @@ query {
     token: "${args.token}",
     isUpdate: ${args.isUpdate ? true : false}
     ) {
-    code,
-    post {
-        author {
-        nickname
-        id
+        code,
+        msg,
+        result {
+            author {
+                nickname
+                id
+            }
+            belongGroup {
+                nickname
+                id
+            }
+            recentTime
+            recentUser {
+                nickname
+                id
+            }
+            title
+            content,
+            parent,
+            status,
+            auth,
+            type
         }
-        belongGroup {
-            nickname
-            id
-        }
-        recentTime
-        recentUser {
-        nickname
-        id
-        }
-        title
-        content,
-        parent,
-        status,
-        auth,
-        type
-    }
     }
 }
 `
@@ -202,15 +221,18 @@ return axios({
 function uploadImage ({userId, token, imgbase}) {
     const query = `
     mutation {
-    data:
-    uploadImage(
-        userId: "${userId}",
-        token: "${token}",
-        imgbase: "${imgbase}"            
-    ) {
-        code,
-        url
-    }
+        data:
+        uploadImage(
+            userId: "${userId}",
+            token: "${token}",
+            imgbase: "${imgbase}"            
+        ) {
+            code,
+            msg,
+            result {
+                url
+            }
+        }
     }
     `;
     return axios({
@@ -233,7 +255,10 @@ if (isLock) {
             postId: ${postId},
             userId: "${userId}",
             token: "${token}"
-        )
+        ) {
+            code,
+            msg
+        }
     }
     `;
 } else {
@@ -244,7 +269,10 @@ if (isLock) {
             postId: ${postId},
             userId: "${userId}",
             token: "${token}"
-        )
+        ) {
+            code,
+            msg
+        }
     }
     `
 }
@@ -261,7 +289,10 @@ function deleteDraft ({token, userId, draftId}) {
             token: "${token}",
             userId: "${userId}",
             absolute: 1
-        )        
+        ) {
+            code,
+            msg
+        }   
     }
 
     `;
@@ -281,9 +312,11 @@ function lockPost ({
             userId: "${userId}",
             token: "${token}",
             postId: ${postId}
-        )        
+        ) {
+            msg,
+            code
+        }      
     }
-
     `
     return axios.post('/graphql', {query});   
 }

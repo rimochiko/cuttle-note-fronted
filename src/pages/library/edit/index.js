@@ -86,14 +86,14 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if(res.code === 1) {
+          if(res.code === 0) {
             // 请求成功
             let space = {
                 id: '',
                 name: '',
                 type: ''            
             };
-            let post = res.post;
+            let post = res.result;
             if (res.post.belongGroup) {
               space.id = post.belongGroup.id;
               space.name = post.belongGroup.nickname;
@@ -187,16 +187,10 @@ class Page extends Component {
       .then(({data}) => {
         let res = data.data.data;
         console.log('lockres:' + res);
-        if (res !== 0) {
+        if (res.code !== 0) {
           // 保存一份草稿
           this.saveDraft();
-          if (res === 1) {
-            this.showTooltip("文档内容有更新，请重新读取");
-          } else if (res === 2) {
-            this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
-          } else {
-            this.showTooltip("请求文章内容失败");
-          }
+          this.showTooltip(res.msg);
           setTimeout(() => {
             history.goBack();
           }, 1000);          
@@ -308,10 +302,10 @@ class Page extends Component {
           Qlquery.createPost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                draftId: res.postId,
-                lastSaveTime: res.date
+                draftId: res.result.id,
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -328,9 +322,9 @@ class Page extends Component {
           Qlquery.updatePost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -348,10 +342,10 @@ class Page extends Component {
           Qlquery.createPost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                draftId: res.postId,
-                lastSaveTime: res.date
+                draftId: res.result.id,
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -368,9 +362,9 @@ class Page extends Component {
           Qlquery.updatePost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -414,7 +408,7 @@ class Page extends Component {
         Qlquery.updatePost(params)
         .then(({data}) => {
           let res = data.data.data;
-          if (res.code === 1) {
+          if (res.code === 0) {
             let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${this.state.postId}`
             this.props.history.push(url)
           }
@@ -431,8 +425,8 @@ class Page extends Component {
           Qlquery.updatePost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
-              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+            if (res.code === 0) {
+              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url)
             }
           })
@@ -444,9 +438,9 @@ class Page extends Component {
           Qlquery.createPost(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               // 跳转页面
-              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+              let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url)
             }
           })
@@ -691,9 +685,9 @@ class Page extends Component {
       .then(({data}) => {
         let res =data.data.data;
         console.log(res);
-        if (res.code === 1) {
+        if (res.code === 0) {
           this.setState({
-            imgSrc: res.url
+            imgSrc: res.result.url
           })
           this.addTextStyle('image');
           this.refs.addImage.toggle();
@@ -829,7 +823,7 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if (res) {
+          if (res.code === 0) {
             // 删除成功
             this.setState({
               draftId: null,

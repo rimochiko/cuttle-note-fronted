@@ -29,13 +29,17 @@ export default class Store {
         const query = `
         mutation {
           data:
-          userVerify(userId: "${user.userId}",token: "${user.token}")
+          userVerify(userId: "${user.userId}",token: "${user.token}") {
+            code,
+            msg,
+            result
+          }
         }`;
           
         await axios.post('/graphql', {query})
         .then(({data}) => {
-          let res = data.data.data;
-          if (res === 1) {
+          let response = data.data.data;
+          if (response.code === 0) {
             // 验证成功
             let obj = {
               token: user.token,
@@ -107,12 +111,20 @@ export default class Store {
             id,
             nickname,
             avatar
+          } {
+            code,
+            msg,
+            result
           },
           follow:
           userFollow(userId: "${this.user.userId}") {
             id,
             nickname,
             avatar
+          } {
+            code,
+            msg,
+            result
           }
         }
         `;
@@ -120,8 +132,9 @@ export default class Store {
         .then(({data}) => {
           let fans = data.data.fans,
               follows = data.data.follow;
-          this.fans = fans;
-          this.follows = follows;
+          
+          this.fans = fans.code === 0 ? fans : [];
+          this.follows = follows.code === 0? follows : [];
         })
         .catch((err) => {
           console.log(err);
@@ -135,13 +148,17 @@ export default class Store {
         const query = `
           query {
             data:
-            getUnreadCount (userId: "${this.user.userId}",token: "${this.user.token}")
+            getUnreadCount (userId: "${this.user.userId}",token: "${this.user.token}") {
+              code,
+              msg,
+              result
+            }
           }
         `;
         await axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
-          this.infoNum = res;
+          this.infoNum = res.code === 0 ? res.result : 0;
         })
         .catch((err) => {
           console.log(err);
@@ -158,7 +175,8 @@ export default class Store {
           data:
           groupMine(userId: "${this.user.userId}",token: "${this.user.token}") {
             code,
-            group {
+            msg,
+            result{
               id,
               avatar,
               nickname
@@ -168,8 +186,8 @@ export default class Store {
         await axios.post('/graphql', {query})
         .then(({data}) => {
           let res = data.data.data;
-          if (res.code === 1) {
-            let group = res.group;
+          if (res.code === 0) {
+            let group = res.result;
             group.forEach((item) => {
               item.avatar = item.avatar ? `http://localhost:8080/static/group/${item.avatar}` : ''
             })

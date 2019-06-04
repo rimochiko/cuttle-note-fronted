@@ -193,16 +193,10 @@ class Page extends Component {
         console.log(data);
         let res = data.data.data;
         console.log('lockres:' + res);
-        if (res !== 0) {
+        if (res.code !== 0) {
           // 保存一份草稿
           this.saveDraft();
-          if (res === 1) {
-            this.showTooltip("文档内容有更新，请重新读取");
-          } else if (res === 2) {
-            this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
-          } else {
-            this.showTooltip("请求文章内容失败");
-          }
+          this.showTooltip(res.msg);
           setTimeout(() => {
             console.log('跳转页面');
             history.goBack();
@@ -255,10 +249,10 @@ class Page extends Component {
           Qlquery.createChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date,
-                draftId: res.postId
+                lastSaveTime: res.result.date,
+                draftId: res.result.id
               });
             } else {
               this.setState({
@@ -275,9 +269,9 @@ class Page extends Component {
           Qlquery.updateChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -295,10 +289,10 @@ class Page extends Component {
           Qlquery.createChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date,
-                draftId: res.postId
+                lastSaveTime: res.result.date,
+                draftId: res.result.id
               });
             } else {
               this.setState({
@@ -315,9 +309,9 @@ class Page extends Component {
           Qlquery.updateChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.date
+                lastSaveTime: res.result.date
               });
             } else {
               this.setState({
@@ -362,8 +356,8 @@ class Page extends Component {
         Qlquery.updateChart(params)
         .then(({data}) => {
           let res = data.data.data;
-          if (res.code === 1) {
-            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+          if (res.code === 0) {
+            let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
             this.props.history.push(url);
           }
         })
@@ -377,8 +371,8 @@ class Page extends Component {
           Qlquery.updateChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
-              let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+            if (res.code === 0) {
+              let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
             }
           })
@@ -390,8 +384,8 @@ class Page extends Component {
           Qlquery.createChart(params)
           .then(({data}) => {
             let res = data.data.data;
-            if (res.code === 1) {
-              let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.postId}`
+            if (res.code === 0) {
+              let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
             }
           })
@@ -477,7 +471,7 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if (res === 1) {
+          if (res.code === 0) {
             // 删除成功
             this.setState({
               draftId: null,

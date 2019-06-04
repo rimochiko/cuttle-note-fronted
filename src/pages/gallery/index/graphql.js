@@ -24,14 +24,22 @@ function getOwnerInfo (params, userId) {
        userId:"${userId}",
        token: "",
        followId: "${params.owner}"
-      )
+      ) {
+        msg
+        code
+        result
+      }
       data:
       userEasy(
-        id:"${params.owner}"
+        userId:"${params.owner}"
       ) {
-       avatar
-       id
-       nickname
+        msg
+        code
+        result {
+          avatar
+          id
+          nickname          
+        }
      }
     }`:
     `query {
@@ -39,9 +47,13 @@ function getOwnerInfo (params, userId) {
       groupEasy(
         id:"${params.owner}"
       ) {
-        id
-        avatar
-        nickname
+        msg
+        code
+        result {
+          avatar
+          id
+          nickname          
+        }
       }
     }`;
    return axios.post('/graphql', {query});
@@ -55,7 +67,11 @@ function addFollow (args) {
       userId: "${args.userId}",
       token: "${args.token}",
       followId: "${args.followId}"
-    )
+    ) {
+      msg
+      code
+      result
+    }
   }
   `;
   return axios.post('/graphql', {query});
@@ -69,7 +85,11 @@ function cancelFollow (args) {
       userId: "${args.userId}",
       token: "${args.token}",
       followId: "${args.followId}"
-    )
+    ) {
+      msg
+      code
+      result
+    }
   }
   `;
   return axios.post('/graphql', {query});
@@ -99,7 +119,24 @@ function postListQuery ({
 function userPostQuery (args) {
     const query = `
     query {
-      data:
+      drafts:
+      draftPosts(
+        userId: "${args.userId}",
+        token: "${args.token}",
+        type: 1,
+        noFind: "${args.noFind}"
+      ) {
+        code,
+        msg,
+        result {
+          id
+          status
+          title
+          date
+          author
+        }
+      }
+      posts:
       userCharts(
        userId: "${args.userId}",
        token: "${args.token}",
@@ -107,13 +144,6 @@ function userPostQuery (args) {
        author: "${args.author}"
      ) {
        code,
-       drafts {
-        id
-        status
-        title
-        date
-        author
-       }
        posts {
         id
         status
@@ -129,7 +159,24 @@ function userPostQuery (args) {
 function groupPostQuery (args) {
     const query = `
     query {
-      data:
+      drafts:
+      draftPosts(
+        userId: "${args.userId}",
+        token: "${args.token}",
+        type: 1,
+        noFind: "${args.noFind}"
+      ) {
+        code,
+        msg,
+        result {
+          id
+          status
+          title
+          date
+          author
+        }
+      }
+      posts:
       groupCharts(
        userId: "${args.userId}",
        token: "${args.token}",
@@ -137,13 +184,6 @@ function groupPostQuery (args) {
        groupId: "${args.groupId}"
      ) {
        code,
-       drafts {
-        id
-        status
-        title
-        date
-        author
-       }
        posts {
         id
         status
@@ -165,7 +205,11 @@ function userDelPostQuery (args) {
         userId:"${args.userId}",
         postId:${args.postId},
         token:"${args.token}"
-      )
+      ) {
+        code,
+        msg,
+        result
+      }
     }`
     return axios.post('/graphql', {query});
 }
@@ -179,7 +223,11 @@ function groupDelPostQuery (args) {
             postId:${args.postId},
             token:"${args.token}",
             groupId:"${args.groupId}",
-        )
+        ) {
+          code,
+          msg,
+          result
+        }
     }`
     return axios.post('/graphql', {query});
 }
@@ -194,7 +242,8 @@ function getOnePost (args) {
       token: "${args.token}"
     ) {
       code,
-      post {
+      msg,
+      result {
         id,
         author {
           nickname,
@@ -267,7 +316,10 @@ function deleteAllDraft ({
                 groupId: "${groupId}",
                 isDraft: 1,
                 type: 1,
-            )
+            ) {
+              code,
+              msg
+            }
         }
       `
   } else {
@@ -279,7 +331,10 @@ function deleteAllDraft ({
             userId: "${userId}",
             isDraft: 1,
             type: 1
-        )
+        ) {
+          code,
+          msg
+        }
     }
     `
   }

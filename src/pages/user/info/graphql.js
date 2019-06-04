@@ -17,7 +17,8 @@ function getInfoList(args) {
           userId: "${args.userId}"
         ) {
           code,
-          infos {
+          msg,
+          result {
             id
             from {
               id
@@ -44,7 +45,8 @@ function getUserInfo(args){
           fromId: "${args.fromId}"
         ) {
           code,
-          infos {
+          msg,
+          result {
             id
             from {
               id
@@ -72,8 +74,9 @@ function searchUsers(args){
       userId: "${args.userId}",
       search: "${args.search}"
     ) {
-      code
-      users {
+      code,
+      msg,
+      result {
         id
         avatar
         nickname
@@ -94,8 +97,9 @@ function sendMessage (args) {
       objectId: "${args.objectId}",
       content: "${args.content}"
     ) {
-      code
-      info {
+      code,
+      msg,
+      result {
         id
         from {
           id
@@ -120,6 +124,9 @@ function acceptInvite (args) {
       token: "${args.token}",
       infoId: ${args.infoId}
     )
+  } {
+    code,
+    msg
   }
   `
   return axios.post('/graphql', {query});

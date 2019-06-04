@@ -15,10 +15,13 @@ function login (args) {
        userId: "${args.name}",
        password: "${args.password}") {
          code,
-         token,
-         userId,
-         avatar,
-         nickname
+         msg,
+         result {
+          token,
+          userId,
+          avatar,
+          nickname
+         }
        }
      }`;
       
@@ -34,11 +37,14 @@ function register (args) {
       password: "${args.password}",
       mail: "${args.mail}"
     ) {
-      token,
-      userId,
-      avatar,
-      nickname,
-      code
+      code,
+      msg,
+      result {
+        token,
+        userId,
+        avatar,
+        nickname
+      }
     }
   }`;
   
@@ -47,16 +53,26 @@ function register (args) {
 
 function checkMail (args) {
   const query = `query {
-    isExist:
-    isMailNone(mail: "${args.mail}")}`;
+    data:
+    isMailNone(mail: "${args.mail}") {
+      code,
+      msg,
+      result
+    }
+  }`;
     
   return axios.post('/graphql', {query});
 }
 
 function checkName (args) {
   const query = `query {
-    isExist:
-    isUserNone(userId: "${args.name}")}`;
+    data:
+    isUserNone(userId: "${args.name}") {
+      code,
+      msg,
+      result
+    }
+  }`;
 
   return axios.post('/graphql', {query})
 }

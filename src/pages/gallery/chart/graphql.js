@@ -16,7 +16,10 @@ function like (args) {
           postId: ${args.id},
           token: "${args.token}",
           userId: "${args.userId}"
-      )
+      ) {
+        code,
+        msg
+      }
     }
   `
   return axios.post('/graphql', {query})
@@ -30,7 +33,10 @@ function unLike(args) {
                 postId: ${args.id},
                 token: "${args.token}",
                 userId: "${args.userId}"
-            )
+            ) {
+              code,
+              msg
+            }
           }
         `;
     return axios.post('/graphql', {query})
@@ -44,7 +50,10 @@ function collect ({postId, token, userId}) {
           postId: ${postId},
           token: "${token}",
           userId: "${userId}"
-      )
+      ) {
+        code,
+        msg
+      }
     }
   `
   return axios.post('/graphql', {query})
@@ -58,7 +67,10 @@ function unCollect ({postId, token, userId}) {
         postId: ${postId},
         token: "${token}",
         userId: "${userId}"
-    )
+    ) {
+      code,
+      msg
+    }
   }
 `
 return axios.post('/graphql', {query})
@@ -76,7 +88,8 @@ function comment ({postId, token, userId, replyId, comment}) {
                 content: "${escape(comment)}",
             ) {
                 code
-                comments {
+                msg
+                result {
                     id
                     creatorId
                     creatorName
@@ -99,7 +112,8 @@ function comment ({postId, token, userId, replyId, comment}) {
               content: "${escape(comment)}",
           ) {
               code
-              comments {
+              msg
+              result {
                   id
                   creatorId
                   creatorName

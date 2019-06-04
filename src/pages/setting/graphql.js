@@ -17,8 +17,11 @@ function updateProfile (args) {
             location: "${args.location}",
             sex: ${args.sex}
         ) {
-          code
-          avatar
+          code,
+          msg,
+          result {
+            avatar
+          }
         }
     }
   `;
@@ -36,12 +39,16 @@ function getProfile (args) {
     const query = `
       query {
         data:
-        userEasy(id: "${args.userId}") {
-            avatar
-            nickname
-            des
-            location
-            sex
+        userEasy(userId: "${args.userId}") {
+            code,
+            msg,
+            result {
+              avatar
+              nickname
+              des
+              location
+              sex
+            }
         }
       }
     `;

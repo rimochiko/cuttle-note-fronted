@@ -12,8 +12,9 @@ function getHomeData (args) {
           token: "${args.token}",
           userId: "${args.userId}"
         ) {
-          code
-          posts {
+          code,
+          msg,
+          result {
             id
             title
             group {
@@ -35,8 +36,9 @@ function getHomeData (args) {
           token: "${args.token}",
           userId: "${args.userId}"
         ) {
-          code
-          options {
+          code,
+          msg,
+          result {
             id
             user {
               id
@@ -58,12 +60,16 @@ function getHomeData (args) {
             token: "${args.token}",
             userId: "${args.userId}"
           ){
-          textNum 
-          dates
-          imgNum 
-          viewNum 
-          likeNum
-          charts 
+            code,
+            msg,
+            result {
+              textNum 
+              dates
+              imgNum 
+              viewNum 
+              likeNum
+              charts 
+            }
           }
     }
     `

@@ -86,15 +86,18 @@ class Page extends Component {
         name: this.state.name
       })
       .then(({data}) => {
-        if(data.data.isExist === 1) {
-          this.setState({
-              isNameTipHide: false,
-              nameTip: '用户名已经存在'
-          })
-        } else {
-          this.setState({
-            isNameTipHide: true
-          })
+        let response = data.data.data;
+        if(response.code === 0) {
+          if (response.result) {
+            this.setState({
+                isNameTipHide: false,
+                nameTip: '用户名已经存在'
+            })            
+          } else {
+            this.setState({
+              isNameTipHide: true
+            })            
+          }
         }
       })
       .catch((err) => {
@@ -142,17 +145,20 @@ class Page extends Component {
         mail: this.state.mail
       })
       .then(({data}) => {
-        if(data.data.isExist === 1) {
-          this.setState({
-            isMailTipHide: false,
-            mailTip: '邮箱已经存在',
-            isDisabled: true
-          })
-        } else {
-          this.setState({
-            isMailTipHide: true,
-            isDisabled: false
-          })
+        let response = data.data.data;
+        if (response.code === 0) {
+          if(response.result) {
+            this.setState({
+              isMailTipHide: false,
+              mailTip: '邮箱已经存在',
+              isDisabled: true
+            })
+          } else {
+            this.setState({
+              isMailTipHide: true,
+              isDisabled: false
+            })
+          }          
         }
       })
       .catch((err) => {
@@ -188,14 +194,15 @@ class Page extends Component {
     })
     .then(({data}) => {
       // 注册成功
-      let res = data.data.data;
-      if (res.code === 1) {
-        let user = {
-          token: res.token,
-          userId: res.userId,
-          nickname: res.nickname,
-          avatar: res.avatar
-        }
+      let response = data.data.data;
+      if (response.code === 0) {
+        let res = response.result,
+            user = {
+              token: res.token,
+              userId: res.userId,
+              nickname: res.nickname,
+              avatar: res.avatar
+            }
         this.props.userStore.logIn(user);
         this.props.history.push('/');
       } else { 

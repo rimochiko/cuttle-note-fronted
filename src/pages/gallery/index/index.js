@@ -142,7 +142,7 @@ class Page extends Component {
           if(res.code === 1) {
             // 请求成功
             this.setState({
-              post: res.post
+              post: res.result
             })
           } else {
             this.showTooltip("请求文章失败:(");
@@ -161,7 +161,8 @@ class Page extends Component {
       let owner = {};
       await Qlquery.getOwnerInfo(params,userId)
       .then(({data}) => {
-        let res = data.data.data;
+        let response = data.data.data,
+            res = response.result;
         let isFollow = data.data.isFollow;
         let avatar;
         if (params.obj === USER) {
@@ -175,7 +176,7 @@ class Page extends Component {
             name: res.nickname,
             avatar: avatar,
             type: params.obj,
-            isFollow: isFollow
+            isFollow: isFollow.result
           }
         }
       })
@@ -210,11 +211,12 @@ class Page extends Component {
 
      await Qlquery.postListQuery(objs)
      .then(({data}) => {
-       let res = data.data.data;
-       if(res.code === 1) {
+       let posts = data.data.posts,
+           drafts = data.data.drafts;
+       if(posts.code === 0) {
          this.setState({
-           posts: res.posts,
-           draftList: res.drafts
+           posts: posts.result,
+           draftList: drafts.result
          })
        } else {
          this.setState({
@@ -251,7 +253,7 @@ class Page extends Component {
       await Qlquery.deletePost(params)
       .then(({data}) => {
         let res = data.data.data;
-        if(res) {
+        if(res.code === 0) {
           // 删除成功
           let match = this.props.match.params;
           this.showRemovePost();
@@ -285,7 +287,7 @@ class Page extends Component {
           .then(({data}) => {
             let res = data.data.data;
             console.log(res);
-            if(res) {
+            if(res.code === 0) {
               // 删除成功
               this.showTooltip("草稿已移除:)")
               let index;
@@ -311,7 +313,7 @@ class Page extends Component {
         Qlquery.deleteAllDraft(params)
         .then(({data}) => {
           let res = data.data.data;
-          if(res) {
+          if(res.code === 0) {
             // 删除成功
             this.showTooltip("草稿已全部移除:)")
             this.setState({
@@ -407,7 +409,7 @@ class Page extends Component {
           })
           .then(({data}) => {
             let res = data.data.data;
-            if (res === 1) {
+            if (res.code === 0) {
               let object = Object.assign({}, this.state.object, {isFollow: true})
               this.setState({
                 object: object
@@ -433,7 +435,7 @@ class Page extends Component {
           })
           .then(({data}) => {
             let res = data.data.data;
-            if (res === 1) {
+            if (res.code === 0) {
               let object = Object.assign({}, this.state.object, {isFollow: false})
               this.setState({
                 object: object

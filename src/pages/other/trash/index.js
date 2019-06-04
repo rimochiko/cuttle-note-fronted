@@ -44,8 +44,9 @@ class Page extends Component {
             userId: "${this.props.userStore.user.userId}",
             token: "${this.props.userStore.user.token}"
           ) {
-            code
-            posts {
+            code,
+            msg,
+            result {
               id
               title
               recentTime
@@ -56,9 +57,9 @@ class Page extends Component {
       axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        if(res.code === 1) {
+        if(res.code === 0) {
           this.setState({
-            posts: res.posts
+            posts: res.result
           });
         }
       })
@@ -85,7 +86,7 @@ class Page extends Component {
       axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        if(res.code === 1) {
+        if(res.code === 0) {
           this.setState({
             posts: []
           });
@@ -145,7 +146,19 @@ class Page extends Component {
       axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        if(res.code === 1) {
+        if(res.code === 0) {
+          // 恢复删除草稿
+          let index;
+          this.state.posts && this.state.posts.forEach((item, index1) => {
+            if (item.id === id) {
+              index = index1;
+            }
+          });
+          let posts = this.state.posts.slice(0);
+          posts.splice(index, 1);
+          this.setState({
+            posts
+          })
         }
       })
       .catch((err) => {
@@ -171,7 +184,18 @@ class Page extends Component {
       axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
-        if(res.code === 1) {
+        if(res.code === 0) {
+          let index;
+          this.state.posts && this.state.posts.forEach((item, index1) => {
+            if (item.id === id) {
+              index = index1;
+            }
+          });
+          let posts = this.state.posts.slice(0);
+          posts.splice(index, 1);
+          this.setState({
+            posts
+          })
         }
       })
       .catch((err) => {

@@ -96,9 +96,9 @@ class Page extends Component {
           if (!group) {
            await Qlquery.getGroupEasy({id})
            .then(({data}) => {
-             let res = data.data.data;
-             console.log('获取到团队信息')
-             if(res.id) {
+             let response = data.data.data
+             if(response.code === 0) {
+               let res = response.result;
                group = {
                  id: res.id,
                  name: res.nickname,
@@ -120,7 +120,7 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          group.members = res.member || [];
+          group.members = res.code === 0 ? res.result : [];
         })
 
         for(let i = 0, len = group.members.length; i < len; i++) {
@@ -141,10 +141,12 @@ class Page extends Component {
         .then(({data}) => {
           let news = data.data.news,
               statistics = data.data.statistic;
-              statistics.charts =  statistics && statistics.charts && statistics.charts.map(item => JSON.parse(item))
+              statistics.result.charts =  statistics.result && 
+                                          statistics.result.charts && 
+                                          statistics.result.charts.map(item => JSON.parse(item))
           this.setState({
-            news: news.options,
-            statistics: statistics
+            news: news.result,
+            statistics: statistics.result
           })
         })
 
@@ -209,9 +211,9 @@ class Page extends Component {
      })
      .then(({data}) => {
        let res = data.data.data;
-       if(res.code === 1) {
+       if(res.code === 0) {
         this.setState({
-          searchList: res.users
+          searchList: res.result
         })         
        }
      })
@@ -497,7 +499,7 @@ class Page extends Component {
     })
     .then(({data})=> {
        let res = data.data.data;
-       if (res === 1) {
+       if (res.code === 0) {
          // 创建成功
          let id = this.state.tId;
          this.toggleCreateGroup();
@@ -535,7 +537,7 @@ class Page extends Component {
      .then(({data}) => {
        let res = data.data.data,
            text = '';
-       if (res === 1) {
+       if (res.code === 0) {
          // 修改成功
          text = "团队资料更新成功，请刷新查看"
        } else {
@@ -558,7 +560,7 @@ class Page extends Component {
     })
      .then(({data}) => {
        let res = data.data.data;
-       if (res) {
+       if (res.result > 0) {
          // 团队名存在
          this.setState({
            tIdTip: '团队域名已存在'
@@ -636,7 +638,7 @@ class Page extends Component {
     })
     .then(({data})=> {
       let res = data.data.data;
-      if(res === 1) {
+      if(res.code === 0) {
         this.setState({
           tipText: '邀请信息已发送'
         });
@@ -669,7 +671,7 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res === 1) {
+      if(res.code === 0) {
         this.setState({
           tipText: '取消管理成功'
         });
@@ -698,7 +700,7 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res === 1) {
+      if(res.code === 0) {
         this.setState({
           tipText: '设置管理成功'
         });
@@ -716,7 +718,7 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res === 1) {
+      if(res.code === 0) {
         this.setState({
           tipText: '移除成员成功'
         });

@@ -64,12 +64,12 @@ class Page extends Component {
       })
       .then(({data}) => {
         let res = data.data.data;
-        if(res && res.count) {
+        if(res.code === 0) {
           this.setState({
             type: type,
             page: params.page ? params.page : 1,
             search: params.search,
-            list: res.res,
+            list: res.result,
             count: res.count
           })
         }
