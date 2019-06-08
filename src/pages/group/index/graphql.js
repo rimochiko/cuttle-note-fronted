@@ -20,8 +20,8 @@ function getGroupEasy (args) {
     const query = 
             `query {
               data:
-              groupEasy(
-                id:"${args.id}"
+              groupOne(
+                groupId:"${args.id}"
               ) {
                 code,
                 msg,

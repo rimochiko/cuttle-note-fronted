@@ -190,6 +190,8 @@ class Section extends Component {
             let res = data.data.data;
             if (res.code === 0) {
                 // 评论成功
+                let comments = res.result;
+                console.log(comments);
                 this.setState({
                     reply: {
                         id: '',
@@ -197,7 +199,7 @@ class Section extends Component {
                     },
                     comment: '',
                     post: Object.assign({}, this.state.post, {
-                        comments: res.result
+                        comments
                     })
                 });
                 this.props.showTooltip("添加评论成功:)")
@@ -212,6 +214,31 @@ class Section extends Component {
     }
 
     generateBtn () {
+        // 大于1，说明是团队成员身份
+        if (this.state.isAuth > 1) {
+            if (this.state.isAuth === 4 || this.state.isAuth === 5) {
+                return (
+                    <p>
+                        <Link title="编辑" to={{pathname:'/article/edit', 
+                                                query: {postId: this.state.post.id,
+                                                       parentId: this.state.post.parent}}}>
+                            <FontAwesomeIcon icon="pen"/>
+                        </Link>
+                        <span title="删除" onClick={this.props.removePost}>
+                            <FontAwesomeIcon icon="trash-alt"/>
+                        </span>
+                    </p>
+                )
+            }
+            return (
+                <Link title="编辑" to={{pathname:'/article/edit', 
+                                        query: {postId: this.state.post.id,
+                                                parentId: this.state.post.parent}}}>
+                    <FontAwesomeIcon icon="pen"/>
+                </Link>
+            )
+        }
+
         if (this.state.isAuth) {
             return (
                 <p>
@@ -222,14 +249,6 @@ class Section extends Component {
                     </Link>
                     <span title="删除" onClick={this.props.removePost}>
                         <FontAwesomeIcon icon="trash-alt"/>
-                    </span>
-                </p>
-            )
-        } else {
-            return (
-                <p>
-                    <span title="文章信息" onClick={this.props.infoPost}>
-                        <FontAwesomeIcon icon="info-circle"/>
                     </span>
                 </p>
             )
@@ -281,7 +300,6 @@ class Section extends Component {
                         {
                             this.generateCollectBtn()
                         }
-                        <li><FontAwesomeIcon icon="share-alt"></FontAwesomeIcon> 分享</li>
                     </ul>
                 </div>
             )

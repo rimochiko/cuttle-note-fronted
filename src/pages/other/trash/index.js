@@ -3,6 +3,7 @@ import Header from '../../../layouts/header/header';
 import Sidebar from '../../../layouts/sidebar/sidebar';
 import './index.scss';
 import Loading from '../../../components/loading';
+import Tooltip from '../../../components/tooltip';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
@@ -10,13 +11,14 @@ import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import axios from 'axios';
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
         super();
         this.state = {
-          posts: []
+          posts: [],
+          tipText: ''
         }
         this.getTrashList = this.getTrashList.bind(this);
         this.generateTrash = this.generateTrash.bind(this);
@@ -34,7 +36,6 @@ class Page extends Component {
 
     /**
      * 获取回收站数据
-     * @param {*} type 
      */
     getTrashData () {
       const query = `
@@ -67,10 +68,16 @@ class Page extends Component {
         console.log(err);
       })
     }
+
+    showTooltip (text) {
+      this.setState({
+        tipText: text
+      });
+      this.refs.tooltip.show()
+    }
   
       /**
      * 清空回收站
-     * @param {*} type 
      */
     removeAllPost () {
       const query = `
@@ -80,7 +87,10 @@ class Page extends Component {
             userId: "${this.props.userStore.user.userId}",
             token: "${this.props.userStore.user.token}"
             isDraft: 0
-        )
+        ) {
+          code,
+          msg
+        }
       }
       `;
       axios.post('/graphql', {query})
@@ -90,6 +100,8 @@ class Page extends Component {
           this.setState({
             posts: []
           });
+        } else {
+          this.showTooltip(res.msg || "清空文档失败")
         }
       })
       .catch((err) => {
@@ -134,20 +146,23 @@ class Page extends Component {
      */
     recoverPost (id) {
       const query = `
-        query {
+        mutation {
           data:
           postRecover(
             userId: "${this.props.userStore.user.userId}",
             token: "${this.props.userStore.user.token}",
             postId: ${id}
-          )
+          ) {
+            code,
+            msg
+          }
         }
       `;
       axios.post('/graphql', {query})
       .then(({data}) => {
         let res = data.data.data;
         if(res.code === 0) {
-          // 恢复删除草稿
+          // 恢复删除文章
           let index;
           this.state.posts && this.state.posts.forEach((item, index1) => {
             if (item.id === id) {
@@ -159,6 +174,9 @@ class Page extends Component {
           this.setState({
             posts
           })
+          this.showTooltip("成功恢复文档")
+        } else {
+          this.showTooltip(res.msg || '恢复文档失败:(')
         }
       })
       .catch((err) => {
@@ -171,14 +189,17 @@ class Page extends Component {
      */
     completeRemove (id) {
       const query = `
-        query {
+        mutation {
           data:
           postDelete(
             userId: "${this.props.userStore.user.userId}",
             token: "${this.props.userStore.user.token}",
             postId: ${id},
             absolute: 1
-          )
+          ) {
+            code,
+            msg
+          }
         }
       `;
       axios.post('/graphql', {query})
@@ -196,13 +217,15 @@ class Page extends Component {
           this.setState({
             posts
           })
+          this.showTooltip("文档已彻底清除")
+        } else {
+          this.showTooltip(res.msg || "文档彻底清除失败:(")
         }
       })
       .catch((err) => {
         console.log(err);
       })
     }
-
     generateTrash () {
       if (this.state.posts && this.state.posts.length) {
         return  this.state.posts.map((item, index) => {
@@ -211,8 +234,8 @@ class Page extends Component {
       } else {
         return (
           <div className="other-no-tip">
-            <p className="title">你的回收站没有任何文章！</p>
-            <p className="des">回收站的文章在删除15天后会自动回收哦~</p>
+            <p className="title">你的回收站中没有任何文章！</p>
+            <p className="des">草稿不会收录在回收站中哦~</p>
           </div>
         )
       }
@@ -224,6 +247,7 @@ class Page extends Component {
                 <Sidebar />
                 <div className="main flex-column">
                     <Loading ref="loading" />
+                    <Tooltip ref="tooltip" text={this.state.tipText}/>
                     <Header />
                     <div className="page-header">
                       <h1 className="normal-title">我的回收站</h1>

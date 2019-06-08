@@ -34,6 +34,17 @@
         box-shadow: 0 10px 15px #eeeef8;     
     }
 }
+
+.info-user-list-none {
+    font-weight: 300;
+    margin: 2rem 0rem 2rem 2rem;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 1.1rem;
+}
 .info-user-list {
     font-weight: 300;
     margin: 2rem 0rem 2rem 2rem;
@@ -194,7 +205,8 @@
     }
     .chat-body {
         flex: 1;
-        padding: 1.5rem 2rem;
+        padding: 1.5rem 2rem .5rem;
+        overflow-y: scroll;
         .chat-one-item {
             display: flex;
             margin-bottom: 2rem;
@@ -264,6 +276,7 @@
         flex-direction: column;
         border-top: 1px solid #e9e9f4;
         padding: .5rem;
+        flex-shrink: 0;
         textarea {
             flex: 1;
             font-size: .9rem;

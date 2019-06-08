@@ -22,7 +22,6 @@ const GROUP = "group",
       USER = "user",
       ARTICLE = "library",
       CHART = "gallery";
-
 const defaultStatistic = {
             likeNum: 0,
             textNum: 0,
@@ -36,7 +35,6 @@ const defaultStatistic = {
             "lineStyle":{"color":"#d3d3e7"},
             "data":[0,0,0,0,0,0,0]}]  
 }
-
 @inject('userStore')
 @observer
 class Page extends Component {
@@ -62,7 +60,6 @@ class Page extends Component {
           let recent = data.data.recent,
               news = data.data.news,
               statistic = data.data.statistic;
-
           if (statistic && statistic.code === 0) {
             statistic.result.charts =  statistic.result && statistic.result.charts.map(item => JSON.parse(item))
           }
@@ -93,9 +90,7 @@ class Page extends Component {
         return;
       }
       document.title="我的首页 - 墨鱼笔记";
-
       await this.fetchData();
-
       this.refs.loading.toggle();
        // 基于准备好的dom，初始化echarts实例
        var myChart = echarts.init(document.getElementById('statist-graph'));
@@ -133,7 +128,6 @@ class Page extends Component {
       series : (this.state.statistic && this.state.statistic.charts) || defaultStatistic.chart
        });
     }
-
     /** 
      * 获取列表Icon
      * */
@@ -148,7 +142,6 @@ class Page extends Component {
         default: return '';
       }
     }
-
     /** 
      * 获取历史阅读记录
      * */
@@ -165,7 +158,6 @@ class Page extends Component {
         </div>
       )
     }
-
     getNewsIcon (type) {
       switch(type) {
         case 0: return (
@@ -177,7 +169,6 @@ class Page extends Component {
         default: return '';
       }
     }
-
     /**
      * 获取动态列表
      *  */
@@ -209,9 +200,7 @@ class Page extends Component {
           );
         default: return '';
       }
-      
     }
-
     render () {
         return (
             <div className="page">
@@ -227,13 +216,9 @@ class Page extends Component {
                           <p>看看自己的设定任务和团队动态来开始自己的记录吧</p>
                         </div>
                       </div>
-
                       <div className="panel">
                           <div className="statist">
-                            <div className="section-title">
-                              <h1 className="text">数据统计</h1>
-                              <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                            </div>
+                            <h1 className="normal-title">数据统计</h1>
                             <div className="panel">
                               <div className="item-statist">
                                 <p className="data">{this.state.statistic.textNum}</p>
@@ -256,10 +241,7 @@ class Page extends Component {
                           </div>
 
                           <div className="history wrapper">
-                            <div className="section-title">
-                              <h1 className="text">最近浏览</h1>
-                              <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                            </div>
+                            <h1 className="normal-title">最近浏览</h1>
                             <div className="item-header">
                             </div>
                             {
@@ -269,17 +251,15 @@ class Page extends Component {
                             }
                           </div>
                         </div>
-
                         <div className="news">
-                          <div className="section-title">
-                            <h1 className="text">最近动态</h1>
-                            <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                          </div>
-                          {
-                            this.state.news && this.state.news.map((item, index) => {
-                              return this.getNewsList(item);
-                            })
-                          }
+                          <h1 className="normal-title">最近动态</h1>
+                            <div className="news-list">
+                            {
+                              this.state.news && this.state.news.map((item, index) => {
+                                return this.getNewsList(item);
+                              })
+                            }
+                            </div>
                         </div>
                    </div>
                 </div>

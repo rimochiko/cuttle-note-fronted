@@ -20,7 +20,7 @@ function createPost (args) {
                 groupTextPostSave (
                     token: "${args.token}",
                     userId: "${args.userId}",
-                    title: "${args.title || '无标题'}",
+                    title: "${escape(args.title || '无标题')}",
                     content: "${escape(args.content)}",
                     isAuth: ${args.Auth ? args.Auth : 1},
                     publish: ${args.publish},
@@ -31,18 +31,19 @@ function createPost (args) {
                     msg,
                     result {
                         id,
-                        date
+                        recentTime
                     }
                 }
             }`;        
         } else {
+            console.log(args);
             query = `
             mutation {
                 data:
                 groupTextPostSave (
                     token: "${args.token}",
                     userId: "${args.userId}",
-                    title: "${args.title || '无标题'}",
+                    title: "${escape(args.title || '无标题')}",
                     content: "${escape(args.content)}",
                     isAuth: ${args.Auth ? args.Auth : 1},
                     publish: ${args.publish},
@@ -52,7 +53,7 @@ function createPost (args) {
                     msg,
                     result {
                         id,
-                        date
+                        recentTime
                     }
                 }
             }`;         
@@ -65,7 +66,7 @@ function createPost (args) {
                 userTextPostSave (
                     token: "${args.token}",
                     userId: "${args.userId}",
-                    title: "${args.title || '无标题'}",
+                    title: "${escape(args.title || '无标题')}",
                     content: "${escape(args.content)}",
                     isAuth: ${args.Auth ? args.Auth : 1},
                     publish: ${args.publish},
@@ -75,7 +76,7 @@ function createPost (args) {
                     msg,
                     result {
                         id,
-                        date
+                        recentTime
                     }
                 }
             }`;        
@@ -86,7 +87,7 @@ function createPost (args) {
                 userTextPostSave (
                     token: "${args.token}",
                     userId: "${args.userId}",
-                    title: "${args.title || '无标题'}",
+                    title: "${escape(args.title || '无标题')}",
                     content: "${escape(args.content)}",
                     isAuth: ${args.Auth ? args.Auth : 1},
                     publish: ${args.publish}
@@ -95,7 +96,7 @@ function createPost (args) {
                     msg,
                     result {
                         id,
-                        date
+                        recentTime
                     }
                 }
             }`;         
@@ -123,7 +124,7 @@ function updatePost (args) {
                 postId: ${args.postId || 0},
                 token: "${args.token}",
                 userId: "${args.userId}",
-                title: "${args.title || '无标题'}",
+                title: "${escape(args.title || '无标题')}",
                 content: "${escape(args.content)}",
                 isAuth: ${args.Auth ? args.Auth : 1},
                 publish: ${args.publish},
@@ -134,7 +135,7 @@ function updatePost (args) {
                 msg,
                 result {
                     id,
-                    date
+                    recentTime
                 }
             }
         }`;
@@ -146,7 +147,7 @@ function updatePost (args) {
                 postId: ${args.postId || 0},
                 token: "${args.token}",
                 userId: "${args.userId}",
-                title: "${args.title || '无标题'}",
+                title: "${escape(args.title || '无标题')}",
                 content: "${escape(args.content)}",
                 isAuth: ${args.Auth ? args.Auth : 1},
                 publish: ${args.publish},
@@ -156,7 +157,7 @@ function updatePost (args) {
                 msg,
                 result {
                     id,
-                    date
+                    recentTime
                 }
             }
         }`;

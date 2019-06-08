@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {Link, NavLink, withRouter} from 'react-router-dom';
 import config from './config';
 import './sidebar.scss';
 import { inject, observer } from 'mobx-react';
+import {CSSTransition} from 'react-transition-group';
 
 @inject('userStore')
 @observer
@@ -11,46 +13,18 @@ class Sidebar extends Component {
     constructor () {
         super();
         this.state = {
-          isBarOpen: true,
-          user: {
-            nickname: '',
-            userId: '',
-            avatar: require('../../assets/images/default.jpg'),
-            des: '',
-            follow: [],
-            fans: []
-          }
+          isBarOpen: false
         }
         this.toggleBar = this.toggleBar.bind(this);
         this.getFans = this.getFans.bind(this);
         this.getFollow = this.getFollow.bind(this);
     }
 
-    componentDidMount () {
-    }
-
-    componentWillReceiveProps () {
-      if (this.props.userStore.user.userId) {
-        let userStore = this.props.userStore;
-        let user = userStore.user;
-
-        this.setState({
-          user: {
-            nickname: user.nickname,
-            userId: user.userId,
-            avatar: user.avatar ? user.avatar : require('../../assets/images/default.jpg'),
-            fans: userStore.fans,
-            follow: userStore.follows
-          }
-        })
-      }
-    }
-
     toggleBar () {
-      this.setState(prevState => ({
-        isBarOpen: !prevState.isBarOpen,
-        barStyle: this.state.isBarOpen? 'block': 'none'  
-      }));
+      console.log(this.state.isBarOpen)
+      this.setState({
+        isBarOpen: !this.state.isBarOpen,
+      });
     }
 
     logOut () {
@@ -59,11 +33,12 @@ class Sidebar extends Component {
     }
 
     getFollow () {
-      if (this.state.user.follow && this.state.user.follow.length) {
+      let userStore = this.props.userStore;
+      if (userStore && userStore.follows.length) {
         return (
           <ul>
             {
-              this.state.user.follow.map((item) => (
+              userStore.follows.map((item) => (
                 <li key={item.id}>
                   <Link to='/'>
                     <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` : require('../../assets/images/default.jpg')}
@@ -73,8 +48,8 @@ class Sidebar extends Component {
               ))
             }
             {
-              this.state.user.follow.length > 5 ?
-              <li>+{this.state.user.follow.length}</li> : ''
+              userStore.follows.length > 5 ?
+              <li>+{userStore.follows.length}</li> : ''
             }
           </ul>
         )
@@ -88,11 +63,12 @@ class Sidebar extends Component {
     }
 
     getFans () {
-      if (this.state.user.fans && this.state.user.fans.length) {
+      let userStore = this.props.userStore;
+      if (userStore && userStore.fans.length) {
         return (
           <ul>
           {
-              this.state.user.fans.map((item) => (
+              userStore.fans.map((item) => (
                 <li key={item.id}>
                   <Link to='/'>
                   <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}` :require('../../assets/images/default.jpg')}
@@ -102,8 +78,8 @@ class Sidebar extends Component {
               ))
             }
             {
-              this.state.user.fans.length > 5 ?
-              <li>+{this.state.user.fans.length}</li> : ''
+              userStore.fans.length > 5 ?
+              <li>+{userStore.fans.length}</li> : ''
             }
           </ul>
         )
@@ -116,12 +92,23 @@ class Sidebar extends Component {
       }
     }
 
+    componentDidMount () {
+      this.boxDOM = ReactDOM.findDOMNode(this.refs.sidebar);
+    }
+
     render () {
+        let user = (this.props.userStore && this.props.userStore.user)|| {
+          nickname: '',
+          userId: '',
+          des: '',
+          avatar: ''
+        }; 
+
         return (
             <div className="public-sidebar">
               <div className="header">
                   <div className="logo" onClick={this.toggleBar}>
-                      <img src={this.state.user.avatar} 
+                      <img src={user.avatar ? user.avatar : require('../../assets/images/default.jpg')} 
                            className="header-avatar"
                            alt=""/>
                   </div>
@@ -160,16 +147,27 @@ class Sidebar extends Component {
                         <FontAwesomeIcon icon={['far','trash-alt']} className="link-icon"/>
                     </NavLink>
                   </li>
-                </ul>                 
-                <div className="author-panel"  style={{display: this.state.barStyle}}>
+                </ul>
+                <CSSTransition 
+                    in={this.state.isBarOpen} 
+                    classNames="modal" timeout={300}
+                    onEnter={()=>{
+                        this.boxDOM.style.display = "block";
+                    }}
+                    onExited={()=>{
+                        this.boxDOM.style.display = "none";
+                    }}
+                >              
+                <div className="author-panel" ref="sidebar">
                   <div className="header">
                     <p>我的资料</p>
                     <span><FontAwesomeIcon icon="times" onClick={this.toggleBar.bind(this)}/></span>
                   </div>
                   <div className="profile">
-                    <img src={this.state.user.avatar} className="avatar" alt={this.state.user.id}/>
-                    <p className="name">{this.state.user.nickname}</p>
-                    <p className="des">{this.state.user.des || '暂无个人简介'}</p>
+                  <img src={user.avatar ? user.avatar : require('../../assets/images/default.jpg')} 
+                       className="avatar" alt={user.userId}/>
+                    <p className="name">{user.nickname || ''}</p>
+                    <p className="des">{user.des || '暂无个人简介'}</p>
                     <div className="list">
                       <span>我的关注</span>
                       {
@@ -183,13 +181,13 @@ class Sidebar extends Component {
                         this.getFans()
                       }
                     </div>
-                    
                   </div>
                   <div className="option">
                     <Link to="/setting" className="radius-btn input-btn"><FontAwesomeIcon icon="cog" />账号设置</Link>
                     <button className="radius-btn input-btn" onClick={this.logOut.bind(this)}><FontAwesomeIcon icon="sign-out-alt"/>退出登录</button>
                   </div>
                 </div>
+                </CSSTransition>
               </div>
         );
     }

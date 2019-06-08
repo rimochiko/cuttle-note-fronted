@@ -108,10 +108,11 @@ class Page extends Component {
         let res = response.result,
             user = {
               token: res.token,
-              userId: res.userId,
+              userId: res.id,
               nickname: res.nickname,
               avatar: res.avatar
             }
+            console.log(res);
         this.props.userStore.logIn(user);
         this.props.history.push('/');
       } else {
@@ -170,13 +171,6 @@ class Page extends Component {
                              onChange={(e) => this.changeStatus(e, 'password')}
                              onBlur={this.judgeInput.bind(this, 'password')}
                              onFocus={this.changeTip.bind(this, 'password')}/>
-                    </div>
-                    
-                    <div className="other-login">
-                      <span>忘记密码？</span>
-                      <p>三方登录 <FontAwesomeIcon icon={["fab","qq"]} />
-                      <FontAwesomeIcon icon={["fab","weibo"]} />
-                      <FontAwesomeIcon icon={["fab","weixin"]} /></p>
                     </div>
                     <button 
                            className="form-btn" 

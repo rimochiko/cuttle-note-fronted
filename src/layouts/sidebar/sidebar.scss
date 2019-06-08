@@ -27,14 +27,14 @@ $borderColor: #e9e9f4;
     } 
     .author-panel {
         box-shadow: 0 10px 15px #eeeef8;
-        display: none;
         position: absolute;
         height: 100vh;
         min-height: 28rem;
         padding: 0 3rem;
         top: 0;
+        width: 15rem;
         left: 5rem;
-        width: 14rem;
+        display: none;
         background-color: $bgColor;
         text-align: center;
         &.open {

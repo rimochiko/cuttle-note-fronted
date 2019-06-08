@@ -27,13 +27,13 @@ import {
 import {
   CollectPage,
   TrashPage,
-  SearchPage
+  SearchPage,
+  NotFoundPage
 } from './pages/other';
 
 import './assets/styles/normal.scss'
 
 class App extends Component {
-
   render() {
     return (
       <Router>
@@ -52,7 +52,8 @@ class App extends Component {
           <Route path="/search/:type/:search?/:page?" component={SearchPage} />        
           <Route path="/register" component={RegisterPage}/>   
           <Route path="/login" component={LoginPage}/>
-          <Redirect to="/"/>
+          <Route path="/404" component={NotFoundPage}/>
+          <Redirect to="/404" />
         </Switch>
       </Router>
     );

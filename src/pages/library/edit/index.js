@@ -94,7 +94,7 @@ class Page extends Component {
                 type: ''            
             };
             let post = res.result;
-            if (res.post.belongGroup) {
+            if (res.result.belongGroup) {
               space.id = post.belongGroup.id;
               space.name = post.belongGroup.nickname;
               space.type = "group"
@@ -104,12 +104,12 @@ class Page extends Component {
               space.type = "user";
             }
             this.setState({
-              title: res.post.title,
-              isAuth: res.post.isAuth,
-              content: res.post.content,
-              lastSaveTime: res.post.recentTime,
-              lastSaveUser: res.post.recentUser,
-              parentId: res.post.parent,
+              title: post.title,
+              isAuth: post.isAuth,
+              content: post.content,
+              lastSaveTime: post.recentTime,
+              lastSaveUser: post.recentUser,
+              parentId: post.parent,
               space: space,
               isUpdate: true
             })
@@ -131,13 +131,7 @@ class Page extends Component {
             }
 
           } else {
-            if (res.code === 1) {
-              this.showTooltip("文档内容有更新，请重新读取");
-            } else if (res.code === 2) {
-              this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
-            } else {
-              this.showTooltip("请求文章内容失败");
-            }
+            this.showTooltip(res.msg || "请求文章失败");
             setTimeout(() => {
               history.goBack();
             }, 1000);
@@ -194,6 +188,8 @@ class Page extends Component {
           setTimeout(() => {
             history.goBack();
           }, 1000);          
+        } else {
+          this.showTooltip(res.msg || "文章加锁失败");
         }
       })
     }
@@ -305,11 +301,11 @@ class Page extends Component {
             if (res.code === 0) {
               this.setState({
                 draftId: res.result.id,
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
-                lastSaveTime: '保存失败'
+                lastSaveTime: res.msg || '保存失败'
               });
             }
           })
@@ -324,11 +320,11 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
-                lastSaveTime: '保存失败'
+                lastSaveTime: res.msg ||'保存失败'
               });
             }
           })
@@ -341,15 +337,15 @@ class Page extends Component {
         if (!state.draftId) {
           Qlquery.createPost(params)
           .then(({data}) => {
-            let res = data.data.data;
+            let res = data.data.data || {msg: ''};
             if (res.code === 0) {
               this.setState({
                 draftId: res.result.id,
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
-                lastSaveTime: '保存失败'
+                lastSaveTime: res.msg ||'保存失败'
               });
             }
           })
@@ -364,7 +360,7 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
@@ -389,7 +385,7 @@ class Page extends Component {
           token: this.props.userStore.user.token,
           userId: this.props.userStore.user.userId,
           title: this.state.title,
-          content: this.refs.editBox && (this.refs.editBox.innerHTML).replace('"', '&quot;'),
+          content: this.refs.editBox.innerHTML,
           isAuth: this.state.isAuth,
           publish: 1,
           parentId: this.state.parentId
@@ -411,6 +407,8 @@ class Page extends Component {
           if (res.code === 0) {
             let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${this.state.postId}`
             this.props.history.push(url)
+          } else {
+            this.showTooltip(res.msg || "发布文章失败")
           }
         })
         .catch((err) => {
@@ -428,6 +426,8 @@ class Page extends Component {
             if (res.code === 0) {
               let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url)
+            } else {
+              this.showTooltip(res.msg || "发布文章失败")
             }
           })
           .catch((err) => {
@@ -442,6 +442,8 @@ class Page extends Component {
               // 跳转页面
               let url = `/library/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url)
+            } else {
+              this.showTooltip(res.msg || "发布文章失败")
             }
           })
           .catch((err) => {
@@ -649,12 +651,10 @@ class Page extends Component {
     }
     
     showTooltip (text) {
-      if (this.refs.tooltip) {
-        this.setState({
-          tipText: text
-        })
-        this.refs.tooltip.show();        
-      }
+      this.setState({
+        tipText: text
+      })
+      this.refs.tooltip && this.refs.tooltip.show();        
     }
 
      // 插入图片
@@ -667,53 +667,6 @@ class Page extends Component {
       })
       this.refs.addImage.toggle();
     }
-    insertUploadImage () {
-      if (!this.state.imgSrcBase) {
-        this.setState({
-          tipText: '上传图片不能为空'
-        })
-        this.refs.tooltip.show()
-        return;
-      }
-
-      // 上传图片
-      Qlquery.uploadImage({
-        token: this.props.userStore.user.token,
-        userId: this.props.userStore.user.userId,
-        imgbase: this.state.imgSrcBase
-      })
-      .then(({data}) => {
-        let res =data.data.data;
-        console.log(res);
-        if (res.code === 0) {
-          this.setState({
-            imgSrc: res.result.url
-          })
-          this.addTextStyle('image');
-          this.refs.addImage.toggle();
-        } else {
-          this.setState({
-            tipText: '上传图片出错'
-          })
-          this.refs.tooltip.show()
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-
-    }
-    insertDirectImage () {
-      if (this.state.imgSrc.search(/(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/) < 0) {
-        this.setState({
-          tipText: '图片地址格式错误'
-        })
-        this.refs.tooltip.show()
-        return;
-      }
-      this.addTextStyle.bind(this, 'image');
-      this.refs.addLink.toggle();
-    }
 
     insertCode (code) {
       this.refs.editBox.innerHTML = this.refs.editBox.innerHTML + code;
@@ -721,6 +674,7 @@ class Page extends Component {
     
     // 获取图片信息
     insertImage (args) {
+      console.log(args);
       this.addTextStyle('image', args);
     }
 
@@ -829,6 +783,8 @@ class Page extends Component {
               draftId: null,
               lastSaveTime: ''
             })
+          } else {
+            this.showTooltip(res.msg || "移除文章失败")
           }
         })
       }
@@ -892,6 +848,8 @@ class Page extends Component {
                          getResult={this.insertCode.bind(this)}/>
 
               <ImageModal ref="addImage"
+                          user={{token: this.props.userStore.token,
+                                 userId: this.props.userStore.userId}}
                           showTip={this.showTooltip.bind(this)}
                           getResult={this.insertImage.bind(this)}
                           sendData={Qlquery.uploadImage.bind(this)}/>

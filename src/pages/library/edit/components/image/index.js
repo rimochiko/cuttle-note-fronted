@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import Modal from '../../../../../components/modal';
 import Tabs from '../../../../../components/tabs';
+import { inject, observer } from 'mobx-react';
 
 const TabPane = Tabs.TabPane;
+
 class ImageModal extends Component {
     constructor () {
         super();
@@ -50,24 +52,27 @@ class ImageModal extends Component {
           this.props.showTip("上传图片不能为空");
           return;
         }
+
+        if (!this.props.user) {
+            return;
+        }
   
         // 上传图片
         this.props.sendData({
-          token: this.props.userStore.user.token,
-          userId: this.props.userStore.user.userId,
+          token: this.props.user.token,
+          userId: this.props.user.userId,
           imgbase: this.state.imgSrcBase
         })
         .then(({data}) => {
           let res =data.data.data;
-          console.log(res);
-          if (res.code === 1) {
+          if (res.code === 0) {
             this.setState({
-              imgSrc: res.url
+              imgSrc: res.result.url
             })
             this.props.getResult({url: `http://localhost:8080/static/article/${this.state.imgSrc}`, alt: this.state.imgSrcText})
             this.refs.insert.toggle();
           } else {
-            this.props.showTip("上传图片出错");
+            this.props.showTip(res.msg || "上传图片出错");
           }
         })
         .catch((err) => {

@@ -15,7 +15,7 @@ function createChart (args) {
         userImagePostSave (
             token: "${args.token}",
             userId: "${args.userId}",
-            title: "${args.title || "无标题"}",
+            title: "${args.title || '无标题'}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
@@ -25,7 +25,7 @@ function createChart (args) {
             msg
             result {
                 id,
-                date
+                recentTime
             }
         }
     }`: `
@@ -34,18 +34,18 @@ function createChart (args) {
         groupImagePostSave (
             token: "${args.token}",
             userId: "${args.userId}",
-            title: "${args.title || "无标题"}",
+            title: "${args.title || '无标题'}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
             imgbase: "${args.imgbase || ''}"
-            groupId: ${args.groupId}
+            groupId: "${args.groupId}"
         ) {
             code
             msg
             result {
                 id,
-                date
+                recentTime
             }
         }
     }`;
@@ -71,7 +71,7 @@ function updateChart (args) {
             postId: ${args.postId || 0},
             draftId: ${args.draftId || 0},
             userId: "${args.userId}",
-            title: "${args.title}",
+            title: "${args.title || '无标题'}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
@@ -81,7 +81,7 @@ function updateChart (args) {
             msg
             result {
                 id,
-                date
+                recentTime
             }
         }
     }`: `
@@ -92,7 +92,7 @@ function updateChart (args) {
             userId: "${args.userId}",
             postId: ${args.postId || 0},
             draftId: ${args.draftId || 0},
-            title: "${args.title}",
+            title: "${args.title || '无标题'}",
             content: "${escape(args.content)}",
             isAuth: ${args.auth ? 1 : 0},
             publish: ${args.publish},
@@ -103,7 +103,7 @@ function updateChart (args) {
             msg
             result {
                 id,
-                date
+                recentTime
             }
         }
     }`;

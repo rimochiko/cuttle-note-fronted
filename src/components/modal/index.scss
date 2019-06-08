@@ -38,16 +38,16 @@ $dotColor: #ff6a6a;
     opacity: 0.01;
   }
   
-  .modal-enter.modal-enter-active {
+  .modal-enter-active {
     opacity: 1;
     transition: opacity 200ms ease-in-out;
   }
   
-  .modal-leave {
+  .modal-exit {
     opacity: 1;
   }
   
-  .modal-leave.modal-leave-active {
+  .modal-exit-active {
     opacity: 0.01;
     transition: opacity 200ms ease-in-out;
   }

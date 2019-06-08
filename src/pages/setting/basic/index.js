@@ -6,7 +6,7 @@ import Qlquery from '../graphql';
 
 import { inject, observer } from 'mobx-react';
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {

@@ -96,9 +96,9 @@ function searchGroup (args) {
                 id
                 nickname
                 avatar
-                adminId
-                adminAvatar
-                adminName                
+                createUser
+                createUserName
+                createUserAvatar          
             }
 
         }

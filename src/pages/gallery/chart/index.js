@@ -335,7 +335,6 @@ class Section extends Component {
                         {
                             this.generateCollectBtn()
                         }
-                        <li><FontAwesomeIcon icon="share-alt"></FontAwesomeIcon> 分享</li>
                     </ul>
                 </div>
             )
@@ -372,7 +371,7 @@ class Section extends Component {
                      {this.generateReply()}
                     <textarea className="input-textarea" 
                               onChange={this.inputComment.bind(this)}
-                              defaultValue={this.state.comment}>
+                              value={this.state.comment}>
                     </textarea>
                     <div className="input-btn-box">
                       <button className="input-btn radius-btn" onClick={this.comment.bind(this)}>提交</button>

@@ -31,8 +31,7 @@ export default class Store {
           data:
           userVerify(userId: "${user.userId}",token: "${user.token}") {
             code,
-            msg,
-            result
+            msg
           }
         }`;
           
@@ -107,24 +106,24 @@ export default class Store {
         const query = `
         query {
           fans:
-          userFans(userId: "${this.user.userId}") {
-            id,
-            nickname,
-            avatar
-          } {
+          userFans(userId: "${this.user.userId}")  {
             code,
             msg,
-            result
+            result {
+                id,
+                nickname,
+                avatar
+            }
           },
           follow:
-          userFollow(userId: "${this.user.userId}") {
-            id,
-            nickname,
-            avatar
-          } {
+          userFollow(userId: "${this.user.userId}")  {
             code,
             msg,
-            result
+            result {
+              id,
+              nickname,
+              avatar
+            }
           }
         }
         `;
@@ -133,8 +132,8 @@ export default class Store {
           let fans = data.data.fans,
               follows = data.data.follow;
           
-          this.fans = fans.code === 0 ? fans : [];
-          this.follows = follows.code === 0? follows : [];
+          this.fans = fans.code === 0 ? fans.result : [];
+          this.follows = follows.code === 0? follows.result : [];
         })
         .catch((err) => {
           console.log(err);
@@ -179,7 +178,8 @@ export default class Store {
             result{
               id,
               avatar,
-              nickname
+              nickname,
+              role
             }
           }
         }`;
@@ -187,11 +187,11 @@ export default class Store {
         .then(({data}) => {
           let res = data.data.data;
           if (res.code === 0) {
-            let group = res.result;
+            let group = res.result || [];
             group.forEach((item) => {
               item.avatar = item.avatar ? `http://localhost:8080/static/group/${item.avatar}` : ''
             })
-            this.groupList = res.group;
+            this.groupList = group;
           } else {
             this.groupList = [];
           }

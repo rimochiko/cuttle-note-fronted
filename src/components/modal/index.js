@@ -11,6 +11,7 @@ class Modal extends Component {
             visible: false,
             style: {display:'none'}
         }
+        this.generateBtn = this.generateBtn.bind(this);
     }
     componentDidMount () {
         this.boxDOM = ReactDOM.findDOMNode(this.refs.modal);
@@ -18,10 +19,26 @@ class Modal extends Component {
     /*
      * 展示：display是flex的情况下如何处理更好？
      */
-    toggle () {
+    toggle (setValue = null) {
+        let value = !this.state.visible;
+        if ((setValue !== null) && (typeof setValue === "boolean")) {
+            value = setValue
+        }
         this.setState({
-            visible: !this.state.visible
+            visible: value
         })
+    }
+
+    generateBtn () {
+        if (this.props.close) {
+            return (
+                <span className="close"></span>
+            )
+        } else {
+            return (
+                <span className="close" onClick={this.toggle.bind(this)}><FontAwesomeIcon icon="times"/></span>
+            )
+        }
     }
 
     render () {
@@ -41,7 +58,7 @@ class Modal extends Component {
                     <div className="mck-modal-box">
                         <div className="mck-modal-header">
                         <p className="title">{this.props.title}</p>
-                        <span className="close" onClick={this.toggle.bind(this)}><FontAwesomeIcon icon="times"/></span>
+                        {this.generateBtn()}
                         </div>
                         {children}
                     </div>

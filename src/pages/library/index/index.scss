@@ -350,3 +350,51 @@
   }
 }
 
+.auth-box {
+    width: 50rem;
+    padding: 2rem;
+    background-image: url(../../../assets/images/404.svg);
+    background-size: 300px;
+    background-repeat: no-repeat;
+    background-position: right center;
+    .auth-header {
+        text-align: center;
+        .title {
+            color: #3e4077;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .des {
+            color: #8493b8;
+            margin-bottom: 1rem;
+        }
+    }
+    .auth-list {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        .auth-item {
+            padding: 1rem;
+            border-radius: .5rem;
+            background-color: #eef0f3;
+            text-align: center;
+            margin: 0 .5rem;
+            box-shadow: 0 10px 15px #f7f7fb;
+            img {
+                width: 3rem;
+                border-radius: 50%;
+                margin-bottom: .5rem;
+                border: 2px solid #fff;
+            }
+            .title {
+                color: #3e4077;
+                font-size: .9rem;
+                margin-bottom: .5rem;
+            }
+            .des {
+                color: #8493b8;
+                font-size: .8rem;
+            }
+        }
+    }
+}

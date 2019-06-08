@@ -39,7 +39,7 @@ function getProfile (args) {
     const query = `
       query {
         data:
-        userEasy(userId: "${args.userId}") {
+        userOne(userId: "${args.userId}") {
             code,
             msg,
             result {

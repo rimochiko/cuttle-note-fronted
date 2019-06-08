@@ -73,6 +73,9 @@
         &.active a {
                 background-color: #c9c9f8;
                 color: #fff;
+                svg {
+                    color: #FFF;
+                }
         }        
         a {
             margin: .5rem;

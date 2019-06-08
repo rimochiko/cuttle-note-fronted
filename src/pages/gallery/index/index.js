@@ -74,7 +74,8 @@ class Page extends Component {
           id: item.id,
           avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
           text: item.nickname,
-          link: `/gallery/group/${item.id}`  
+          link: `/gallery/group/${item.id}`,
+          role: item.role
         }
       })
 
@@ -83,7 +84,8 @@ class Page extends Component {
           id: user.userId, 
           text: user.nickname,
           avatar: user.avatar || require('../../../assets/images/default.jpg'),
-          link: '/gallery/'
+          link: '/gallery/',
+          role: 1
         }].concat(groupList)
       })
     }
@@ -139,13 +141,13 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if(res.code === 1) {
+          if(res.code === 0) {
             // 请求成功
             this.setState({
               post: res.result
             })
           } else {
-            this.showTooltip("请求文章失败:(");
+            this.showTooltip(res.msg || "请求文章失败:(");
           }
         })
         .catch((err) => {
@@ -165,19 +167,21 @@ class Page extends Component {
             res = response.result;
         let isFollow = data.data.isFollow;
         let avatar;
-        if (params.obj === USER) {
-          avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
-        } else if (params.obj === GROUP) {
-          avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
-        }
-        if(res.id) {
+        if(response.code === 0) {
+          if (params.obj === USER) {
+            avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
+          } else if (params.obj === GROUP) {
+            avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
+          }
           owner = {
             id: res.id,
             name: res.nickname,
             avatar: avatar,
             type: params.obj,
-            isFollow: isFollow.result
+            isFollow: isFollow && isFollow.result
           }
+        } else {
+          this.showTooltip(response.msg);
         }
       })
       .catch((err) => {
@@ -201,6 +205,7 @@ class Page extends Component {
       let objs = {
          userId: this.props.userStore.user.userId,
          token: this.props.userStore.user.token,
+         isFind: this.state.isAuth
       }
 
       if (params.obj === GROUP) {
@@ -215,8 +220,8 @@ class Page extends Component {
            drafts = data.data.drafts;
        if(posts.code === 0) {
          this.setState({
-           posts: posts.result,
-           draftList: drafts.result
+           posts: posts.result || [],
+           draftList: drafts.result || []
          })
        } else {
          this.setState({
@@ -514,7 +519,7 @@ class Page extends Component {
                     <Modal title="草稿箱" ref="draft">
                       <div className="draft-box">
                         <div className="draft-header">
-                          <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
+                          <span className="title">我的草稿箱</span>
                           <button className="btn" onClick={this.deleteDraft.bind(this, null)}>舍弃全部草稿</button>
                         </div>
                         <div className="draft-list">
@@ -528,8 +533,7 @@ class Page extends Component {
                                                   groupName: owner && owner.type === GROUP ? owner.name:null}}} 
                                       className="title">{item.title}</Link>
                                 <p className="des">
-                                  <Link to={`library/${this.state.object.type}/${this.state.object.id}`} className="link">{item.author}</Link>
-                                  保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
+                                  我保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
                                 </p>
                               </div>  
                             )

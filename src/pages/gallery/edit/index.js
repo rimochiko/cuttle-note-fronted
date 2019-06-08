@@ -25,7 +25,7 @@ const USER = "user",
 const MIND = "mind",
       FLOW = "flow"; 
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
@@ -83,14 +83,14 @@ class Page extends Component {
         })
         .then(({data}) => {
           let res = data.data.data;
-          if(res.code === 1) {
+          if(res.code === 0) {
             // 请求成功
             let space = {
                 id: '',
                 name: '',
                 type: ''            
             };
-            let post = res.post;
+            let post = res.result;
             if (res.post.belongGroup) {
               space.id = post.belongGroup.id;
               space.name = post.belongGroup.nickname;
@@ -100,14 +100,14 @@ class Page extends Component {
               space.name = post.author.nickname;
               space.type = USER;
             }
-            let content = res.post.content && JSON.parse(res.post.content);
+            let content = post.content && JSON.parse(post.content);
             this.setState({
-              title: res.post.title,
-              isAuth: res.post.isAuth,
+              title: post.title,
+              isAuth: post.isAuth,
               type:  content.type,
               chart: content.chart,
-              lastSaveTime: res.post.recentTime,
-              lastSaveUser: res.post.recentUser,
+              lastSaveTime: post.recentTime,
+              lastSaveUser: post.recentUser,
               space: space,
               isUpdate: true
             })
@@ -125,13 +125,7 @@ class Page extends Component {
               })
             }
           } else {
-            if (res.code === 2) {
-              this.showTooltip("文档内容有更新，请重新读取");
-            } else if (res.code === 3) {
-              this.showTooltip("你的小伙伴正在编辑此文档，请稍后重试");
-            } else {
-              this.showTooltip("请求文章内容失败");
-            }
+            this.showTooltip(res.msg);
             setTimeout(() => {
               history.goBack();
             }, 1000);
@@ -190,9 +184,7 @@ class Page extends Component {
         isLock: true 
       })
       .then(({data}) => {
-        console.log(data);
         let res = data.data.data;
-        console.log('lockres:' + res);
         if (res.code !== 0) {
           // 保存一份草稿
           this.saveDraft();
@@ -251,7 +243,7 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date,
+                lastSaveTime: res.result.recentTime,
                 draftId: res.result.id
               });
             } else {
@@ -271,7 +263,7 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
@@ -291,7 +283,7 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date,
+                lastSaveTime: res.result.recentTime,
                 draftId: res.result.id
               });
             } else {
@@ -311,7 +303,7 @@ class Page extends Component {
             let res = data.data.data;
             if (res.code === 0) {
               this.setState({
-                lastSaveTime: res.result.date
+                lastSaveTime: res.result.recentTime
               });
             } else {
               this.setState({
@@ -359,6 +351,8 @@ class Page extends Component {
           if (res.code === 0) {
             let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
             this.props.history.push(url);
+          } else {
+            this.showTooltip( res.msg || "发布图画失败")
           }
         })
         .catch((err) => {
@@ -374,6 +368,8 @@ class Page extends Component {
             if (res.code === 0) {
               let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
+            } else {
+              this.showTooltip( res.msg || "发布图画失败")
             }
           })
           .catch((err) => {
@@ -387,6 +383,8 @@ class Page extends Component {
             if (res.code === 0) {
               let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
+            } else {
+              this.showTooltip( res.msg || "发布图画失败")
             }
           })
           .catch((err) => {

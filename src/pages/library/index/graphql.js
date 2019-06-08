@@ -23,17 +23,14 @@ function userPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 0,
-        noFind: "${args.noFind}"
+        isFind: ${args.isFind}
       ) {
         code,
         msg,
         result {
           id
-          status
           title
-          date
-          author
-          parent
+          recentTime
         }
       }
       posts:
@@ -49,25 +46,21 @@ function userPostQuery (args) {
         id
         status
         title
-        author,
-        parent,
+        parent
         children {
           id
           status
           title
-          author,
           parent,
           children {
             id,
             status,
             title,
-            author,
             parent,
             children {
               id,
               status,
               title,
-              author
               parent
             }
           }
@@ -86,7 +79,7 @@ function groupPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 0,
-        noFind: "${args.noFind}",
+        isFind: ${args.isFind},
         groupId: "${args.groupId}"
       ) {
         code,
@@ -95,8 +88,7 @@ function groupPostQuery (args) {
           id
           status
           title
-          date
-          author
+          recentTime
           parent
         }
       }
@@ -113,25 +105,21 @@ function groupPostQuery (args) {
         id
         status
         title
-        author,
         parent,
         children {
           id
           status
           title
-          author,
           parent,
           children {
             id,
             status,
             title,
-            author,
             parent,
             children {
               id,
               status,
               title,
-              author
               parent
             }
           }
@@ -146,19 +134,22 @@ function postListQuery ({
   token,
   userId,
   groupId,
-  author
+  author,
+  isFind
 }) {
   if (groupId) {
     return groupPostQuery({
       userId,
       token,
-      groupId
+      groupId,
+      isFind
     })
   } else {
     return userPostQuery({
       userId,
       token,
-      author
+      author,
+      isFind
    })
   }
 }
@@ -290,7 +281,7 @@ function getOwnerInfo (params, userId) {
            result
          }
          data:
-         userEasy(
+         userOne(
            userId:"${params.owner}"
          ) {
            code,
@@ -304,8 +295,8 @@ function getOwnerInfo (params, userId) {
        }`:
        `query {
          data:
-         groupEasy(
-           id:"${params.owner}"
+         groupOne(
+           groupId:"${params.owner}"
          ) {
             code,
             msg,

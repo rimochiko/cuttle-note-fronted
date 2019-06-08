@@ -18,7 +18,7 @@ function login (args) {
          msg,
          result {
           token,
-          userId,
+          id,
           avatar,
           nickname
          }
@@ -41,7 +41,7 @@ function register (args) {
       msg,
       result {
         token,
-        userId,
+        id,
         avatar,
         nickname
       }

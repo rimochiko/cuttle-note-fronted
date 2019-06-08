@@ -199,10 +199,11 @@ class Page extends Component {
         let res = response.result,
             user = {
               token: res.token,
-              userId: res.userId,
+              userId: res.id,
               nickname: res.nickname,
               avatar: res.avatar
             }
+            console.log(user);
         this.props.userStore.logIn(user);
         this.props.history.push('/');
       } else { 

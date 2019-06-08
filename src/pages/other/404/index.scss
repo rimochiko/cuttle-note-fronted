@@ -1,0 +1,41 @@
+@import '../../../assets/styles/public.scss';
+
+.not-found {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .not-found-center {
+        padding: 3rem 15rem 3rem 3rem;
+        border-radius: 1rem;
+        background-color: #FFF;
+        background-image: url(../../../assets/images/404.svg);
+        background-size: 200px;
+        background-repeat: no-repeat;
+        background-position: right center;
+        font-weight: 300;
+        @extend .section;
+        .title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: block;
+            color: #3e4077;
+        }
+        .des {
+            font-size: 1.4rem;
+            color: #8493b8;
+            margin-bottom: 1.5rem;
+        }
+        a {
+            display: block;
+            border-radius: 1rem;
+            width: 10rem;
+            padding: .6rem 0;
+            text-align: center;
+            background-image: linear-gradient(to bottom,#4c68fa, #4c8efa);
+            background-color: #4d7cff;
+            color: #FFF;
+            font-size: .9rem;
+        }
+    }
+}

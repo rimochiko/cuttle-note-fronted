@@ -22,7 +22,7 @@ import Qlquery from './graphql';
 const USER = "user",
       GROUP = "group";
 
-@inject('userStore', 'postStore')
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
@@ -51,8 +51,18 @@ class Page extends Component {
         this.getOwnerInfo = this.getOwnerInfo.bind(this);
         this.getPostList = this.getPostList.bind(this);
         this.generateOption = this.generateOption.bind(this);
+        this.tooltip = null;
     }
 
+    isUrlExist (params) {
+      if ((params.obj !== USER) && (params.obj !== GROUP)) {
+        return false;
+      }
+      if (params.id && !(/^[0-9]+$/.test(params.id))) {
+        return false;
+      }
+      return true;
+    }
     async componentDidMount () {
       // 判断是否有登录
       if (await this.props.userStore.isLogin() === false) {
@@ -61,6 +71,10 @@ class Page extends Component {
       }
       document.title="文库 - 墨鱼笔记";
       let params = this.analysisParams(this.props);
+      if (!this.isUrlExist(params)) {
+        this.props.history.push('/404');
+        return;
+      }
       await this.getGroup();
       await this.fetchOwnerData(params);
       await this.fetchIdData(params);
@@ -141,21 +155,29 @@ class Page extends Component {
         await Qlquery.getOnePost({
           userId: this.props.userStore.user.userId,
           postId: params.id,
-          token: this.props.userStore.user.token 
+          token: this.props.userStore.user.token
         })
         .then(({data}) => {
           let res = data.data.data;
           if(res.code === 0) {
             // 请求成功
+            let post = res.result;
+            post.title = unescape(post.title);
+            post.content = unescape(post.content);
             this.setState({
-              post: res.result
+              post
             })
           } else {
-            this.showTooltip("请求文章失败");
+            if (res.code === 8) {
+              this.props.history.push('/404');
+              return;
+            }
+            this.showTooltip(res.msg || "请求文章失败");
           }
         })
         .catch((err) => {
-          this.showTooltip(err);
+          console.log(err);
+          this.showTooltip("请求文章失败");
         })
       }
     }
@@ -171,33 +193,41 @@ class Page extends Component {
             res = obj.result;
         let isFollow = data.data.isFollow;
         let avatar;
-        if (params.obj === USER) {
-          avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
-        } else if (params.obj === GROUP) {
-          avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
-        }
         if(obj.code === 0) {
+          if (params.obj === USER) {
+            avatar = res.avatar ? `http://localhost:8080/static/user/${res.avatar}`: require('../../../assets/images/default.jpg');
+          } else if (params.obj === GROUP) {
+            avatar = res.avatar ? `http://localhost:8080/static/group/${res.avatar}`: require('../../../assets/images/default_g.jpg');
+          }
           owner = {
             id: res.id,
             name: res.nickname,
             avatar: avatar,
             type: params.obj,
-            isFollow: isFollow.result
+            isFollow: isFollow && isFollow.result
           }
+        } else {
+          if (obj.code === 8) {
+            this.props.history.push('/404');
+            return;
+          }
+          this.showTooltip(obj.msg);
         }
       })
       .catch((err) => {
         console.log(err);
-        this.showTooltip(err);
+        this.showTooltip("电波传达错误:(");
       })
       return owner;
     }
 
     showTooltip (text) {
-      this.setState({
-        tipText: text
-      });
-      this.refs.tooltip.show();
+      if (this.refs.tooltip) {
+        this.setState({
+          tipText: text
+        });
+        this.refs.tooltip.show();        
+      }
     }
     
     /**
@@ -207,6 +237,7 @@ class Page extends Component {
       let objs = {
         userId: this.props.userStore.user.userId,
         token: this.props.userStore.user.token,
+        isFind: this.state.isAuth
      }
 
      if (params.obj === GROUP) {
@@ -214,22 +245,29 @@ class Page extends Component {
      } else {
        objs.author = params.owner;
      }
-
       await Qlquery.postListQuery(objs)
       .then(({data}) => {
         let posts = data.data.posts,
             drafts = data.data.drafts;
         if(posts.code === 0) {
           this.setState({
-            posts: posts.result,
-            draftList: drafts.result
+            posts: posts.result || [],
+            draftList: drafts.result || []
           })
         } else {
           this.setState({
             posts: [],
             draftList: []
           })
-          this.showTooltip('无权访问或该空间不存在:(');
+          if (posts.code === 4) {
+            this.refs.auth.toggle();
+            return;
+          }
+          if (posts.code === 8) {
+            this.props.history.push('/404');
+            return;
+          }
+          this.showTooltip(posts.msg || '无权访问或该空间不存在:(');
         }
       })
       .catch((err) => {
@@ -250,23 +288,22 @@ class Page extends Component {
         postId: this.state.post.id,
         token:this.props.userStore.user.token        
       }
-
       if (this.state.object.type === GROUP) {
         params.groupId = this.state.object.id;
       }
-
       await Qlquery.deletePost(params)
-      .then(({data}) => {
+      .then(async ({data}) => {
         let res = data.data.data;
         if(res.code === 0) {
           // 删除成功
           let match = this.props.match.params;
           this.showRemovePost();
           this.showTooltip("文章已放入回收站:)")
+          await this.fetchOwnerData(match);
           this.props.history.push(`/library/${match.obj}/`);
         } else {
           // 删除失败
-          this.showTooltip("电波传达失败:(")
+          this.showTooltip(res.msg || "电波传达失败:(")
         }
       })
       .catch((err) => {
@@ -359,7 +396,12 @@ class Page extends Component {
         obj: nextMatch.obj || USER,
         id: nextMatch.id
       }
-      this.refs.loading.toggle();
+      if (!this.isUrlExist(params)) {
+        this.props.history.push('/404');
+        return;
+      }
+      this.refs.auth.toggle(false);
+      this.refs.loading.toggle(true);
       if (params.obj !== prevMatch.obj) {
         await this.fetchOwnerData(params);
         await this.fetchIdData(params);
@@ -369,7 +411,7 @@ class Page extends Component {
       } else if (params.id !== prevMatch.id) {
         await this.fetchIdData(params);
       }
-      this.refs.loading.toggle();
+      this.refs.loading.toggle(false);
    }
 
     /**
@@ -406,7 +448,7 @@ class Page extends Component {
             })
             this.showTooltip("关注用户成功:)");
           } else {
-            this.showTooltip("关注用户失败:(");
+            this.showTooltip(res.msg);
           }
         })
       }
@@ -429,7 +471,7 @@ class Page extends Component {
             })
             this.showTooltip("取消关注成功:)");
           } else {
-            this.showTooltip("取消关注失败:)");
+            this.showTooltip(res.msg);
           }
         })
       }
@@ -497,10 +539,25 @@ class Page extends Component {
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
                     <Tooltip ref="tooltip" text={this.state.tipText}/>
+                    <Modal title="访问提示" ref="auth" auth="1">
+                      <div className="auth-box">
+                        <div className="auth-header">
+                          <p className="title">Oh，你没有访问此页面的权限哦！</p>
+                          <p className="des">你可以联系该页面的管理员~</p>                        
+                        </div>
+                        <div className="auth-list">
+                            <div className="auth-item">
+                              <img src={require('../../../assets/images/default.jpg')} alt=""/>
+                              <p className="title">111111</p> 
+                              <p className="des">ID：111111</p> 
+                            </div>  
+                        </div>
+                      </div>
+                    </Modal>
                     <Modal title="草稿箱" ref="draft">
                       <div className="draft-box">
                         <div className="draft-header">
-                          <span className="title">{(this.state.object && this.state.object.nickname) || '我'}的草稿箱</span>
+                          <span className="title">我的草稿箱</span>
                           <button className="btn" onClick={this.deleteDraft.bind(this,null)}>舍弃全部草稿</button>
                         </div>
                         <div className="draft-list">
@@ -513,8 +570,7 @@ class Page extends Component {
                                                     parentId: item.parentId}}} 
                                         className="title">{item.title}</Link>
                                   <p className="des">
-                                    <Link to={`library/${this.state.object.type}/${this.state.object.id}`} className="link">{item.author}</Link>
-                                     保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
+                                     我保存于{item.recentTime} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
                                   </p>
                                 </div>  
                               )

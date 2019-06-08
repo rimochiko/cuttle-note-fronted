@@ -47,11 +47,11 @@ class Tree extends Component {
         return;
 
         let length = data.length;
-        let parentId = data[length - 1].parentId;
+        let parent = data[length - 1].parent;
         let i = 0;
 
         for(; i < length; i++) {
-            if (data[i].id === parentId) {
+            if (data[i].id === parent) {
                 break;
             }
         }
@@ -60,7 +60,7 @@ class Tree extends Component {
             data.length = i + 1;
         }
         
-        if (!(data[i] && data[i].parentId)) {
+        if (!(data[i] && data[i].parent)) {
             isContinue = false;
         }
         this.calOpenData(data, isContinue);

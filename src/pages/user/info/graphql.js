@@ -123,11 +123,11 @@ function acceptInvite (args) {
       userId: "${args.userId}",
       token: "${args.token}",
       infoId: ${args.infoId}
-    )
-  } {
-    code,
-    msg
-  }
+    ) {
+      code,
+      msg
+    }
+  } 
   `
   return axios.post('/graphql', {query});
 }

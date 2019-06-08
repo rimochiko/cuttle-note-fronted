@@ -11,6 +11,7 @@ $mainColor: #632df8;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        user-select: none;
         .btn-main {
             flex: 1;
             display: flex;

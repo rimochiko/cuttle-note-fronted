@@ -30,7 +30,7 @@ function getOwnerInfo (params, userId) {
         result
       }
       data:
-      userEasy(
+      userOne(
         userId:"${params.owner}"
       ) {
         msg
@@ -44,8 +44,8 @@ function getOwnerInfo (params, userId) {
     }`:
     `query {
       data:
-      groupEasy(
-        id:"${params.owner}"
+      groupOne(
+        groupId:"${params.owner}"
       ) {
         msg
         code
@@ -99,19 +99,22 @@ function postListQuery ({
   token,
   userId,
   groupId,
-  author
+  author,
+  isFind
 }) {
   if (groupId) {
     return groupPostQuery({
       userId,
       token,
-      groupId
+      groupId,
+      isFind
     })
   } else {
     return userPostQuery({
       userId,
       token,
-      author
+      author,
+      isFind
    })
   }
 }
@@ -124,7 +127,7 @@ function userPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 1,
-        noFind: "${args.noFind}"
+        isFind: ${args.isFind}
       ) {
         code,
         msg,
@@ -132,23 +135,22 @@ function userPostQuery (args) {
           id
           status
           title
-          date
-          author
+          recentTime
         }
       }
       posts:
       userCharts(
        userId: "${args.userId}",
        token: "${args.token}",
-       type: 1,
        author: "${args.author}"
+       type: 1
      ) {
        code,
-       posts {
+       msg,
+       result {
         id
         status
         title
-        author,
         url
        }
      }
@@ -164,7 +166,7 @@ function groupPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 1,
-        noFind: "${args.noFind}"
+        isFind: ${args.isFind}
       ) {
         code,
         msg,
@@ -172,8 +174,7 @@ function groupPostQuery (args) {
           id
           status
           title
-          date
-          author
+          recentTime
         }
       }
       posts:
@@ -184,11 +185,11 @@ function groupPostQuery (args) {
        groupId: "${args.groupId}"
      ) {
        code,
-       posts {
+       msg,
+       result {
         id
         status
         title
-        author,
         url
        }
      }
@@ -267,7 +268,6 @@ function getOnePost (args) {
         isLike
         viewNum
         isCollect,
-        parent,
         status,
         auth,
         type

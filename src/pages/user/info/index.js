@@ -13,7 +13,12 @@ import Qlquery from './graphql';
 import { inject, observer } from 'mobx-react';
 import Tooltip from '../../../components/tooltip';
 
-@inject('userStore', 'postStore')
+import {
+  CSSTransition,
+  TransitionGroup,
+} from 'react-transition-group';
+
+@inject('userStore')
 @observer
 class Page extends Component {
     constructor () {
@@ -39,6 +44,8 @@ class Page extends Component {
         }
         this.generateExtraContent = this.generateExtraContent.bind(this);
         this.generateInfoAdd = this.generateInfoAdd.bind(this);
+        this.generateBubble = this.generateBubble.bind(this);
+        this.generateList = this.generateList.bind(this);
     }
 
     async componentDidMount () {
@@ -53,6 +60,7 @@ class Page extends Component {
       let from = this.props.match.params && this.props.match.params.from;
       await this.getInfoList();
       await this.getUserInfo(from);
+      this.scrollToBottom();
       this.refs.loading.toggle();
     }
     
@@ -106,6 +114,7 @@ class Page extends Component {
           let response = data.data.data;
           if (response.code === 0) {
             // 请求成功
+            console.log(response);
             this.setState({
               infos: response.result,
               user: user
@@ -123,13 +132,13 @@ class Page extends Component {
       }
       let nextFrom = nextMatch.from || (this.state.users[0] && this.state.users[0].from.id);
       let prevFrom = prevMatch.from || (this.state.users[0] && this.state.users[0].from.id);
-      console.log(nextFrom, prevFrom);
       if (!nextFrom) {
         await this.getInfoList();
         await this.getUserInfo(nextFrom);
       } else if (nextFrom !== prevFrom) {
         await this.getUserInfo(nextFrom);
       }    
+      this.scrollToBottom();
    }
     
    /**
@@ -175,6 +184,16 @@ class Page extends Component {
         })
       }
     }
+
+    /**
+     * 滚动到底部
+     */
+    scrollToBottom () {
+      let chatbox = this.refs.chatbox;
+      if (chatbox) {
+        chatbox.scrollTop = chatbox.scrollHeight
+      }
+    }
     
     /**
      * 发送消息
@@ -195,12 +214,22 @@ class Page extends Component {
           this.setState({
             infos: [
               ...this.state.infos,
-              response.info
+              response.result
             ],
-            sendMessage: ''
+            sendText: ''
           });
+          this.scrollToBottom();
+        } else {
+          this.showTooltip(response.msg, "发送消息失败:(")
         }
       })        
+    }
+
+    showTooltip (text, unknown="电波传达失败:(") {
+      this.setState({
+        tipText: text || unknown
+      })
+      this.refs.tooltip && this.refs.tooltip.show();
     }
    
     /**
@@ -217,22 +246,14 @@ class Page extends Component {
       .then(({data}) => {
         let response = data.data.data;
         if(response.code === 0) {
-          this.setState({
-            tipText: '成功接受邀请'
-          })
+          this.showTooltip("成功接受邀请");
           // 如果要显示的话，还得后台返回消息数据
         } else {
-          this.setState({
-            tipText: response.msg
-          })
+          this.showTooltip(response.msg || "接受邀请失败:(")
         }
-        this.refs.tooltip.show();
       })
       .catch((err) => {
-        this.setState({
-          tipText: '接受邀请失败:('
-        })
-        this.refs.tooltip.show();
+        this.showTooltip("接受邀请失败:(")
       })
     }
 
@@ -253,7 +274,16 @@ class Page extends Component {
         let obj = JSON.parse(detail);
         return (
           <div className="info-replenish">
-            <p><span className="label">文章评论通知</span>(<Link to={`${obj.type ? "library":"gallery"}/${obj.link}`}>{obj.title}</Link>)</p>
+            <p><span className="label">我评论了你的文章</span>(<Link to={`${obj.type ? "library":"gallery"}/${obj.link}`}>{obj.title}</Link>)</p>
+          </div>
+        )
+      }
+
+      if (type === 14 && detail) {
+        let obj = JSON.parse(detail);
+        return (
+          <div className="info-replenish">
+            <p><span className="label">我回复了你的评论：{obj.refComment}</span>(<Link to={`${obj.type ? "library":"gallery"}/${obj.link}`}>{obj.title}</Link>)</p>
           </div>
         )
       }
@@ -283,11 +313,12 @@ class Page extends Component {
 
     // 添加新对话
     async addBubble () {
-      let userStore = this.props.userStore;
+      let userStore = this.props.userStore,
+          user = this.state.selectUser;
       await Qlquery.sendMessage({
         userId: userStore.user.userId,
         token: userStore.user.token,
-        objectId: this.state.user.id,
+        objectId: user.id,
         content: this.state.selectText
       })
       .then(({data}) => {
@@ -298,6 +329,9 @@ class Page extends Component {
           this.setState({
             selectText: ''
           });
+          this.props.history.push(`/info/${user.id}`)
+        } else {
+          this.showTooltip(response.msg, "发送消息失败:(")
         }
       })
     }
@@ -318,6 +352,112 @@ class Page extends Component {
             onChange={this.searchMembers.bind(this)}/>
         )
       }
+    }
+
+    generateBubble () {
+      if (!this.state.infos || !this.state.infos.length) {
+        return;
+      }
+      return (
+        <div className="infos flex-1">
+          <div className="chat-header">
+            <p className="text">{this.state.user.nickname}</p>
+            <p className="des">{this.state.user.des || "暂无个人简介"}</p>
+          </div>
+          <div className="chat-body" ref="chatbox">
+          {
+            this.state.infos.map((item) => {
+              if (item.from.id === this.state.user.id) {
+                return (
+                  <div className="chat-one-item" 
+                                  key={item.id}>
+                    <div className="item-avatar">
+                    <img src={item.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
+                          alt={item.from.nickname}/>
+                    </div>
+                    <div className="item-main">
+                      <div className="buble">
+                        {item.content}
+                        {this.generateExtraContent(item.id,item.type, item.detail)}
+                      </div>
+                      <p className="date">{item.date}</p>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="chat-one-item mine"
+                                key={item.id}>
+                    <div className="item-avatar">
+                    <img src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
+                          alt={item.from.nickname}/>
+                    </div>
+                    <div className="item-main">
+                      <div className="buble">
+                        {item.content}
+                      </div>
+                      <p className="date">{item.date}</p>
+                    </div>
+                  </div>
+                )
+              }
+            })
+          }                         
+          </div>
+          
+          <div className="chat-footer">
+            <textarea cols="3" value={this.state.sendText} onChange={(e) => {
+              this.setState({
+                sendText: e.target.value
+              })
+            }}></textarea>
+            <div className="chat-tool">
+              <div className="chat-tool-list">
+              </div>
+              <button className="radius-btn input-btn"
+                      onClick={this.sendMessage.bind(this)}>发送</button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+
+    generateList () {
+      if (!this.state.users || !this.state.users.length) {
+        return (
+          <div className="info-user-list-none">
+            <p>暂无联系人</p>
+          </div>
+        )
+      }
+      return (
+        <div className="info-user-list bg-box">
+        {
+          this.state.users && this.state.users.map((item) => {
+            return (
+              <Link className="info-user" 
+                    to={`/info/${item.from.id}`} 
+                    key={item.from.id}>
+                <div className="info-avatar">
+                  {item.status === 1 ? <span className="buble"></span> : '' }
+                  <img 
+                    src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
+                    alt={item.from.nickname}/>
+                </div>
+                <div className="info-detail">
+                  <div className="info-header">
+                    <p>{item.from.nickname}</p>
+                    <p className="date">{item.date}</p>
+                  </div>
+                  <p className="info-des">{item.content}</p>
+                </div>
+              </Link>                                  
+            )
+          })
+        }
+        </div>
+      )
     }
 
     render () {
@@ -350,7 +490,8 @@ class Page extends Component {
                         </ul>                        
                       </div>
                         <textarea cols="3"
-                                  placeholder="输入要发送的消息..." 
+                                  placeholder="输入要发送的消息..."
+                                  value={this.state.selectText}
                                   onChange={(e) => {
                                 this.setState({
                                   selectText: e.target.value
@@ -371,93 +512,13 @@ class Page extends Component {
                                 <FontAwesomeIcon icon="pen"></FontAwesomeIcon>
                               </button>
                             </div>
-                            <div className="info-user-list bg-box">
                             {
-                              this.state.users && this.state.users.map((item) => {
-                                return (
-                                  <Link className="info-user" 
-                                        to={`/info/${item.from.id}`} 
-                                        key={item.from.id}>
-                                    <div className="info-avatar">
-                                      {item.status === 1 ? <span className="buble"></span> : '' }
-                                      <img 
-                                        src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
-                                        alt={item.from.nickname}/>
-                                    </div>
-                                    <div className="info-detail">
-                                      <div className="info-header">
-                                        <p>{item.from.nickname}</p>
-                                        <p className="date">{item.date}</p>
-                                      </div>
-                                      <p className="info-des">{item.content}</p>
-                                    </div>
-                                  </Link>                                  
-                                )
-                              })
+                              this.generateList()
                             }
-                            </div>
                         </div>  
-                       
-
-                        <div className="infos flex-1">
-                          <div className="chat-header">
-                            <p className="text">{this.state.user.nickname}</p>
-                            <p className="des">{this.state.user.des || "暂无个人简介"}</p>
-                          </div>
-                          <div className="chat-body flex-scroll-y">
-                          {
-                            this.state.infos.map((item) => {
-                              if (item.from.id === this.state.user.id) {
-                                return (
-                                  <div className="chat-one-item" key={item.id}>
-                                    <div className="item-avatar">
-                                    <img src={item.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
-                                         alt={item.from.nickname}/>
-                                    </div>
-                                    <div className="item-main">
-                                      <div className="buble">
-                                        {item.content}
-                                        {this.generateExtraContent(item.id,item.type, item.detail)}
-                                      </div>
-                                      <p className="date">{item.date}</p>
-                                    </div>
-                                  </div>
-                                );
-                              } else {
-                                return (
-                                  <div className="chat-one-item mine" key={item.id}>
-                                    <div className="item-avatar">
-                                    <img src={item.from.avatar ? `http://localhost:8080/static/user/${item.from.avatar}` : require('../../../assets/images/default.jpg')}
-                                         alt={item.from.nickname}/>
-                                    </div>
-                                    <div className="item-main">
-                                      <div className="buble">
-                                        {item.content}
-                                      </div>
-                                      <p className="date">{item.date}</p>
-                                    </div>
-                                  </div>
-                                )
-                              }
-                            })
-                          }                         
-                          </div>
-
-                          <div className="chat-footer">
-                            <textarea cols="3" value={this.state.sendText} onChange={(e) => {
-                              this.setState({
-                                sendText: e.target.value
-                              })
-                            }}></textarea>
-                            <div className="chat-tool">
-                              <div className="chat-tool-list">
-                              </div>
-                              <button className="radius-btn input-btn"
-                                      onClick={this.sendMessage.bind(this)}>发送</button>
-                            </div>
-                          </div>
-                        </div>
-
+                        {
+                          this.generateBubble()
+                        }
                     </div>   
                 </div>
             </div>

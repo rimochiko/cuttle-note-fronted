@@ -70,6 +70,12 @@ class Page extends Component {
         }
         this.getNewsList = this.getNewsList.bind(this);
         this.judgeSubmitForm = this.judgeSubmitForm.bind(this);
+        this.fetchGroupList = this.fetchGroupList.bind(this);
+        this.fetchGroupData = this.fetchGroupData.bind(this);
+        this.toggleMembers = this.toggleMembers.bind(this);
+        this.toggleAddMem = this.toggleAddMem.bind(this);
+        this.toggleCreateGroup = this.toggleCreateGroup.bind(this);
+        this.toggleSetting = this.toggleSetting.bind(this);
     }
 
     async fetchGroupData(id) {
@@ -111,16 +117,13 @@ class Page extends Component {
            })
           }
         }
-
-        console.log('获取团队');
-
         // 获取团队成员
         await Qlquery.getMembers({
           groupId: group.id
         })
         .then(({data}) => {
           let res = data.data.data;
-          group.members = res.code === 0 ? res.result : [];
+          group.members = res && res.code === 0 ? res.result : [];
         })
 
         for(let i = 0, len = group.members.length; i < len; i++) {
@@ -189,8 +192,8 @@ class Page extends Component {
    /**
     * 团队数据统计面板
     */
-   toggleStatistics () {
-     this.refs.statistics.toggle();
+   toggleMembers () {
+     this.refs.members.toggle();
    }
 
    /**
@@ -211,7 +214,7 @@ class Page extends Component {
      })
      .then(({data}) => {
        let res = data.data.data;
-       if(res.code === 0) {
+       if(res && res.code === 0) {
         this.setState({
           searchList: res.result
         })         
@@ -277,7 +280,7 @@ class Page extends Component {
         <ul className="ul-list-link">
           <li><Link to={`/library/group/${this.state.group.id}`}><FontAwesomeIcon icon="book" />文库</Link></li>
           <li><Link to={`/gallery/group/${this.state.group.id}`}><FontAwesomeIcon icon="image" />图库</Link></li>
-          <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
+          <li><span onClick={this.toggleMembers.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
           <li><span onClick={this.toggleSetting.bind(this)}><FontAwesomeIcon icon="cogs" />设置</span></li>
         </ul>
       )
@@ -286,7 +289,7 @@ class Page extends Component {
         <ul className="ul-list-link">
           <li><Link to={`/library/group/${this.state.group.id}`}><FontAwesomeIcon icon="book" />文库</Link></li>
           <li><Link to={`/gallery/group/${this.state.group.id}`}><FontAwesomeIcon icon="image" />图库</Link></li>
-          <li><span onClick={this.toggleStatistics.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
+          <li><span onClick={this.toggleMembers.bind(this)}><FontAwesomeIcon icon="users" />成员</span></li>
         </ul> 
       )
     }
@@ -333,10 +336,7 @@ class Page extends Component {
 
         <div className="flex-column group-main flex-1">
           <div className="group-statistics">
-                <div className="section-title">
-                  <h1 className="text">数据统计</h1>
-                  <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-                </div>
+                <h1 className="normal-title">数据统计</h1>
                 <div className="flex-row">
                   <div className="group-statist-detail">
                     <div className="item-statist">
@@ -360,15 +360,14 @@ class Page extends Component {
                 </div>
             </div>
             <div className="news">
-              <div className="section-title">
-                <h1 className="text">团队动态</h1>
-                <Link to="/"><FontAwesomeIcon icon="ellipsis-h" /></Link> 
-              </div>
+              <h1 className="normal-title">团队动态</h1>
+              <div className="news-list">
               {
                 this.state.news&&this.state.news.map((item, index) => {
                   return this.getNewsList(item);
                 })
               }
+              </div>
             </div>
           </div>
       </div>
@@ -401,18 +400,10 @@ class Page extends Component {
       )
     }
   }
-  
-  async componentDidMount () {
-     // 判断是否有登录
-     if (await this.props.userStore.isLogin() === false) {
-      this.props.history.push('/login');
-      return;
-    }
-    document.title="团队 - 墨鱼笔记";
-    let userStore = this.props.userStore;
-    let params = this.props.match.params;
-    await userStore.getGroup();
 
+  async fetchGroupList () {
+    let userStore = this.props.userStore;
+    await userStore.getGroup();
     let groupList = userStore.groupList.map((item) => {
       return {
         id: item.id,
@@ -424,9 +415,19 @@ class Page extends Component {
     this.setState({
       groupList: groupList
     })
+  }
+  
+  async componentDidMount () {
+     // 判断是否有登录
+     if (await this.props.userStore.isLogin() === false) {
+      this.props.history.push('/login');
+      return;
+    }
+    document.title="团队 - 墨鱼笔记";
+    let userStore = this.props.userStore;
+    let params = this.props.match.params;
+    await this.fetchGroupList();
     await this.fetchGroupData(params && params.id);
-    console.log(this.state.group);
-    
 
     if (this.state.group.id) {
       let  myChart = echarts.init(document.getElementById('statist-graph'));
@@ -499,7 +500,7 @@ class Page extends Component {
     })
     .then(({data})=> {
        let res = data.data.data;
-       if (res.code === 0) {
+       if (res && res.code === 0) {
          // 创建成功
          let id = this.state.tId;
          this.toggleCreateGroup();
@@ -537,15 +538,15 @@ class Page extends Component {
      .then(({data}) => {
        let res = data.data.data,
            text = '';
-       if (res.code === 0) {
+       if (res && res.code === 0) {
          // 修改成功
-         text = "团队资料更新成功，请刷新查看"
+         text = "团队资料更新成功，请刷新查看";
        } else {
-         text = "团队资料更新失败"
+         text = res.msg
        }
        this.toggleSetting();
        this.setState({
-         tipText: text
+         tipText: text || "团队资料更新失败"
        });
        this.refs.tooltip.show();
      })
@@ -585,13 +586,13 @@ class Page extends Component {
       return;
     }
     this.refs.loading.toggle();
+    await this.fetchGroupList();
     await this.fetchGroupData(nextMatch);
     this.refs.loading.toggle();
  }
 
   /**
     * 移除选择
-    * @param {*} id 
     */
   removeSelectItem(id) {
     let list = this.state.selectList.slice(0), i, len;
@@ -610,9 +611,6 @@ class Page extends Component {
   
   /**
    * 添加选中人
-   * @param {*} id 
-   * @param {*} nickname 
-   * @param {*} avatar 
    */
   addSelectItem(id, nickname, avatar) {
     let list = this.state.selectList.slice(0);
@@ -638,7 +636,7 @@ class Page extends Component {
     })
     .then(({data})=> {
       let res = data.data.data;
-      if(res.code === 0) {
+      if(res && res.code === 0) {
         this.setState({
           tipText: '邀请信息已发送'
         });
@@ -646,7 +644,7 @@ class Page extends Component {
         this.refs.tooltip.show();
       } else {
         this.setState({
-          tipText: '邀请发送失败'
+          tipText: res.msg
         });
         this.refs.addMem.toggle();
         this.refs.tooltip.show();
@@ -671,13 +669,22 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res.code === 0) {
-        this.setState({
-          tipText: '取消管理成功'
+      if(res && res.code === 0) {
+        let members = this.state.group.members && this.state.group.members.slice(0);
+        members && members.forEach((item) => {
+          if (item.id === userId) {
+            item.role = 5
+          }
         });
+        this.setState({
+          group: Object.assign({}, this.state.group, {
+            members: members
+          }),
+          tipText: '取消管理成功'
+        })
       } else {
         this.setState({
-          tipText: '取消管理失败'
+          tipText: (res && res.msg) || '取消管理失败'
         });
       }
       this.refs.tooltip.show();
@@ -700,12 +707,26 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res.code === 0) {
-        this.setState({
-          tipText: '设置管理成功'
+      if(res && res.code === 0) {
+        // 应该循环遍历成员
+        let members = this.state.group.members && this.state.group.members.slice(0);
+        members && members.forEach((item) => {
+          if (item.id === userId) {
+            item.role = 4
+          }
         });
-        this.refs.tooltip.show();
+        this.setState({
+          group: Object.assign({}, this.state.group, {
+            members: members
+          }),
+          tipText: '设置管理成功'
+        })
+      } else {
+        this.setState({
+          tipText:  (res && res.msg) || '设置管理失败'
+        });
       }
+      this.refs.tooltip.show();
     })
   }
 
@@ -718,13 +739,26 @@ class Page extends Component {
     })
     .then(({data}) => {
       let res = data.data.data;
-      if(res.code === 0) {
-        this.setState({
-          tipText: '移除成员成功'
+      if(res && res.code === 0) {
+        let members = this.state.group.members && this.state.group.members.slice(0);
+        let index = -1;
+        members && members.forEach((item, index1) => {
+          if (item.id === userId) {
+            index = index1;
+          }
         });
+        if (index > 0){
+          members.splice(index, 1);
+        }
+        this.setState({
+          group: Object.assign({}, this.state.group, {
+            members: members
+          }),
+          tipText: '移除成员成功'
+        })
       } else {
         this.setState({
-          tipText: '移除成员失败'
+          tipText: res.msg ||'移除成员失败'
         });
       }
       this.refs.tooltip.show();
@@ -907,7 +941,7 @@ class Page extends Component {
                       </div>
                     </Modal>
 
-                    <Modal title="团队成员" ref="statistics">
+                    <Modal title="团队成员" ref="members">
                       <div className="member-manage">
                         <table className="member-table">
                           <tbody>
@@ -1039,16 +1073,14 @@ class Page extends Component {
 
                             <div className="input-group mini-group">
                               <div>
-                                <label className="input-label">小组是否私密</label>
-                                <span className="input-mark">私密小组的图文库只有成员能浏览</span>
+                                <label className="input-label">小组是否公开</label>
+                                <span className="input-mark">非公开小组的图文库只有成员能浏览</span>
                               </div>
                               <Switch 
                                 isChecked={this.state.tPublic}
                                 toggle={() => {
                                   this.setState({
-                                    temp: {
-                                      public: !this.state.tPublic
-                                    }
+                                      tPublic: !this.state.tPublic
                                   })
                                 }}/>
                             </div> 
@@ -1145,16 +1177,14 @@ class Page extends Component {
 
                             <div className="input-group mini-group">
                               <div>
-                                <label className="input-label">小组是否私密</label>
-                                <span className="input-mark">私密小组的图文库只有成员能浏览</span>
+                                <label className="input-label">小组是否公开</label>
+                                <span className="input-mark">非公开小组的图文库只有成员能浏览</span>
                               </div>
                               <Switch 
                                 isChecked={this.state.tPublic}
                                 toggle={() => {
                                   this.setState({
-                                    temp: {
-                                      public: !this.state.tPublic
-                                    }
+                                      tPublic: !this.state.tPublic
                                   })
                                 }}/>
                             </div> 
