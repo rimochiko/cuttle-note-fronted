@@ -26,12 +26,15 @@ class App extends Component {
   componentDidMount(){
     let graph = this.refs.flow.graph;
     let that = this;
-    console.log(graph);
     graph.on('afterchange', (e) => {
       that.props.update(graph.save());
-      let baseImg = graph._cfg._canvas._cfg.el.toDataURL("image/png");
-      that.props.getBase64(baseImg);
     })
+  }
+
+  saveBase () {
+    let graph = this.refs.flow.graph;
+    let baseImg = graph._cfg._canvas._cfg.el.toDataURL("image/png");
+    return baseImg;
   }
 
   componentWillReceiveProps (nextProps) {
@@ -40,8 +43,8 @@ class App extends Component {
         isInit: true,
         data: nextProps.chart
       })
-      if (this.refs.mind) {
-        this.refs.mind.graph.read(nextProps.chart);
+      if (this.refs.flow) {
+        this.refs.flow.graph.read(nextProps.chart);
       }
     }
   }

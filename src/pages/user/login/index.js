@@ -13,8 +13,8 @@ class Page extends Component {
     constructor () {
         super();
         this.state = {
-          name: '111111',
-          password: '111111',
+          name: '',
+          password: '',
           nameTip: '用户名',
           passwordTip: '密码',
           isNameTipHide: false,

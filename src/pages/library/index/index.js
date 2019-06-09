@@ -35,7 +35,7 @@ class Page extends Component {
             type: USER,
             isFollow: false
           },
-          isAuth: false,
+          isAuth: 0,
           spaceList: [],
           posts: [],
           post: {
@@ -45,6 +45,7 @@ class Page extends Component {
             createDate: '',
             comments: []
           },
+          admin: [],
           draftList: [],
           tipText: ''
         }
@@ -94,7 +95,8 @@ class Page extends Component {
           avatar: item.avatar || require('../../../assets/images/default_g.jpg'),
           text: item.nickname,
           link: `/library/group/${item.id}`,
-          type: GROUP 
+          type: GROUP,
+          role: item.role
         }
       })
 
@@ -104,7 +106,8 @@ class Page extends Component {
           text: user.nickname,
           avatar: user.avatar || require('../../../assets/images/default.jpg'),
           link: '/library/',
-          type: USER
+          type: USER,
+          role: 1
         }].concat(groupList)
       })
     }
@@ -139,7 +142,7 @@ class Page extends Component {
       this.state.spaceList.forEach((item) => {
         if (item.id === owner.id && item.type === owner.type) {
           this.setState({
-            isAuth: true
+            isAuth: item.role
           })
         }
       })
@@ -257,9 +260,13 @@ class Page extends Component {
         } else {
           this.setState({
             posts: [],
-            draftList: []
+            draftList: [],
+            isAuth: 0
           })
           if (posts.code === 4) {
+            this.setState({
+              admin: posts.admin || []
+            })
             this.refs.auth.toggle();
             return;
           }
@@ -428,7 +435,7 @@ class Page extends Component {
       if (this.state.post.status === 0) {
         return "草稿文章会被直接删除，确定要执行？"
       }
-      return "确定要移入回收站？（15天内可恢复）";
+      return "确定要移入回收站？";
     }
 
     // 关注用户
@@ -539,18 +546,22 @@ class Page extends Component {
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
                     <Tooltip ref="tooltip" text={this.state.tipText}/>
-                    <Modal title="访问提示" ref="auth" auth="1">
+                    <Modal title="访问提示" ref="auth" close={true}>
                       <div className="auth-box">
                         <div className="auth-header">
                           <p className="title">Oh，你没有访问此页面的权限哦！</p>
                           <p className="des">你可以联系该页面的管理员~</p>                        
                         </div>
                         <div className="auth-list">
-                            <div className="auth-item">
-                              <img src={require('../../../assets/images/default.jpg')} alt=""/>
-                              <p className="title">111111</p> 
-                              <p className="des">ID：111111</p> 
-                            </div>  
+                          {
+                            this.state.admin && this.state.admin.map((item) => (
+                              <div className="auth-item" key={item.id}>
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}`:require('../../../assets/images/default.jpg')} alt=""/>
+                                <p className="title">{item.nickname}</p> 
+                                <p className="des">ID：{item.id}</p> 
+                              </div>                               
+                            ))
+                          }
                         </div>
                       </div>
                     </Modal>

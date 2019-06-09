@@ -53,6 +53,8 @@ class Page extends Component {
           lockTimer: null
         }
         this.generateSaveStatus = this.generateSaveStatus.bind(this);
+        this.publishPost = this.publishPost.bind(this);
+        this.cleanTimer = this.cleanTimer.bind(this);
     }
 
 
@@ -91,7 +93,7 @@ class Page extends Component {
                 type: ''            
             };
             let post = res.result;
-            if (res.post.belongGroup) {
+            if (post && post.belongGroup) {
               space.id = post.belongGroup.id;
               space.name = post.belongGroup.nickname;
               space.type = GROUP
@@ -100,7 +102,7 @@ class Page extends Component {
               space.name = post.author.nickname;
               space.type = USER;
             }
-            let content = post.content && JSON.parse(post.content);
+            let content = post.content && JSON.parse(unescape(post.content));
             this.setState({
               title: post.title,
               isAuth: post.isAuth,
@@ -125,13 +127,14 @@ class Page extends Component {
               })
             }
           } else {
-            this.showTooltip(res.msg);
+            this.showTooltip(res.msg || "获取文章失败:(");
             setTimeout(() => {
               history.goBack();
             }, 1000);
           }
         })
         .catch((err) => {
+          this.showTooltip("获取文章失败:(")
           console.log(err);
         })
       } else {
@@ -197,6 +200,14 @@ class Page extends Component {
       })
     }
 
+    cleanTimer () {
+      clearTimeout(this.state.changeTimer);
+      clearTimeout(this.state.lockTimer);
+      this.setState({
+        lockTimer: null,
+        changeTimer: null
+      })
+    }
     componentWillUnmount () {
       clearTimeout(this.state.changeTimer);
       clearTimeout(this.state.lockTimer);
@@ -322,7 +333,14 @@ class Page extends Component {
      * 发布图片
      */
     publishPost () {
+      this.refs.loading.toggle();
       let state = this.state;
+      let base;
+      if (state.type === MIND) {
+        base = this.mind.saveBase();
+      } else if (state.type === FLOW) {
+        base = this.flow.saveBase();
+      }
       let params = {
         token: this.props.userStore.user.token,
         userId: this.props.userStore.user.userId,
@@ -333,7 +351,7 @@ class Page extends Component {
         }),
         isAuth: state.isAuth,
         publish: 1,
-        imgbase: state.imgBase
+        imgbase: base
       };
 
       // 加入团队信息
@@ -352,6 +370,7 @@ class Page extends Component {
             let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
             this.props.history.push(url);
           } else {
+            this.cleanTimer();
             this.showTooltip( res.msg || "发布图画失败")
           }
         })
@@ -369,6 +388,7 @@ class Page extends Component {
               let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
             } else {
+              this.cleanTimer();
               this.showTooltip( res.msg || "发布图画失败")
             }
           })
@@ -384,6 +404,7 @@ class Page extends Component {
               let url = `/gallery/${state.space.type === USER ? "user" : "group"}/${state.space.id}/${res.result.id}`
               this.props.history.push(url);
             } else {
+              this.cleanTimer();
               this.showTooltip( res.msg || "发布图画失败")
             }
           })
@@ -525,6 +546,9 @@ class Page extends Component {
                     )}/>
                     <Route path="/photo/edit/mind" ref="mind" render={(props) => (
                       <Mind {...props}
+                          ref={(ref) => {
+                            this.mind = ref
+                          }}
                           chart={this.state.chart}
                           update={this.updateChartData.bind(this)}
                           getBase64={this.getChartBase.bind(this)}
@@ -532,6 +556,9 @@ class Page extends Component {
                     )} />
                     <Route path="/photo/edit/flow" ref="flow" render={(props) => (
                       <Flow {...props}
+                            ref={(ref) => {
+                              this.flow = ref
+                            }}
                             chart={this.state.chart}
                             update={this.updateChartData.bind(this)}
                             getBase64={this.getChartBase.bind(this)}

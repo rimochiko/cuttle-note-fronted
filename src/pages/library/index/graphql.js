@@ -23,7 +23,7 @@ function userPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 0,
-        isFind: ${args.isFind}
+        isFind: ${args.isFind > 0}
       ) {
         code,
         msg,
@@ -79,7 +79,7 @@ function groupPostQuery (args) {
         userId: "${args.userId}",
         token: "${args.token}",
         type: 0,
-        isFind: ${args.isFind},
+        isFind: ${args.isFind > 0},
         groupId: "${args.groupId}"
       ) {
         code,
@@ -101,6 +101,11 @@ function groupPostQuery (args) {
      ) {
        code,
        msg,
+       admin {
+         id,
+         nickname,
+         avatar
+       }
        result {
         id
         status

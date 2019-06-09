@@ -125,7 +125,7 @@ class Page extends Component {
     }
 
     if (type === 'mail') {
-      let reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+      let reg = new RegExp(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/);
       if (!this.state.mail) {
         this.setState({
           isMailTipHide: false,

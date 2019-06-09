@@ -204,23 +204,27 @@ function deleteDraft ({token, userId, draftId}) {
         }
         `;
         return axios.post('/graphql', {query});   
-    }
+}
     
-    function lockPost ({
-        token,
-        userId,
-        postId
-    }) {
-        // 0-加锁成功,1-他人正在编辑,2-内容有变动
-        const query = `
+function lockPost ({
+    token,
+    userId,
+    postId
+}) {
+    // 0-加锁成功,1-他人正在编辑,2-内容有变动
+    const query = `
+    mutation {
+        data:
         lockPost(
             userId: "${userId}",
             token: "${token}",
-            postId: ${postId}
+            postId: ${postId},
+            isUpdate: false
         ) {
+            msg,
             code
-            msg
-        }
-        `
-        return axios.post('/graphql', {query});   
+        }      
+    }
+    `
+    return axios.post('/graphql', {query});   
 }

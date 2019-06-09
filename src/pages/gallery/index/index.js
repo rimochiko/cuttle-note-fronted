@@ -42,10 +42,12 @@ class Page extends Component {
             },
             spaceList: [],
             draftList: [],
-            isAuth: false,
+            admin: [],
+            isAuth: 0,
             tipText: ''
         }
         this.generateOption = this.generateOption.bind(this);
+        this.showRemovePost = this.showRemovePost.bind(this);
     }
     
     async componentDidMount () {
@@ -120,7 +122,7 @@ class Page extends Component {
       this.state.spaceList.forEach((item) => {
         if (item.id === owner.id) {
           this.setState({
-            isAuth: true
+            isAuth: item.role
           })
         }
       })
@@ -143,8 +145,11 @@ class Page extends Component {
           let res = data.data.data;
           if(res.code === 0) {
             // 请求成功
+            let post = res.result;
+            post.title = unescape(post.title);
+            post.content = unescape(post.content);
             this.setState({
-              post: res.result
+              post
             })
           } else {
             this.showTooltip(res.msg || "请求文章失败:(");
@@ -224,12 +229,23 @@ class Page extends Component {
            draftList: drafts.result || []
          })
        } else {
-         this.setState({
-           isAuth: false,
-           posts: [],
-           draftList: []
-         })
-         this.showTooltip('无权访问或该空间不存在:(');
+        this.setState({
+          posts: [],
+          draftList: [],
+          isAuth: 0
+        })
+        if (posts.code === 4) {
+          this.setState({
+            admin: posts.admin || []
+          })
+          this.refs.auth.toggle();
+          return;
+        }
+        if (posts.code === 8) {
+          this.props.history.push('/404');
+          return;
+        }
+        this.showTooltip(posts.msg || '无权访问或该空间不存在:(');
        }
      })
      .catch((err) => {
@@ -387,7 +403,7 @@ class Page extends Component {
       if (this.state.post.status === 0) {
         return "草稿文章会被直接删除，确定要执行？"
       }
-      return "确定要移入回收站？（15天内可恢复）";
+      return "确定要移入回收站？";
     }
   
     toggleCreate () {
@@ -516,6 +532,25 @@ class Page extends Component {
                 <div className="flex-row overflow flex-1">
                     <Loading ref="loading"/>
                     <Tooltip ref="tooltip" text={this.state.tipText}/>
+                    <Modal title="访问提示" ref="auth" auth="1">
+                      <div className="auth-box">
+                        <div className="auth-header">
+                          <p className="title">Oh，你没有访问此页面的权限哦！</p>
+                          <p className="des">你可以联系该页面的管理员~</p>                        
+                        </div>
+                        <div className="auth-list">
+                          {
+                            this.state.admin && this.state.admin.map((item) => (
+                              <div className="auth-item" key={item.id}>
+                                <img src={item.avatar ? `http://localhost:8080/static/user/${item.avatar}`:require('../../../assets/images/default.jpg')} alt=""/>
+                                <p className="title">{item.nickname}</p> 
+                                <p className="des">ID：{item.id}</p> 
+                              </div>                               
+                            ))
+                          }
+                        </div>
+                      </div>
+                    </Modal>
                     <Modal title="草稿箱" ref="draft">
                       <div className="draft-box">
                         <div className="draft-header">
@@ -533,7 +568,7 @@ class Page extends Component {
                                                   groupName: owner && owner.type === GROUP ? owner.name:null}}} 
                                       className="title">{item.title}</Link>
                                 <p className="des">
-                                  我保存于{item.date} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
+                                  我保存于{item.recentTime} · <span className="link" onClick={this.deleteDraft.bind(this, item.id)}>舍弃</span>
                                 </p>
                               </div>  
                             )

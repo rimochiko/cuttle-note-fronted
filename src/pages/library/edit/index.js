@@ -104,9 +104,9 @@ class Page extends Component {
               space.type = "user";
             }
             this.setState({
-              title: post.title,
+              title: unescape(post.title),
               isAuth: post.isAuth,
-              content: post.content,
+              content: unescape(post.content),
               lastSaveTime: post.recentTime,
               lastSaveUser: post.recentUser,
               parentId: post.parent,
@@ -118,7 +118,6 @@ class Page extends Component {
             if (this.state.space.type === GROUP) {
               this.setState({
                 lockTimer: setTimeout(() => {
-                  console.log('locker')
                   if (!this.refs.editBox) {
                     clearInterval(this.state.lockTimer);
                     this.setState({
@@ -126,10 +125,9 @@ class Page extends Component {
                     })
                   }
                   this.sendLock();
-                }, 15000)
+                }, 30000)
               })
             }
-
           } else {
             this.showTooltip(res.msg || "请求文章失败");
             setTimeout(() => {
@@ -164,6 +162,11 @@ class Page extends Component {
           parentId: (this.props.location.query && this.props.location.query.parentId) || null
         });
       }
+
+      const listener = ev => {
+        this.saveDraft();
+      };
+      window.removeEventListener('beforeunload', listener)
       this.refs.editBox.innerHTML = (this.state.post && this.state.post.content) || '';
       this.refs.loading.toggle();
     }

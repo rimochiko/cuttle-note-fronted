@@ -49,11 +49,14 @@ class App extends Component {
     let that = this;
     graph.on('afterchange', (e) => {
       that.props.update(graph.save());
-      let baseImg = graph._cfg._canvas._cfg.el.toDataURL("image/png");
-      that.props.getBase64(baseImg);
     })
   }
 
+  saveBase () {
+    let graph = this.refs.mind.graph;
+    let baseImg = graph._cfg._canvas._cfg.el.toDataURL("image/png");
+    return baseImg;
+  }
 
   render() {
     return (

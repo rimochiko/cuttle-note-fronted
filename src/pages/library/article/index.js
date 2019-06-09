@@ -216,7 +216,7 @@ class Section extends Component {
     generateBtn () {
         // 大于1，说明是团队成员身份
         if (this.state.isAuth > 1) {
-            if (this.state.isAuth === 4 || this.state.isAuth === 5) {
+            if (this.state.isAuth === 4 || this.state.isAuth === 6) {
                 return (
                     <p>
                         <Link title="编辑" to={{pathname:'/article/edit', 

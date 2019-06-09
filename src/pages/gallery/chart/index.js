@@ -40,7 +40,7 @@ class Section extends Component {
 
     componentWillReceiveProps (nextProps) {
         if (this.props.post && (nextProps.post !== this.props.post)) {
-            let content =  JSON.parse(unescape(nextProps.post.content));
+            let content =  JSON.parse(nextProps.post.content);
             let post = Object.assign({},nextProps.post, {
                 imgType: content && content.type,
                 content: content && content.chart
@@ -53,8 +53,11 @@ class Section extends Component {
     }
 
     componentDidMount() {
-        if (this.refs.graph) {
-            this.refs.graph.graph.changeMode('readOnly');
+        console.log(this.graph);
+        if (this.graph) {
+            console.log(this.graph);
+            console.log(this.graph.current);
+            //this.graph.current.graph.graph.changeMode('readOnly');
         }
     }
 
@@ -239,7 +242,7 @@ class Section extends Component {
             return (
                 <GGEditor>
                     <Mind  className="edit-canvas"
-                            ref="graph"
+                            ref={ref=> this.graph = ref}
                             style={{ width: 980, height: 500 }} 
                             data={this.state.post.content || {
                                 roots: [{
@@ -253,7 +256,7 @@ class Section extends Component {
             return (
                 <GGEditor>
                 <Flow  className="edit-canvas"
-                        ref="graph"
+                        ref={ref=> this.graph = ref}
                         style={{ width: 980, height: 500 }} 
                         data={this.state.post.content || {
                             nodes: [],
